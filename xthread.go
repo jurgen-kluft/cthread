@@ -2,9 +2,9 @@ package main
 
 import (
 	"github.com/jurgen-kluft/xcode"
-	"github.com/jurgen-kluft/xrandom/package"
+	"github.com/jurgen-kluft/xthread/package"
 )
 
 func main() {
-	xcode.Generate(xrandom.GetPackage())
+	xcode.Generate(xthread.GetPackage())
 }
