@@ -1,6 +1,6 @@
 #ifndef __XMTHREAD_EVENT_WIN32_H__
 #define __XMTHREAD_EVENT_WIN32_H__
-#include "xbase\x_target.h"
+#include "xbase/x_target.h"
 
 #include <Windows.h>
 
@@ -12,10 +12,9 @@ namespace xcore
 					xevent_impl(bool autoReset);		
 					~xevent_impl();
 
-		void		setImpl();
-		void		waitImpl();
-		bool		waitImpl(u32 milliseconds);
-		void		resetImpl();
+		void		event_set();
+		void		event_wait();
+		void		event_reset();
 
 	private:
 		HANDLE		_event;
@@ -24,7 +23,7 @@ namespace xcore
 	//
 	// inlines
 	//
-	inline void xevent_impl::setImpl()
+	inline void xevent_impl::event_set()
 	{
 		if (!SetEvent(_event))
 		{
@@ -33,7 +32,7 @@ namespace xcore
 	}
 
 
-	inline void xevent_impl::resetImpl()
+	inline void xevent_impl::event_reset()
 	{
 		if (!ResetEvent(_event))
 		{

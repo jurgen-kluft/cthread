@@ -1,11 +1,11 @@
-#include "xbase\x_target.h"
-#include "xbase\x_debug.h"
-#include "xbase\x_allocator.h"
+#include "xbase/x_target.h"
+#include "xbase/x_debug.h"
+#include "xbase/x_allocator.h"
 
-#include "xmthread\x_threadpool.h"
-#include "xmthread\x_runnableadapter.h"
-#include "xmthread\x_thread.h"
-#include "xmthread\x_event.h"
+#include "xthread/x_threadpool.h"
+#include "xthread/x_runnableadapter.h"
+#include "xthread/x_thread.h"
+#include "xthread/x_event.h"
 
 #include "xunittest\xunittest.h"
 

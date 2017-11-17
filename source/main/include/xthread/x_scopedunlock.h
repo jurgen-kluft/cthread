@@ -1,6 +1,6 @@
 #ifndef __XMTHREAD_SCOPEDUNLOCK_H__
 #define __XMTHREAD_SCOPEDUNLOCK_H__
-#include "xbase\x_target.h"
+#include "xbase/x_target.h"
 
 namespace xcore
 {

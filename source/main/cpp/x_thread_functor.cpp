@@ -1,8 +1,6 @@
-#include "xthread/x_mutex.h"
+#include "xthread/x_thread_functor.h"
 
 namespace xcore
 {
-
-
 
 } // namespace xcore

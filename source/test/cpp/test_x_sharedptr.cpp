@@ -1,8 +1,8 @@
-#include "xbase\x_target.h"
-#include "xbase\x_debug.h"
-#include "xbase\x_allocator.h"
+#include "xbase/x_target.h"
+#include "xbase/x_debug.h"
+#include "xbase/x_allocator.h"
 
-#include "xmthread\x_sharedptr.h"
+#include "xthread/x_sharedptr.h"
 
 #include "xunittest\xunittest.h"
 

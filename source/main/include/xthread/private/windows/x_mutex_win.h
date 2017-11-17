@@ -1,6 +1,6 @@
 #ifndef __XMTHREAD_MUTEX_WIN32_H__
 #define __XMTHREAD_MUTEX_WIN32_H__
-#include "xbase\x_target.h"
+#include "xbase/x_target.h"
 
 #include <Windows.h>
 
@@ -12,33 +12,30 @@ namespace xcore
 							xmutex_impl();
 							~xmutex_impl();
 
-		void				lockImpl();
-		bool				tryLockImpl();
-		bool				tryLockImpl(u32 milliseconds);
-		void				unlockImpl();
+		void				mutex_lock();
+		bool				mutex_tryLock();
+		void				mutex_unlock();
 
 	private:
 		CRITICAL_SECTION	_cs;
 	};
 
-	typedef xmutex_impl FastMutexImpl;
-
 	//
 	// inlines
 	//
-	inline void xmutex_impl::lockImpl()
+	inline void xmutex_impl::mutex_lock()
 	{
 		EnterCriticalSection(&_cs);
 	}
 
 
-	inline bool xmutex_impl::tryLockImpl()
+	inline bool xmutex_impl::mutex_tryLock()
 	{
 		return TryEnterCriticalSection(&_cs) != 0;
 	}
 
 
-	inline void xmutex_impl::unlockImpl()
+	inline void xmutex_impl::mutex_unlock()
 	{
 		LeaveCriticalSection(&_cs);
 	}

@@ -1,4 +1,4 @@
-#include "xmthread\x_semaphore.h"
+#include "xthread/x_semaphore.h"
 
 namespace xcore 
 {

@@ -1,31 +1,29 @@
 #ifndef __XMTHREAD_ATOMICCOUNTER_H__
 #define __XMTHREAD_ATOMICCOUNTER_H__
 
-#include "xbase\x_target.h"
-
-#if !defined(TARGET_PC)
-	#include "xmthread\x_mutex.h"
-#endif // TARGET
+#include "xbase/x_target.h"
 
 namespace xcore 
 {
-	/// This class implements a simple counter, which
-	/// provides atomic operations that are safe to
-	/// use in a multithreaded environment.
-	///
-	/// Typical usage of xatomcnt is for implementing
-	/// reference counting and similar things.
-	///
-	/// On some platforms, the implementation of xatomcnt
-	/// is based on atomic primitives specific to the platform
-	/// (such as InterlockedIncrement, etc. on Windows), and
-	/// thus very efficient. On platforms that do not support
-	/// atomic primitives, operations are guarded by a xfastmutex.
-	///
-	/// The following platforms currently have atomic primitives:
-	///   - Windows
-	///   - PS3
-	///   - Xbox 360
+	// This class implements a simple counter, which
+	// provides atomic operations that are safe to
+	// use in a multithreaded environment.
+	//
+	// Typical usage of xatomcnt is for implementing
+	// reference counting and similar things.
+	//
+	// On some platforms, the implementation of xatomcnt
+	// is based on atomic primitives specific to the platform
+	// (such as InterlockedIncrement, etc. on Windows), and
+	// thus very efficient. On platforms that do not support
+	// atomic primitives, operations are guarded by a xfastmutex.
+	//
+	// The following platforms currently have atomic primitives:
+	//   - Windows
+	//   - PS3
+	//   - Xbox 360
+	//   - PS4
+	//   - Xbox One
 	class xatomcnt
 	{
 	public:
@@ -73,17 +71,8 @@ namespace xcore
 
 	private:
 #if defined(TARGET_PC)
-		typedef volatile u32 ximpl_t;
-#else
-		// generic implementation based on xfastmutex
-		struct ximpl_t
-		{
-			mutable xfastmutex mutex;
-			volatile s32      value;
-		};
+		volatile u32	_counter;
 #endif // TARGET_PC
-
-		ximpl_t			_counter;
 	};
 
 
@@ -116,81 +105,52 @@ namespace xcore
 
 #else
 	//
-	// Generic implementation based on xfastmutex
+	// Generic implementation 
 	//
 	inline xatomcnt::operator xatomcnt::xvalue_t () const
 	{
-		xvalue_t result;
-		{
-			xfastmutex::xscoped_lock lock(_counter.mutex);
-			result = _counter.value;
-		}
-		return result;
+		return _counter.value;
 	}
 
 
 	inline xatomcnt::xvalue_t xatomcnt::value() const
 	{
-		xvalue_t result;
-		{
-			xfastmutex::xscoped_lock lock(_counter.mutex);
-			result = _counter.value;
-		}
-		return result;
+		return _counter.value;
 	}
 
 
 	inline xatomcnt::xvalue_t xatomcnt::operator ++ () // prefix
 	{
-		xvalue_t result;
-		{
-			xfastmutex::xscoped_lock lock(_counter.mutex);
-			result = ++_counter.value;
-		}
-		return result;
+		--_counter.value;
+		return _counter.value;
 	}
 
 
 	inline xatomcnt::xvalue_t xatomcnt::operator ++ (s32) // postfix
 	{
-		xvalue_t result;
-		{
-			xfastmutex::xscoped_lock lock(_counter.mutex);
-			result = _counter.value++;
-		}
+		xvalue_t result = _counter.value;
+		_counter.value += 1;
 		return result;
 	}
 
 
 	inline xatomcnt::xvalue_t xatomcnt::operator -- () // prefix
 	{
-		xvalue_t result;
-		{
-			xfastmutex::xscoped_lock lock(_counter.mutex);
-			result = --_counter.value;
-		}
+		--_counter.value;
+		xvalue_t result = _counter.value;
 		return result;
 	}
 
 
 	inline xatomcnt::xvalue_t xatomcnt::operator -- (s32) // postfix
 	{
-		xvalue_t result;
-		{
-			xfastmutex::xscoped_lock lock(_counter.mutex);
-			result = _counter.value--;
-		}
+		xvalue_t result = _counter.value--;
 		return result;
 	}
 
-
 	inline bool xatomcnt::operator ! () const
 	{
-		bool result;
-		{
-			xfastmutex::xscoped_lock lock(_counter.mutex);
-			result = _counter.value == 0;
-		}
+		bool result = _counter.value == 0;
 		return result;
 	}
 

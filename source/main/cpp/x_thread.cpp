@@ -1,9 +1,8 @@
-#include "xbase\x_target.h"
-#include "xbase\x_string_std.h"
+#include "xbase/x_target.h"
+#include "xbase/x_string_std.h"
 
-#include "xmthread\x_thread.h"
-#include "xmthread\x_mutex.h"
-#include "xmthread\x_threadlocal.h"
+#include "xthread/x_thread.h"
+#include "xthread/x_mutex.h"
 
 namespace xcore 
 {

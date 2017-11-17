@@ -1,6 +1,6 @@
-#include "xbase\x_target.h"
-#include "xbase\x_debug.h"
-#include "xmthread\private\x_semaphore_win32.h"
+#include "xbase/x_target.h"
+#include "xbase/x_debug.h"
+#include "xthread/private/windows/x_semaphore_win.h"
 
 namespace xcore 
 {

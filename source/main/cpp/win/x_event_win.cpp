@@ -1,4 +1,4 @@
-#include "xmthread\private\x_event_win32.h"
+#include "xthread/private/windows/x_event_win.h"
 
 namespace xcore 
 {
@@ -17,7 +17,7 @@ namespace xcore
 	}
 
 
-	void xevent_impl::waitImpl()
+	void xevent_impl::event_wait()
 	{
 		switch (WaitForSingleObject(_event, INFINITE))
 		{
@@ -29,19 +29,6 @@ namespace xcore
 		}
 	}
 
-	bool xevent_impl::waitImpl(u32 milliseconds)
-	{
-		switch (WaitForSingleObject(_event, milliseconds + 1))
-		{
-		case WAIT_TIMEOUT:
-			return false;
-		case WAIT_OBJECT_0:
-			return true;
-		default:
-			// wait for event failed
-			return false;
-		}
-	}
 
 
 } // namespace xcore

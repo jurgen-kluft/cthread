@@ -1,5 +1,4 @@
-#include "xmthread\x_event.h"
-#include "xmthread\x_synchronizedobject.h"
+#include "xthread/x_event.h"
 
 namespace xcore 
 {
@@ -7,10 +6,8 @@ namespace xcore
 	{
 	}
 
-
 	xevent::~xevent()
 	{
 	}
-
 
 } // namespace xcore

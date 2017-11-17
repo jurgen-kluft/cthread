@@ -1,201 +1,90 @@
 #ifndef __XMTHREAD_THREAD_H__
 #define __XMTHREAD_THREAD_H__
-#include "xbase\x_target.h"
+#include "xbase/x_target.h"
 
-#include "xmthread\x_mutex.h"
-#include "xmthread\x_threadlocal.h"
+#include "xthread/x_mutex.h"
 
 #if defined(TARGET_PC)
-#include "xmthread\private\x_thread_win32.h"
+#include "xthread/private/windows/x_thread_win.h"
+#elif defined(TARGET_OSX)
+#include "xthread/private/osx/x_thread_osx.h"
 #endif
 
 namespace xcore
 {
-	class xrunnable;
-	class xthread_ls;
+	class xthread_functor;
 
-	/// This class implements a platform-independent
-	/// wrapper to an operating system thread.
+	/// This class implements a platform-independent wrapper to an operating system thread.
 	///
-	/// Every xthread object gets a unique (within
-	/// its process) numeric thread ID.
-	/// Furthermore, a thread can be assigned a name.
-	/// The name of a thread can be changed at any time.
+	/// Every xthread object gets a unique (within its process) numeric thread ID.
 	class xthread : private xthread_impl
 	{
 	public:	
-		typedef xthread_impl::TIDImpl TID;
+							xthread();							/// Creates a thread. Call start() to start it.
+							xthread(const char* name);			/// Creates a named thread. Call start() to start it.
 
-		using xthread_impl::Callable;
+							~xthread();							/// Destroys the thread.
 
-		enum Priority
-			/// xthread priorities.
-		{
-			PRIO_LOWEST  = PRIO_LOWEST_IMPL, /// The lowest thread priority.
-			PRIO_LOW     = PRIO_LOW_IMPL,    /// A lower than normal thread priority.
-			PRIO_NORMAL  = PRIO_NORMAL_IMPL, /// The normal thread priority.
-			PRIO_HIGH    = PRIO_HIGH_IMPL,   /// A higher than normal thread priority.
-			PRIO_HIGHEST = PRIO_HIGHEST_IMPL /// The highest thread priority.
-		};
+		xthread_idx_t		get_idx() const;					/// Returns the unique thread ID of the thread.
+		xthread_tid_t		get_tid() const;					/// Returns the native thread ID of the thread.
 
-							xthread();
-		/// Creates a thread. Call start() to start it.
+		const char*			get_name() const;					/// Returns the name of the thread.
+		void				set_name(const char* name);			/// Sets the name of the thread.
 
-							xthread(const char* name);
-		/// Creates a named thread. Call start() to start it.
+		void				set_priority(EThreadPriority p);	/// Sets the thread's priority.
+		EThreadPriority		get_priority() const;				/// Returns the thread's priority.
 
-							~xthread();
-		/// Destroys the thread.
-
-		s32					id() const;
-		/// Returns the unique thread ID of the thread.
-
-		TID					tid() const;
-		/// Returns the native thread ID of the thread.
-
-		const char*			name() const;
-		/// Returns the name of the thread.
-
-		const char*			getName() const;
-		/// Returns the name of the thread.
-
-		void				setName(const char* name);
-		/// Sets the name of the thread.
-
-		void				setPriority(Priority prio);
-		/// Sets the thread's priority.
-		///
-		/// Some platform only allow changing a thread's priority
-		/// if the process has certain privileges.
-
-		Priority			getPriority() const;
-		/// Returns the thread's priority.
-
-		void				setOSPriority(s32 prio);
-		/// Sets the thread's priority, using an operating system specific
-		/// priority value. Use getMinOSPriority() and getMaxOSPriority() to
-		/// obtain mininum and maximum priority values.
-
-		s32					getOSPriority() const;
-		/// Returns the thread's priority, expressed as an operating system
-		/// specific priority value.
-		///
-		/// May return 0 if the priority has not been explicitly set.
-
-		static s32			getMinOSPriority();
-		/// Returns the mininum operating system-specific priority value,
-		/// which can be passed to setOSPriority().
-
-		static s32			getMaxOSPriority();
-		/// Returns the maximum operating system-specific priority value,
-		/// which can be passed to setOSPriority().
-
-		void				setStackSize(s32 size);
-		/// Sets the thread's stack size in bytes.
-		/// Setting the stack size to 0 will use the default stack size.
-		/// Typically, the real stack size is rounded up to the nearest
-		/// page size multiple.
-
-		s32					getStackSize() const;
-		/// Returns the thread's stack size in bytes.
-		/// If the default stack size is used, 0 is returned.
-
-		void				start(xrunnable& target);
-		/// Starts the thread with the given target.
-
-		void				start(Callable target, void* pData = 0);
-		/// Starts the thread with the given target and parameter.
+		void				start(xthread_functor* f);
 
 		void				join();
-		/// Waits until the thread completes execution.	
-		/// If multiple threads try to join the same
-		/// thread, the result is undefined.
-
 		void				join(u32 milliseconds);
-		/// Waits for at most the given interval for the thread
-		/// to complete. Throws a TimeoutException if the thread
-		/// does not complete within the specified time interval.
 
-		bool				tryJoin(u32 milliseconds);
-		/// Waits for at most the given interval for the thread
-		/// to complete. Returns true if the thread has finished,
-		/// false otherwise.
-
-		bool				isRunning() const;
-		/// Returns true if the thread is running.
-
-		static void			sleep(u32 milliseconds);
-		/// Suspends the current thread for the specified
-		/// amount of time.
-
-		static void			yield();
-		/// Yields cpu to other threads.
+		enum EState
+		{
+			STATE_CREATED  = 0,
+			STATE_RUNNING  = 1,
+			STATE_STOPPED  = 2
+		};
+		EState				get_state() const;					/// Returns state of the thread
 
 		static xthread*		current();
-		/// Returns the xthread object for the currently active thread.
-		/// If the current thread is the main thread, 0 is returned.
 
-		static TID			currentTid();
-		/// Returns the native thread ID for the current thread.    
-
-	protected:
-		xthread_ls*			tls();
-		/// Returns a reference to the thread's local storage.
-
-		void				makeName(char* str, s32 max_len);
-		/// Creates a unique name for a thread.
-
-		static s32			uniqueId();
-		/// Creates and returns a unique id for a thread.
+		static void			sleep(u32 milliseconds);
+		static void			yield();
+		static void			exit();
 
 	private:
 							xthread(const xthread&);
 		xthread&			operator = (const xthread&);
 
-		s32					_id;
+		u64					_id;
 		char				_name[64];
-		xthread_ls			_pTLS;
-		mutable xfastmutex	_mutex;
-
-		friend class xthread_ls;
-		friend class xpoolthread;
 	};
 
 
 	//
 	// inlines
 	//
-	inline xthread::TID xthread::tid() const
+	inline thread_tid_t xthread::get_tid() const
 	{
 		return tidImpl();
 	}
 
 
-	inline s32 xthread::id() const
+	inline thread_idx_t xthread::get_idx() const
 	{
 		return _id;
 	}
 
-
-	inline const char* xthread::name() const
+	inline const char* xthread::get_name() const
 	{
-		xfastmutex::xscoped_lock lock(_mutex);
 		return _name;
 	}
 
-
-	inline const char* xthread::getName() const
-	{
-		xfastmutex::xscoped_lock lock(_mutex);
-		return _name;
-	}
-
-
-	inline bool xthread::isRunning() const
+	inline bool xthread::get_state() const
 	{
 		return isRunningImpl();
 	}
-
 
 	inline void xthread::sleep(u32 milliseconds)
 	{
@@ -215,45 +104,15 @@ namespace xcore
 	}
 
 
-	inline void xthread::setOSPriority(s32 prio)
-	{
-		setOSPriorityImpl(prio);	
-	}
-
-
-	inline s32 xthread::getOSPriority() const
-	{
-		return getOSPriorityImpl();
-	}
-
-
-	inline s32 xthread::getMinOSPriority()
-	{
-		return xthread_impl::getMinOSPriorityImpl();
-	}
-
-
-	inline s32 xthread::getMaxOSPriority()
-	{
-		return xthread_impl::getMaxOSPriorityImpl();
-	}
-
-
-	inline void xthread::setStackSize(s32 size)
+	inline void xthread::set_stack_size(s32 size)
 	{
 		setStackSizeImpl(size);
 	}
 
 
-	inline s32 xthread::getStackSize() const
+	inline s32 xthread::get_stack_size() const
 	{
 		return getStackSizeImpl();
-	}
-
-
-	inline xthread::TID xthread::currentTid()
-	{
-		return currentTidImpl();
 	}
 
 

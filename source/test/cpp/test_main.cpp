@@ -1,6 +1,6 @@
-#include "xbase\x_base.h"
-#include "xbase\x_allocator.h"
-#include "xbase\x_string.h"
+#include "xbase/x_base.h"
+#include "xbase/x_allocator.h"
+#include "xbase/x_string.h"
 #include "xtime\x_time.h"
 
 #include "xunittest\xunittest.h"
