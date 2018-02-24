@@ -1,6 +1,9 @@
 #include "xbase/x_target.h"
 #include "xbase/x_debug.h"
-#include "xthread/private/osx/x_semaphore_osx.h"
+
+#ifdef TARGET_MAC
+
+#include "xthread/private/osx/x_semaphore_mac.h"
 
 namespace xcore 
 {
@@ -24,3 +27,6 @@ namespace xcore
 
 
 } // namespace xcore
+
+
+#endif

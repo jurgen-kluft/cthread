@@ -5,8 +5,8 @@
 
 #if defined(TARGET_PC)
 #include "xthread/private/windows/x_mutex_win.h"
-#elif defined(TARGET_OSX)
-#include "xthread/private/osx/x_mutex_osx.h"
+#elif defined(TARGET_MAC)
+#include "xthread/private/osx/x_mutex_mac.h"
 #endif
 
 

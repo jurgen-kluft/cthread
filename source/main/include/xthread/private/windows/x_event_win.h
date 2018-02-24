@@ -2,7 +2,6 @@
 #define __XMTHREAD_EVENT_WIN32_H__
 #include "xbase/x_target.h"
 
-#include <Windows.h>
 
 namespace xcore 
 {
@@ -17,28 +16,9 @@ namespace xcore
 		void		event_reset();
 
 	private:
-		HANDLE		_event;
+		void *		_event;
 	};
 
-	//
-	// inlines
-	//
-	inline void xevent_impl::event_set()
-	{
-		if (!SetEvent(_event))
-		{
-			// cannot signal event
-		}
-	}
-
-
-	inline void xevent_impl::event_reset()
-	{
-		if (!ResetEvent(_event))
-		{
-			// cannot reset event
-		}
-	}
 
 
 } // namespace xcore

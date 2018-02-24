@@ -2,7 +2,6 @@
 #define __XMTHREAD_SEMAPHORE_WIN32_H__
 #include "xbase/x_target.h"
 
-#include <Windows.h>
 
 namespace xcore 
 {
@@ -14,22 +13,11 @@ namespace xcore
 
 		void	sema_signal();
 		void	sema_wait();
+		bool	sema_try_wait(u32 milliseconds);
 
 	private:
-		HANDLE	_sema;
+		void*	_sema;
 	};
-
-
-	//
-	// inlines
-	//
-	inline void xsemaphore_impl::sema_signal()
-	{
-		if (!ReleaseSemaphore(_sema, 1, NULL))
-		{
-			// cannot signal semaphore
-		}
-	}
 
 
 } // namespace xcore

@@ -2,23 +2,21 @@
 #include "xbase/x_debug.h"
 #include "xbase/x_allocator.h"
 
-#include "xthread/x_namedevent.h"
+#include "xthread/x_event.h"
 #include "xthread/x_thread.h"
-#include "xthread/x_runnable.h"
-#include "xtime\x_datetime.h"
+#include "xthread/x_thread_functor.h"
+#include "xtime/x_datetime.h"
 
 #include "xunittest\xunittest.h"
 
 using xcore::xthread;
-using xcore::xrunnable;
 using xcore::xdatetime;
 
-
-static xcore::xnevent testEvent("TestEvent");
+static xcore::xevent testEvent;
 
 namespace
 {
-	class TestEvent: public xrunnable
+	class TestEvent: public xcore::xthread_functor
 	{
 	public:
 		void run()
@@ -38,7 +36,7 @@ namespace
 }
 
 
-UNITTEST_SUITE_BEGIN(xnevent)
+UNITTEST_SUITE_BEGIN(xevent)
 {
     UNITTEST_FIXTURE(main)
     {
@@ -49,7 +47,7 @@ UNITTEST_SUITE_BEGIN(xnevent)
 		{
 			xthread thr1;
 			TestEvent te;
-			thr1.start(te);
+			thr1.start(&te);
 			xdatetime now = xdatetime::sNow();
 			xthread::sleep(2000);
 			testEvent.set();
@@ -57,7 +55,7 @@ UNITTEST_SUITE_BEGIN(xnevent)
 			CHECK_TRUE (te.timestamp() > now);
 
 			xthread thr2;
-			thr2.start(te);
+			thr2.start(&te);
 			now = xdatetime::sNow();
 			xthread::sleep(2000);
 			testEvent.set();

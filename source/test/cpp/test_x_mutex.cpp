@@ -2,25 +2,23 @@
 #include "xbase/x_debug.h"
 #include "xbase/x_allocator.h"
 
-#include "xthread/x_namedmutex.h"
+#include "xthread/x_mutex.h"
 #include "xthread/x_thread.h"
-#include "xthread/x_runnable.h"
-#include "xtime\x_datetime.h"
+#include "xthread/x_thread_functor.h"
+#include "xtime/x_datetime.h"
 
-#include "xunittest\xunittest.h"
+#include "xunittest/xunittest.h"
 
-using xcore::xnmutex;
 using xcore::xthread;
-using xcore::xrunnable;
 using xcore::xdatetime;
 
 
-static xnmutex testMutex("TestMutex");
+static xcore::xmutex testMutex;
 
 
 namespace
 {
-	class TestLock: public xrunnable
+	class TestLock: public xcore::xthread_functor
 	{
 	public:
 		void run()
@@ -39,7 +37,7 @@ namespace
 		xdatetime _timestamp;
 	};
 
-	class TestTryLock: public xrunnable
+	class TestTryLock: public xcore::xthread_functor
 	{
 	public:
 		TestTryLock(): _locked(false)
@@ -65,7 +63,7 @@ namespace
 	};
 }
 
-UNITTEST_SUITE_BEGIN(xnmutex)
+UNITTEST_SUITE_BEGIN(xmutex)
 {
     UNITTEST_FIXTURE(main)
     {
@@ -77,7 +75,7 @@ UNITTEST_SUITE_BEGIN(xnmutex)
 			testMutex.lock();
 			xthread thr;
 			TestLock tl;
-			thr.start(tl);
+			thr.start(&tl);
 			xdatetime now = xdatetime::sNow();
 			xthread::sleep(2000);
 			testMutex.unlock();
@@ -90,14 +88,14 @@ UNITTEST_SUITE_BEGIN(xnmutex)
 		{
 			xthread thr1;
 			TestTryLock ttl1;
-			thr1.start(ttl1);
+			thr1.start(&ttl1);
 			thr1.join();
 			CHECK_TRUE (ttl1.locked());
 	
 			testMutex.lock();
 			xthread thr2;
 			TestTryLock ttl2;
-			thr2.start(ttl2);
+			thr2.start(&ttl2);
 			thr2.join();
 			testMutex.unlock();
 			CHECK_TRUE (!ttl2.locked());

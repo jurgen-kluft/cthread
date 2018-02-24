@@ -1,4 +1,7 @@
-#include "xthread/private/osx/x_event_osx.h"
+#include "xbase/x_target.h"
+
+#ifdef TARGET_MAC
+#include "xthread/private/osx/x_event_mac.h"
 
 namespace xcore 
 {
@@ -25,3 +28,5 @@ namespace xcore
 
 
 } // namespace xcore
+
+#endif

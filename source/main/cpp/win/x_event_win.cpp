@@ -1,4 +1,8 @@
+#include "xbase/x_target.h"
+
+#ifdef TARGET_PC
 #include "xthread/private/windows/x_event_win.h"
+#include <Windows.h>
 
 namespace xcore 
 {
@@ -29,6 +33,27 @@ namespace xcore
 		}
 	}
 
+	//
+	// inlines
+	//
+	void xevent_impl::event_set()
+	{
+		if (!SetEvent(_event))
+		{
+			// cannot signal event
+		}
+	}
+
+
+	void xevent_impl::event_reset()
+	{
+		if (!ResetEvent(_event))
+		{
+			// cannot reset event
+		}
+	}
 
 
 } // namespace xcore
+
+#endif

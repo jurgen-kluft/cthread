@@ -4,8 +4,8 @@
 
 #if defined(TARGET_PC)
 #include "xthread/private/windows/x_event_win.h"
-#elif defined(TARGET_OSX)
-#include "xthread/private/osx/x_event_osx.h"
+#elif defined(TARGET_MAC)
+#include "xthread/private/osx/x_event_mac.h"
 #endif
 
 

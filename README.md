@@ -1,15 +1,11 @@
-# xthread
+# xthread, cross platform thread library (c++)
 
-cross platform thread library
+- windows
+- mac
 
+- thread create/destroy/pause/resume
 - primitives
   - mutex
-  - auto_reset_event
+  - event
   - semaphore
-  - rwlock
-- thread create/destroy/pause/resume
 
-Ideas:
-
-- thread pool
-- task scheduler

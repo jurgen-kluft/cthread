@@ -2,7 +2,7 @@
 #define __XMTHREAD_EVENT_OSX_H__
 #include "xbase/x_target.h"
 
-#include "xthread/private/osx/x_semaphore_osx.h"
+#include "xthread/private/osx/x_semaphore_mac.h"
 
 #include <pthread.h>
 #include <stdbool.h>

@@ -1,108 +1,89 @@
 #include "xbase/x_target.h"
-#include "xbase/x_string_std.h"
+#include "xbase/x_string_ascii.h"
 
 #include "xthread/x_thread.h"
 #include "xthread/x_mutex.h"
 
+#include <atomic>
+
 namespace xcore 
 {
-	static void copy_str(char* to, s32 max_len, const char* from)
+	static void sMakeName(xuchars& str, xthread::tid_t id)
 	{
-		for (s32 i=0; i<max_len; ++i)
-		{
-			to[i] = from[i];
-			if (from[i] == '\0')
-				break;
-		}
+		ascii::sprintf(str, xcuchars("#%d"), x_va(id));
+	}
+
+	static s32 sUniqueId()
+	{
+		static std::atomic<int> count(0);
+		return count++;
 	}
 
 	xthread::xthread()
-		: _id(uniqueId())
+		: ithread(ithread::config())
 	{
-		_name[0] = '\0';
-		_name[1] = '\0';
-		makeName(_name, sizeof(_name));
+		m_threadTid = (sUniqueId());
+		m_name[0] = '\0';
+		m_name[1] = '\0';
+		xuchars name(m_name, &m_name[sizeof(m_name) - 1]);
+		sMakeName(name, m_threadTid);
 	}
 
-	xthread::xthread(const char* name)
-		: _id(uniqueId())
+	xthread::xthread(const char* _name)
+		: ithread(ithread::config())
 	{
-		copy_str(_name, sizeof(_name), name);
+		m_threadTid = (sUniqueId());
+		xuchars name(m_name, &m_name[sizeof(m_name) - 1]);
+		ascii::copy(name, xcuchars(_name));
+	}
+
+	xthread::xthread(config const& cnfg)
+		: ithread(cnfg)
+	{
+		m_threadTid = (sUniqueId());
+		m_name[0] = '\0';
+		m_name[1] = '\0';
+		xuchars name(m_name, &m_name[sizeof(m_name) - 1]);
+		sMakeName(name, m_threadTid);
 	}
 
 	xthread::~xthread()
 	{
 	}
 
-	void xthread::setPriority(Priority prio)
+	void xthread::set_priority(e_priority prio)
 	{
-		setPriorityImpl(prio);
+		thread_set_priority(prio);
 	}
 
-	xthread::Priority xthread::getPriority() const
+	xthread::e_priority xthread::get_priority() const
 	{
-		return Priority(getPriorityImpl());
+		return thread_get_priority();
 	}
 
-	void xthread::start(xrunnable& target)
+	void xthread::start(xthread_functor* f)
 	{
-		startImpl(target);
-	}
-
-	void xthread::start(Callable target, void* pData)
-	{
-		startImpl(target, pData);
+		thread_start(f);
 	}
 
 	void xthread::join()
 	{
-		joinImpl();
+		thread_join();
 	}
 
-	void xthread::join(u32 milliseconds)
+	bool xthread::join(u32 milliseconds)
 	{
-		if (!joinImpl(milliseconds))
+		if (!thread_join(milliseconds))
 		{
 			// timeout
+			return false;
 		}
+		return true;
 	}
 
-
-	bool xthread::tryJoin(u32 milliseconds)
+	void xthread::set_name(const char* name)
 	{
-		return joinImpl(milliseconds);
-	}
-
-	xthread_ls* xthread::tls()
-	{
-		return &_pTLS;
-	}
-
-	void xthread::makeName(char* str, s32 max_len)
-	{
-		x_sprintf(str, max_len-1, "#%d", _id);
-	}
-
-	namespace
-	{
-		static xfastmutex uniqueIdMutex;
-	}
-
-
-	s32 xthread::uniqueId()
-	{
-		xfastmutex::xscoped_lock lock(uniqueIdMutex);
-
-		static unsigned count = 0;
-		++count;
-		return count;
-	}
-
-
-	void xthread::setName(const char* name)
-	{
-		xfastmutex::xscoped_lock lock(_mutex);
-		copy_str(_name, sizeof(_name), name);
+		ascii::copy(xuchars(m_name), xcuchars(name));
 	}
 
 

@@ -4,8 +4,8 @@
 
 #if defined(TARGET_PC)
 #include "xthread/private/windows/x_semaphore_win.h"
-#elif defined(TARGET_OSX)
-#include "xthread/private/osx/x_semaphore_osx.h"
+#elif defined(TARGET_MAC)
+#include "xthread/private/osx/x_semaphore_mac.h"
 #endif
 
 namespace xcore
@@ -52,6 +52,14 @@ namespace xcore
 		// be greater than zero. 
 		// Decrements the semaphore's value by one.
 
+		bool		try_wait(u32 milliseconds);
+		// Waits for the semaphore to become signalled.
+		// To become signalled, a semaphore's value must
+		// be greater than zero. 
+		// Decrements the semaphore's value by one.
+		// Returns false if there is a time-out and true
+		// if we got a signal.
+
 	private:
 					xsemaphore();
 					xsemaphore(const xsemaphore&);
@@ -74,6 +82,10 @@ namespace xcore
 		sema_wait();
 	}
 
+	inline bool	xsemaphore::try_wait(u32 milliseconds)
+	{
+		return sema_try_wait(milliseconds);
+	}
 
 } // namespace xcore
 

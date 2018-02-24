@@ -1,28 +1,26 @@
 #include "xbase/x_target.h"
 #include "xbase/x_debug.h"
 #include "xbase/x_allocator.h"
-#include "xbase/x_string_std.h"
+#include "xbase/x_string_ascii.h"
 
 #include "xthread/x_thread.h"
-#include "xthread/x_runnable.h"
-#include "xthread/x_threadtarget.h"
+#include "xthread/x_thread_functor.h"
+
 #include "xthread/x_event.h"
 
-#include "xtime\x_datetime.h"
-#include "xtime\x_timespan.h"
+#include "xtime/x_datetime.h"
+#include "xtime/x_timespan.h"
 
-#include "xunittest\xunittest.h"
+#include "xunittest/xunittest.h"
 
 using xcore::xthread;
-using xcore::xrunnable;
-using xcore::xthread_target;
 using xcore::xevent;
 using xcore::xdatetime;
 using xcore::xtimespan;
 using xcore::s32;
 
 
-class MyRunnable: public xrunnable
+class MyRunnable: public xcore::xthread_functor
 {
 public:
 	MyRunnable(): _ran(false)
@@ -33,7 +31,7 @@ public:
 	{
 		xthread* pThread = xthread::current();
 		if (pThread)
-			_threadName = pThread->name();
+			_threadName = pThread->get_name();
 		_ran = true;
 		_event.wait();
 	}
@@ -93,13 +91,13 @@ UNITTEST_SUITE_BEGIN(xthread)
 		{
 			xthread thread;
 			MyRunnable r;
-			CHECK_TRUE (!thread.isRunning());
-			thread.start(r);
+			CHECK_TRUE (!thread.is_running());
+			thread.start(&r);
 			xthread::sleep(200);
-			CHECK_TRUE (thread.isRunning());
+			CHECK_TRUE (thread.is_running());
 			r.notify();
 			thread.join();
-			CHECK_TRUE (!thread.isRunning());
+			CHECK_TRUE (!thread.is_running());
 			CHECK_TRUE (r.ran());
 			CHECK_NOT_NULL (r.threadName());
 			CHECK_FALSE ( *r.threadName() == '\0' );
@@ -110,7 +108,7 @@ UNITTEST_SUITE_BEGIN(xthread)
 		{
 			xthread thread("MyThread");
 			MyRunnable r;
-			thread.start(r);
+			thread.start(&r);
 			r.notify();
 			thread.join();
 			CHECK_TRUE (r.ran());
@@ -135,39 +133,39 @@ UNITTEST_SUITE_BEGIN(xthread)
 			MyRunnable r2;
 			MyRunnable r3;
 			MyRunnable r4;
-			CHECK_TRUE (!thread1.isRunning());
-			CHECK_TRUE (!thread2.isRunning());
-			CHECK_TRUE (!thread3.isRunning());
-			CHECK_TRUE (!thread4.isRunning());
-			thread1.start(r1);
+			CHECK_TRUE (!thread1.is_running());
+			CHECK_TRUE (!thread2.is_running());
+			CHECK_TRUE (!thread3.is_running());
+			CHECK_TRUE (!thread4.is_running());
+			thread1.start(&r1);
 			xthread::sleep(200);
-			CHECK_TRUE (thread1.isRunning());
-			CHECK_TRUE (!thread2.isRunning());
-			CHECK_TRUE (!thread3.isRunning());
-			CHECK_TRUE (!thread4.isRunning());
-			thread2.start(r2);
-			thread3.start(r3);
-			thread4.start(r4);
+			CHECK_TRUE (thread1.is_running());
+			CHECK_TRUE (!thread2.is_running());
+			CHECK_TRUE (!thread3.is_running());
+			CHECK_TRUE (!thread4.is_running());
+			thread2.start(&r2);
+			thread3.start(&r3);
+			thread4.start(&r4);
 			xthread::sleep(200);
-			CHECK_TRUE (thread1.isRunning());
-			CHECK_TRUE (thread2.isRunning());
-			CHECK_TRUE (thread3.isRunning());
-			CHECK_TRUE (thread4.isRunning());
+			CHECK_TRUE (thread1.is_running());
+			CHECK_TRUE (thread2.is_running());
+			CHECK_TRUE (thread3.is_running());
+			CHECK_TRUE (thread4.is_running());
 			r4.notify();
 			thread4.join();
-			CHECK_TRUE (!thread4.isRunning());
-			CHECK_TRUE (thread1.isRunning());
-			CHECK_TRUE (thread2.isRunning());
-			CHECK_TRUE (thread3.isRunning());
+			CHECK_TRUE (!thread4.is_running());
+			CHECK_TRUE (thread1.is_running());
+			CHECK_TRUE (thread2.is_running());
+			CHECK_TRUE (thread3.is_running());
 			r3.notify();
 			thread3.join();
-			CHECK_TRUE (!thread3.isRunning());
+			CHECK_TRUE (!thread3.is_running());
 			r2.notify();
 			thread2.join();
-			CHECK_TRUE (!thread2.isRunning());
+			CHECK_TRUE (!thread2.is_running());
 			r1.notify();
 			thread1.join();
-			CHECK_TRUE (!thread1.isRunning());
+			CHECK_TRUE (!thread1.is_running());
 
 			CHECK_TRUE (r1.ran());
 			CHECK_EQUAL(r1.threadName(), "Thread1");
@@ -187,36 +185,14 @@ UNITTEST_SUITE_BEGIN(xthread)
 		{
 			xthread thread;
 			MyRunnable r;
-			CHECK_TRUE (!thread.isRunning());
-			thread.start(r);
+			CHECK_TRUE (!thread.is_running());
+			thread.start(&r);
 			xthread::sleep(200);
-			CHECK_TRUE (thread.isRunning());
-			CHECK_TRUE (!thread.tryJoin(100));
+			CHECK_TRUE (thread.is_running());
+			CHECK_TRUE (!thread.join(100));
 			r.notify();
-			CHECK_TRUE (thread.tryJoin(500));
-			CHECK_TRUE (!thread.isRunning());
-		}
-
-
-		UNITTEST_TEST(testThreadTarget)
-		{
-			xthread_target te(&MyRunnable::staticFunc);
-			xthread thread;
-
-			CHECK_TRUE (!thread.isRunning());
-
-			s32 tmp = MyRunnable::_staticVar;
-			thread.start(te);
-			thread.join();
-			CHECK_TRUE (tmp + 1 == MyRunnable::_staticVar);
-
-			xthread_target te1(freeFunc);
-			CHECK_TRUE (!thread.isRunning());
-
-			tmp = MyRunnable::_staticVar;
-			thread.start(te1);
-			thread.join();
-			CHECK_TRUE (tmp + 1 == MyRunnable::_staticVar);
+			CHECK_TRUE (thread.join(500));
+			CHECK_TRUE (!thread.is_running());
 		}
 
 
@@ -224,17 +200,19 @@ UNITTEST_SUITE_BEGIN(xthread)
 		{
 			xthread thread;
 
-			CHECK_TRUE (!thread.isRunning());
+			CHECK_TRUE (!thread.is_running());
+
+			MyRunnable f;
 
 			s32 tmp = MyRunnable::_staticVar;
-			thread.start(freeFunc, &tmp);
+			thread.start(&f);
 			thread.join();
 			CHECK_TRUE (tmp * 2 == MyRunnable::_staticVar);
 
-			CHECK_TRUE (!thread.isRunning());
+			CHECK_TRUE (!thread.is_running());
 
 			tmp = MyRunnable::_staticVar = 0;
-			thread.start(freeFunc, &tmp);
+			thread.start(&f);
 			thread.join();
 			CHECK_TRUE (0 == MyRunnable::_staticVar);
 		}
@@ -244,35 +222,11 @@ UNITTEST_SUITE_BEGIN(xthread)
 		{
 			s32 stackSize = 50000000;
 
-			xthread thread;
-			CHECK_TRUE (0x2000 == thread.getStackSize());
-			thread.setStackSize(stackSize);
-			CHECK_TRUE (stackSize <= thread.getStackSize());
-			s32 tmp = MyRunnable::_staticVar;
-			thread.start(freeFunc, &tmp);
-			thread.join();
-			CHECK_TRUE (tmp * 2 == MyRunnable::_staticVar);
-
-			stackSize = 1;
-			thread.setStackSize(stackSize);
-		#ifdef PTHREAD_STACK_MIN
-			CHECK_TRUE (PTHREAD_STACK_MIN == thread.getStackSize());
-		#else
-			CHECK_TRUE (stackSize >= thread.getStackSize());
-		#endif
-			tmp = MyRunnable::_staticVar;
-			thread.start(freeFunc, &tmp);
-			thread.join();
-			CHECK_TRUE (tmp * 2 == MyRunnable::_staticVar);
-
-			thread.setStackSize(0);
-			CHECK_TRUE (0 == thread.getStackSize());
-			tmp = MyRunnable::_staticVar;
-			thread.start(freeFunc, &tmp);
-			thread.join();
-			CHECK_TRUE (tmp * 2 == MyRunnable::_staticVar);
+			xthread::config cnfg;
+			cnfg.m_stack_size = stackSize;
+			xthread thread(cnfg);
+			CHECK_TRUE (stackSize == thread.get_stacksize());
 		}
-
 
 		UNITTEST_TEST(testSleep)
 		{

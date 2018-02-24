@@ -1,6 +1,9 @@
 #include "xbase/x_target.h"
 #include "xbase/x_debug.h"
+
+#ifdef TARGET_PC
 #include "xthread/private/windows/x_semaphore_win.h"
+#include <Windows.h>
 
 namespace xcore 
 {
@@ -15,14 +18,23 @@ namespace xcore
 		}
 	}
 
-
 	xsemaphore_impl::~xsemaphore_impl()
 	{
 		CloseHandle(_sema);
 	}
 
+	//
+	// inlines
+	//
+	void xsemaphore_impl::sema_signal()
+	{
+		if (!ReleaseSemaphore(_sema, 1, NULL))
+		{
+			// cannot signal semaphore
+		}
+	}
 
-	void xsemaphore_impl::waitImpl()
+	void xsemaphore_impl::sema_wait()
 	{
 		switch (WaitForSingleObject(_sema, INFINITE))
 		{
@@ -34,20 +46,20 @@ namespace xcore
 		}
 	}
 
-
-	bool xsemaphore_impl::waitImpl(u32 milliseconds)
+	bool	xsemaphore_impl::sema_try_wait(u32 milliseconds)
 	{
-		switch (WaitForSingleObject(_sema, milliseconds + 1))
+		switch (WaitForSingleObject(_sema, milliseconds))
 		{
-		case WAIT_TIMEOUT:
-			return false;
 		case WAIT_OBJECT_0:
 			return true;
 		default:
 			// wait for semaphore failed
-			return false;
+			break;
 		}
+		return false;
 	}
 
 
 } // namespace xcore
+
+#endif

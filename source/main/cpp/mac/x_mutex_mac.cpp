@@ -1,5 +1,7 @@
-#include "xthread/private/osx/x_mutex_osx.h"
 #include "xtime/x_datetime.h"
+
+#ifdef TARGET_MAC
+#include "xthread/private/osx/x_mutex_mac.h"
 
 namespace xcore
 {
@@ -18,6 +20,6 @@ namespace xcore
 		pthread_mutex_destroy(&_mutex);
 	}
 
-
-
 } // namespace xcore
+
+#endif

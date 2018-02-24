@@ -2,7 +2,6 @@
 #define __XMTHREAD_MUTEX_WIN32_H__
 #include "xbase/x_target.h"
 
-#include <Windows.h>
 
 namespace xcore 
 {
@@ -17,28 +16,9 @@ namespace xcore
 		void				mutex_unlock();
 
 	private:
-		CRITICAL_SECTION	_cs;
+		u64					_cs[8];
 	};
 
-	//
-	// inlines
-	//
-	inline void xmutex_impl::mutex_lock()
-	{
-		EnterCriticalSection(&_cs);
-	}
-
-
-	inline bool xmutex_impl::mutex_tryLock()
-	{
-		return TryEnterCriticalSection(&_cs) != 0;
-	}
-
-
-	inline void xmutex_impl::mutex_unlock()
-	{
-		LeaveCriticalSection(&_cs);
-	}
 
 } // namespace xcore
 
