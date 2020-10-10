@@ -7,37 +7,48 @@
 
 namespace xcore
 {
-	xmutex_impl::xmutex_impl()
+	struct xmutex_data
 	{
+		CRITICAL_SECTION _cs;
+	};
+
+	xmutex::xmutex()
+	{
+		xmutex_data* data = (xmutex_data*)m_data;
+
 		// the func has a boolean return value under WInnNt/2000/XP but not on Win98
 		// the return only checks if the input address of &_cs was valid, so it is 
 		// safe to omit it.
-		InitializeCriticalSectionAndSpinCount((CRITICAL_SECTION*)&_cs, 4000);
+		InitializeCriticalSectionAndSpinCount((CRITICAL_SECTION*)&data->_cs, 4000);
 	}
 
-	xmutex_impl::~xmutex_impl()
+	xmutex::~xmutex()
 	{
-		DeleteCriticalSection((CRITICAL_SECTION*)&_cs);
+		xmutex_data* data = (xmutex_data*)m_data;
+		DeleteCriticalSection((CRITICAL_SECTION*)&data->_cs);
 	}
 
 	//
 	// inlines
 	//
-	void xmutex_impl::mutex_lock()
+	void xmutex::lock()
 	{
-		EnterCriticalSection((CRITICAL_SECTION*)&_cs);
+		xmutex_data* data = (xmutex_data*)m_data;
+		EnterCriticalSection((CRITICAL_SECTION*)&data->_cs);
 	}
 
 
-	bool xmutex_impl::mutex_tryLock()
+	bool xmutex::tryLock()
 	{
-		return TryEnterCriticalSection((CRITICAL_SECTION*)&_cs) != 0;
+		xmutex_data* data = (xmutex_data*)m_data;
+		return TryEnterCriticalSection((CRITICAL_SECTION*)&data->_cs) != 0;
 	}
 
 
-	void xmutex_impl::mutex_unlock()
+	void xmutex::unlock()
 	{
-		LeaveCriticalSection((CRITICAL_SECTION*)&_cs);
+		xmutex_data* data = (xmutex_data*)m_data;
+		LeaveCriticalSection((CRITICAL_SECTION*)&data->_cs);
 	}
 
 } // namespace xcore

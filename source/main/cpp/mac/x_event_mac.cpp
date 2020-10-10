@@ -1,29 +1,38 @@
 #include "xbase/x_target.h"
 
 #ifdef TARGET_MAC
-#include "xthread/private/osx/x_event_mac.h"
+#include "xthread/x_event.h"
 
 namespace xcore 
 {
-	xevent_impl::xevent_impl(bool autoReset)
+	struct xevent_data
 	{
-		pthread_mutex_init(&_mutex, 0);
-		pthread_cond_init(&_cond, 0);
-		_triggered = false;
+		pthread_mutex_t	_mutex;
+		pthread_cond_t	_cond;
+		bool			_triggered;
+	};
+
+	xevent::xevent(bool autoReset)
+	{
+		xevent_data* data = (xevent_data*)m_data;
+		pthread_mutex_init(&data->_mutex, 0);
+		pthread_cond_init(&data->_cond, 0);
+		data->_triggered = false;
 	}
 
-	xevent_impl::~xevent_impl()
+	xevent::~xevent()
 	{
 		
 	}
 
 
-	void xevent_impl::event_wait()
+	void xevent_impl::wait()
 	{
-		pthread_mutex_lock(&_mutex);
-		while (!_triggered)
-			pthread_cond_wait(&_cond, &_mutex);
-		pthread_mutex_unlock(&_mutex);
+		xevent_data* data = (xevent_data*)m_data;
+		pthread_mutex_lock(&data->_mutex);
+		while (!data->_triggered)
+			pthread_cond_wait(&data->_cond, &_mutex);
+		pthread_mutex_unlock(&data->_mutex);
 	}
 
 

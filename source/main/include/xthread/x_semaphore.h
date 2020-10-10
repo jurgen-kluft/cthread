@@ -2,14 +2,16 @@
 #define __XMTHREAD_SEMAPHORE_H__
 #include "xbase/x_target.h"
 
-#if defined(TARGET_PC)
-#include "xthread/private/windows/x_semaphore_win.h"
-#elif defined(TARGET_MAC)
-#include "xthread/private/osx/x_semaphore_mac.h"
-#endif
-
 namespace xcore
 {
+	#if defined(TARGET_PC)
+		const int xsema_data_size64 = 1;
+	#elif defined(TARGET_MAC)
+		const int xsema_data_size64 = 10;
+	#else
+		const int xsema_data_size64 = -1;
+	#endif
+	
 	// A xsemaphore is a synchronization object with the following 
 	// characteristics:
 	// A semaphore has a value that is constrained to be a non-negative
@@ -21,7 +23,7 @@ namespace xcore
 	// value be non-negative. A P (wait()) operation that is initiated when 
 	// the value of the semaphore is 0 suspends the calling thread. 
 	// The calling thread may continue when the value becomes positive again.
-	class xsemaphore : private xsemaphore_impl
+	class xsemaphore
 	{
 	public:
 					xsemaphore(s32 n);
@@ -61,31 +63,12 @@ namespace xcore
 		// if we got a signal.
 
 	private:
+		u64			m_data[xsema_data_size64];
 					xsemaphore();
 					xsemaphore(const xsemaphore&);
 
 		xsemaphore& operator = (const xsemaphore&) {}
 	};
-
-
-	//
-	// inlines
-	//
-	inline void xsemaphore::signal()
-	{
-		sema_signal();
-	}
-
-
-	inline void xsemaphore::wait()
-	{
-		sema_wait();
-	}
-
-	inline bool	xsemaphore::try_wait(u32 milliseconds)
-	{
-		return sema_try_wait(milliseconds);
-	}
 
 } // namespace xcore
 

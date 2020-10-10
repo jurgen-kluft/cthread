@@ -2,41 +2,49 @@
 #include "xbase/x_debug.h"
 
 #ifdef TARGET_PC
-#include "xthread/private/windows/x_semaphore_win.h"
+#include "xthread/x_semaphore.h"
 #include <Windows.h>
 
 namespace xcore 
 {
-	xsemaphore_impl::xsemaphore_impl(s32 n, s32 max)
+	struct xsema_data
+	{
+		void* _sema;
+	};
+
+	xsemaphore::xsemaphore(s32 n, s32 max)
 	{
 		ASSERT(n >= 0 && max > 0 && n <= max);
-
-		_sema = CreateSemaphoreW(NULL, n, max, NULL);
-		if (!_sema)
+		xsema_data* data = (xsema_data*)m_data;
+		data->_sema = CreateSemaphoreW(NULL, n, max, NULL);
+		if (!data->_sema)
 		{
 			// cannot create semaphore
 		}
 	}
 
-	xsemaphore_impl::~xsemaphore_impl()
+	xsemaphore::~xsemaphore()
 	{
-		CloseHandle(_sema);
+		xsema_data* data = (xsema_data*)m_data;
+		CloseHandle(data->_sema);
 	}
 
 	//
 	// inlines
 	//
-	void xsemaphore_impl::sema_signal()
+	void xsemaphore::signal()
 	{
-		if (!ReleaseSemaphore(_sema, 1, NULL))
+		xsema_data* data = (xsema_data*)m_data;
+		if (!ReleaseSemaphore(data->_sema, 1, NULL))
 		{
 			// cannot signal semaphore
 		}
 	}
 
-	void xsemaphore_impl::sema_wait()
+	void xsemaphore::wait()
 	{
-		switch (WaitForSingleObject(_sema, INFINITE))
+		xsema_data* data = (xsema_data*)m_data;
+		switch (WaitForSingleObject(data->_sema, INFINITE))
 		{
 		case WAIT_OBJECT_0:
 			return;
@@ -46,9 +54,10 @@ namespace xcore
 		}
 	}
 
-	bool	xsemaphore_impl::sema_try_wait(u32 milliseconds)
+	bool	xsemaphore::try_wait(u32 milliseconds)
 	{
-		switch (WaitForSingleObject(_sema, milliseconds))
+		xsema_data* data = (xsema_data*)m_data;
+		switch (WaitForSingleObject(data->_sema, milliseconds))
 		{
 		case WAIT_OBJECT_0:
 			return true;

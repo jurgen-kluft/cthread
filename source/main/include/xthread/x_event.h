@@ -2,20 +2,20 @@
 #define __XMTHREAD_EVENT_H__
 #include "xbase/x_target.h"
 
-#if defined(TARGET_PC)
-#include "xthread/private/windows/x_event_win.h"
-#elif defined(TARGET_MAC)
-#include "xthread/private/osx/x_event_mac.h"
-#endif
-
-
 namespace xcore 
 {
+	#if defined(TARGET_PC)
+		const int xevent_data_size64 = 1;
+	#elif defined(TARGET_MAC)
+		const int xevent_data_size64 = 10;
+	#else
+		const int xevent_data_size64 = -1;
+	#endif	
 	// An xevent is a synchronization object that allows one thread to signal one or more
 	// other threads that a certain event has happened.
 	// Usually, one thread signals an event, while one or more other threads wait
 	// for an event to become signalled.
-	class xevent : private xevent_impl
+	class xevent
 	{
 	public:
 					xevent(bool autoReset = true);
@@ -40,29 +40,10 @@ namespace xcore
 		/// Resets the event to unsignalled state.
 
 	private:
+		u64			m_data[xevent_data_size64];
 					xevent(const xevent&);
 					xevent& operator = (const xevent&);
 	};
-
-
-	//
-	// inlines
-	//
-	inline void xevent::set()
-	{
-		event_set();
-	}
-
-
-	inline void xevent::wait()
-	{
-		event_wait();
-	}
-
-	inline void xevent::reset()
-	{
-		event_reset();
-	}
 
 
 } // namespace xcore

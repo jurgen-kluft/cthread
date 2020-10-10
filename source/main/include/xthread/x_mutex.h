@@ -3,15 +3,16 @@
 
 #include "xbase/x_target.h"
 
-#if defined(TARGET_PC)
-#include "xthread/private/windows/x_mutex_win.h"
-#elif defined(TARGET_MAC)
-#include "xthread/private/osx/x_mutex_mac.h"
-#endif
-
-
 namespace xcore 
 {
+	#if defined(TARGET_PC)
+		const int xmutex_data_size64 = 14;
+	#elif defined(TARGET_MAC)
+		const int xmutex_data_size64 = 10;
+	#else
+		const int xmutex_data_size64 = -1;
+	#endif
+
 	// A xmutex (mutual exclusion) is a synchronization 
 	// mechanism used to control access to a shared resource
 	// in a concurrent (multithreaded) scenario.
@@ -20,12 +21,9 @@ namespace xcore
 	// not by other threads).
 	// Using the xscoped_lock class is the preferred way to automatically
 	// lock and unlock a mutex.
-	class xmutex : private xmutex_impl
+	class xmutex
 	{
 	public:
-				xmutex() : xmutex_impl() {}		// creates the xmutex.
-				~xmutex() {}					// destroys the xmutex.
-
 		void	lock();
 		// Locks the mutex. Blocks if the mutex
 		// is held by another thread.
@@ -40,28 +38,13 @@ namespace xcore
 		// other threads.
 
 	private:
-				xmutex(const xmutex&) {}
+		u64		m_data[xmutex_data_size64];
+
+		xmutex() {}
+        ~xmutex() {}
+        xmutex(const xmutex&) {}
 		xmutex& operator = (const xmutex&) {}
 	};
-
-
-	//
-	// inlines
-	//
-	inline void xmutex::lock()
-	{
-		mutex_lock();
-	}
-
-	inline bool xmutex::tryLock()
-	{
-		return mutex_tryLock();
-	}
-
-	inline void xmutex::unlock()
-	{
-		mutex_unlock();
-	}
 
 
 } // namespace xcore

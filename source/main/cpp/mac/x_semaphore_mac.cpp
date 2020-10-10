@@ -3,26 +3,40 @@
 
 #ifdef TARGET_MAC
 
-#include "xthread/private/osx/x_semaphore_mac.h"
+#include "xthread/x_semaphore.h"
 
 namespace xcore 
 {
-	xsemaphore_impl::xsemaphore_impl(s32 n, s32 max)
+	// Semaphore (Apple iOS and OSX)
+	struct xsema_data
+	{
+		semaphore_t _sema;
+	};
+
+	xsemaphore::xsemaphore(s32 n, s32 max)
 	{
 		ASSERT(n >= 0 && max > 0 && n <= max);
-		semaphore_create(mach_task_self(), &_sema, SYNC_POLICY_FIFO, n);
+		xsema_data* data = (xsema_data*)m_data;		
+		semaphore_create(mach_task_self(), &data->_sema, SYNC_POLICY_FIFO, n);
 	}
 
 
-	xsemaphore_impl::~xsemaphore_impl()
+	xsemaphore::~xsemaphore()
 	{
-		semaphore_destroy(mach_task_self(), _sema);
+		xsema_data* data = (xsema_data*)m_data;		
+		semaphore_destroy(mach_task_self(), data->_sema);
 	}
 
-
-	void xsemaphore_impl::sema_wait()
+	void xsemaphore::signal()
 	{
-		semaphore_wait(_sema);
+		xsema_data* data = (xsema_data*)m_data;		
+		semaphore_signal(data->_sema);
+	}
+
+	void xsemaphore::wait()
+	{
+		xsema_data* data = (xsema_data*)m_data;		
+		semaphore_wait(data->_sema);
 	}
 
 

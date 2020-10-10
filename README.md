@@ -7,7 +7,6 @@
   - event
   - semaphore
 
-
 ```c++
 static void highest_priority_thread_fn(void* arg)
 {

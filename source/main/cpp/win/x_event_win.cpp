@@ -1,29 +1,37 @@
 #include "xbase/x_target.h"
 
 #ifdef TARGET_PC
-#include "xthread/private/windows/x_event_win.h"
+#include "xthread/x_event.h"
 #include <Windows.h>
 
 namespace xcore 
 {
-	xevent_impl::xevent_impl(bool autoReset)
+	struct xevent_data
 	{
-		_event = CreateEventW(NULL, autoReset ? FALSE : TRUE, FALSE, NULL);
-		if (!_event)
+		void * _event;
+	};
+
+	xevent::xevent(bool autoReset)
+	{
+		xevent_data* data = (xevent_data*)m_data;
+		data->_event = CreateEventW(NULL, autoReset ? FALSE : TRUE, FALSE, NULL);
+		if (!data->_event)
 		{
 			// cannot create event
 		}
 	}
 
-	xevent_impl::~xevent_impl()
+	xevent::~xevent()
 	{
-		CloseHandle(_event);
+		xevent_data* data = (xevent_data*)m_data;
+		CloseHandle(data->_event);
 	}
 
 
-	void xevent_impl::event_wait()
+	void xevent::wait()
 	{
-		switch (WaitForSingleObject(_event, INFINITE))
+		xevent_data* data = (xevent_data*)m_data;
+		switch (WaitForSingleObject(data->_event, INFINITE))
 		{
 		case WAIT_OBJECT_0:
 			return;
@@ -33,21 +41,20 @@ namespace xcore
 		}
 	}
 
-	//
-	// inlines
-	//
-	void xevent_impl::event_set()
+	void xevent::set()
 	{
-		if (!SetEvent(_event))
+		xevent_data* data = (xevent_data*)m_data;
+		if (!SetEvent(data->_event))
 		{
 			// cannot signal event
 		}
 	}
 
 
-	void xevent_impl::event_reset()
+	void xevent::reset()
 	{
-		if (!ResetEvent(_event))
+		xevent_data* data = (xevent_data*)m_data;
+		if (!ResetEvent(data->_event))
 		{
 			// cannot reset event
 		}
