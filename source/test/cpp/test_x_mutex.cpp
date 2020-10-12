@@ -4,7 +4,7 @@
 
 #include "xthread/x_mutex.h"
 #include "xthread/x_thread.h"
-#include "xthread/x_thread_functor.h"
+#include "xthread/x_threading.h"
 #include "xtime/x_datetime.h"
 
 #include "xunittest/xunittest.h"

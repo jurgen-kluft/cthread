@@ -71,6 +71,9 @@ namespace xcore
 		static void			yield();
 		static void			exit();
 
+		static u32          default_stacksize();
+		static e_priority   default_priority();
+
 	protected:
         friend class xthreading;
 

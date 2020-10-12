@@ -3,7 +3,7 @@
 #include "xbase/x_allocator.h"
 
 #include "xthread/x_thread.h"
-#include "xthread/x_thread_functor.h"
+#include "xthread/x_threading.h"
 #include "xthread/x_semaphore.h"
 
 #include "xunittest/xunittest.h"

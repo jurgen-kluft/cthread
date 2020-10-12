@@ -1,10 +1,9 @@
 #include "xbase/x_target.h"
 #include "xbase/x_debug.h"
 #include "xbase/x_allocator.h"
-#include "xbase/x_string_ascii.h"
 
 #include "xthread/x_thread.h"
-#include "xthread/x_thread_functor.h"
+#include "xthread/x_threading.h"
 
 #include "xthread/x_event.h"
 

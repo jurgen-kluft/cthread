@@ -15,6 +15,7 @@ namespace xcore
 		void* threading_mem = allocator->allocate(sizeof(xthreading));
 		xthreading* threading = new (threading_mem) xthreading();
 
+		threading->m_allocator = allocator;
 		threading->m_threads = gCreateThreadsData(allocator, max_threads);
 		threading->m_mutexes = gCreateMutexesData(allocator, max_mutexes);
 		threading->m_events = gCreateEventsData(allocator, max_events);
@@ -22,6 +23,10 @@ namespace xcore
 		return threading;
 	}
 
-
+	void xthreading::destroy(xthreading*& threading)
+	{
+		threading->m_allocator->destruct(threading);
+		threading = nullptr;
+	}
 
 } // namespace xcore
