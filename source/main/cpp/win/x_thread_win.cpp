@@ -7,6 +7,7 @@
 #ifdef TARGET_PC
 #include "xthread/x_thread.h"
 #include "xthread/x_threading.h"
+#include "xthread/private/x_threading.h"
 
 #include "xthread/x_mutex.h"
 #include "xthread/x_event.h"
@@ -26,9 +27,15 @@ namespace xcore
 
     typedef void* hnd_t;
 
-    class xthread_data
+    class xthread_win : public xthread
     {
     public:
+		xthread_win() : xthread() {}  
+		xthread_win(const char* name) : xthread(name) {}
+		xthread_win(const char* name, e_priority p, u32 stack_size) : xthread(name, p, stack_size) {}
+
+		~xthread_win() {}
+
         hnd_t               m_threadHandle;
         xthread::idx_t      m_threadIdx;
         xthread::tid_t      m_threadTid;
@@ -51,18 +58,18 @@ namespace xcore
             _endthreadex(0);
         }
     };
-    thread_local xthread_data* tl_thread_ptr = NULL;
+    thread_local xthread_win* tl_thread_ptr = NULL;
 
     xthread::~xthread()
     {
-        xthread_data* data = m_data;
+        xthread_win* data = (xthread_win*)this;
         if (data->m_threadHandle)
             ::CloseHandle(data->m_threadHandle);
     }
 
     void xthread::set_priority(e_priority priority)
     {
-        xthread_data* data = m_data;
+        xthread_win* data = (xthread_win*)this;
         if (priority != data->m_priority)
         {
             data->m_priority = priority;
@@ -78,7 +85,7 @@ namespace xcore
 
     void xthread::start()
     {
-        xthread_data* data = m_data;
+        xthread_win* data = (xthread_win*)this;
         if (get_state() == STATE_RUNNING)
         {
             // thread already running
@@ -93,7 +100,7 @@ namespace xcore
     unsigned __stdcall __main_func(void* arg)
     {
         // Call the real entry point function, passing the provided context.
-        xthread_data* t = reinterpret_cast<xthread_data*>(arg);
+        xthread_win* t = reinterpret_cast<xthread_win*>(arg);
         tl_thread_ptr   = t;
         {
             t->run();
@@ -103,58 +110,9 @@ namespace xcore
         return 0;
     }
 
-    class xthreading_data
-    {
-    public:
-        xthread_data*     m_threads;
-        xfsadexed_array   m_threads_alloc;
-        xmutex*           m_mutexes;
-        xfsadexed_array   m_mutexes_alloc;
-        xevent*           m_events;
-        xfsadexed_array   m_events_alloc;
-        xsemaphore*       m_semaphores;
-        xfsadexed_array   m_semaphores_alloc;
-    };
-
-    xthread* xthreading::create_thread(const char* name, void* arg, xthread_functor* f, u32 stack_size, xthread::e_priority priority)
-    {
-        xthreading_data* threading = m_data;
-
-        xthread_data* data     = threading->m_threads_alloc.construct<xthread_data>();
-        data->m_arg            = arg;
-        data->m_functor        = f;
-        data->m_thread         = xthread(name, priority, stack_size);
-        xthread* thread        = &data->m_thread;
-        thread->m_data         = data;
-
-        u32            threadId   = 0;
-        hnd_t          thread_hnd = (HANDLE)::_beginthreadex(NULL, stack_size, &__main_func, data, CREATE_SUSPENDED, &threadId);
-        xthread::tid_t thread_tid = static_cast<DWORD>(threadId);
-
-        if (thread_hnd)
-        {
-            data->m_threadHandle = thread_hnd;
-            data->m_threadTid    = thread_tid;
-            data->m_threadState  = xthread::STATE_CREATED;
-        }
-
-        if (data->m_priority.prio != xthread::e_priority::NORMAL && !SetThreadPriority(thread_hnd, data->m_priority.prio))
-        {
-            // cannot set thread priority
-        }
-
-        return thread;
-    }
-
-	void xthreading::destroy_thread(xthread* thread)
-	{
-		xthread_data* data = thread->m_data;
-        m_data->m_threads_alloc.destruct(data);
-	}
-
     void xthread::join()
     {
-        xthread_data* data = m_data;
+        xthread_win* data = (xthread_win*)this;
         if (!data->m_threadHandle)
             return;
 
@@ -175,7 +133,7 @@ namespace xcore
 
     bool xthread::join(u32 milliseconds)
     {
-        xthread_data* data = m_data;
+        xthread_win* data = (xthread_win*)this;
         if (!data->m_threadHandle)
             return true;
 
@@ -195,13 +153,13 @@ namespace xcore
 
     u32 xthread::get_stacksize() const 
 	{
-        xthread_data* data = m_data;
+        xthread_win* data = (xthread_win*)this;
         return data->m_stack_size; 
 	}
 
     xthread::e_state xthread::get_state() const 
 	{
-        xthread_data* data = m_data;
+        xthread_win* data = (xthread_win*)this;
         return data->m_threadState; 
 	}
 
@@ -230,7 +188,7 @@ namespace xcore
 
     xthread::xthread()
     {
-        xthread_data* data = m_data;
+        xthread_win* data = (xthread_win*)this;
         data->m_threadTid = (sUniqueId());
         data->m_name[0]    = '\0';
         data->m_name[1]    = '\0';
@@ -240,7 +198,7 @@ namespace xcore
 
     xthread::xthread(const char* _name)
     {
-        xthread_data* data = m_data;
+        xthread_win* data = (xthread_win*)this;
         data->m_threadTid = (sUniqueId());
         ascii::runes name((ascii::prune)data->m_name, (ascii::prune)data->m_name , &data->m_name[sizeof(data->m_name) - 1]);
         utf::copy(_name, name);
@@ -249,11 +207,79 @@ namespace xcore
 
     xthread::e_priority xthread::get_priority() const 
 	{
-        xthread_data* data = m_data;
+        xthread_win* data = (xthread_win*)this;
         return data->m_priority;
 	}
 
 	
+
+	// ----------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
+	class xthreads_data
+	{
+	public:
+		xthread_win*   m_threads;
+		xfsadexed_array m_alloc;
+		XCORE_CLASS_PLACEMENT_NEW_DELETE
+	};
+
+	xthreads_data*		gCreateThreadsData(xalloc* alloc, u32 max_threads)
+	{
+		xthreads_data* threads = alloc->construct<xthreads_data>();
+		xthread_win* threads_array = (xthread_win*)alloc->allocate(sizeof(xthread_win) * max_threads);
+		threads->m_alloc = xfsadexed_array(threads_array, sizeof(xthread_win), max_threads);
+		return threads;
+
+	}
+
+	xthreading::xthreading()
+		: m_threads(nullptr)
+		, m_events(nullptr)
+		, m_mutexes(nullptr)
+		, m_semaphores(nullptr)
+	{
+
+	}
+
+	xthreading::~xthreading()
+	{
+
+	}
+
+    xthread* xthreading::create_thread(const char* name, void* arg, xthread_functor* f, u32 stack_size, xthread::e_priority priority)
+    {
+        xthread_win* thread_win = m_threads->m_alloc.construct<xthread_win>();
+        thread_win->m_arg        = arg;
+        thread_win->m_functor    = f;
+        thread_win->m_thread     = xthread(name, priority, stack_size);
+        xthread* thread    = &thread_win->m_thread;
+
+        u32            threadId   = 0;
+        hnd_t          thread_hnd = (HANDLE)::_beginthreadex(NULL, stack_size, &__main_func, thread_win, CREATE_SUSPENDED, &threadId);
+        xthread::tid_t thread_tid = static_cast<DWORD>(threadId);
+
+        if (thread_hnd)
+        {
+			thread_win->m_threadHandle = thread_hnd;
+			thread_win->m_threadTid    = thread_tid;
+			thread_win->m_threadState  = xthread::STATE_CREATED;
+        }
+
+        if (thread_win->m_priority.prio != xthread::e_priority::NORMAL && !SetThreadPriority(thread_hnd, thread_win->m_priority.prio))
+        {
+            // cannot set thread priority
+        }
+
+        return thread;
+    }
+
+    void xthreading::destroy_thread(xthread* thread)
+    {
+		xthread_win* thread_win = (xthread_win*)thread;
+		m_threads->m_alloc.destruct(thread_win);
+    }
+
 } // namespace xcore
 
 #endif

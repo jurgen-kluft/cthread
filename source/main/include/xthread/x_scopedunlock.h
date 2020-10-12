@@ -1,6 +1,9 @@
 #ifndef __XMTHREAD_SCOPEDUNLOCK_H__
 #define __XMTHREAD_SCOPEDUNLOCK_H__
 #include "xbase/x_target.h"
+#ifdef USE_PRAGMA_ONCE
+#pragma once
+#endif
 
 namespace xcore
 {

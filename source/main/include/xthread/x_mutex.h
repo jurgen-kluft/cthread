@@ -1,18 +1,12 @@
 #ifndef __XMTHREAD_MUTEX_H__
 #define __XMTHREAD_MUTEX_H__
-
 #include "xbase/x_target.h"
+#ifdef USE_PRAGMA_ONCE
+#pragma once
+#endif
 
 namespace xcore 
 {
-	#if defined(TARGET_PC)
-		const int xmutex_data_size64 = 14;
-	#elif defined(TARGET_MAC)
-		const int xmutex_data_size64 = 10;
-	#else
-		const int xmutex_data_size64 = -1;
-	#endif
-
 	// A xmutex (mutual exclusion) is a synchronization 
 	// mechanism used to control access to a shared resource
 	// in a concurrent (multithreaded) scenario.
@@ -37,13 +31,11 @@ namespace xcore
 		// Unlocks the mutex so that it can be acquired by
 		// other threads.
 
-	private:
-		u64		m_data[xmutex_data_size64];
-
-		xmutex() {}
-        ~xmutex() {}
+	protected:
+		xmutex();
+		~xmutex();
         xmutex(const xmutex&) {}
-		xmutex& operator = (const xmutex&) {}
+		xmutex& operator = (const xmutex&) { return *this; }
 	};
 
 

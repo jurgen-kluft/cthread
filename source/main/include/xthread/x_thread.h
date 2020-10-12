@@ -1,6 +1,9 @@
 #ifndef __XMTHREAD_THREAD_H__
 #define __XMTHREAD_THREAD_H__
 #include "xbase/x_target.h"
+#ifdef USE_PRAGMA_ONCE
+#pragma once
+#endif
 
 namespace xcore
 {
@@ -70,18 +73,14 @@ namespace xcore
 
 	protected:
         friend class xthreading;
-        friend class xthread_data;
+
         xthread();                                               /// Creates a thread. Call start() to start it.
         xthread(const char* name);                               /// Creates a named thread. Call start() to start it.
         xthread(const char* name, e_priority p, u32 stack_size); /// Creates a thread using some configuration. Call start() to start it.
         xthread(const xthread&);
         xthread& operator=(const xthread&);
         ~xthread(); /// Destroys the thread.
-
-        xthread_data* m_data;
 	};
-
-
 
 } // namespace xcore
 

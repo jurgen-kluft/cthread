@@ -1,7 +1,11 @@
 #ifndef __XMTHREAD_THREADING_H__
 #define __XMTHREAD_THREADING_H__
 #include "xbase/x_target.h"
+#ifdef USE_PRAGMA_ONCE
+#pragma once
+#endif
 
+#include "xbase/x_allocator.h"
 #include "xthread/x_thread.h"
 
 namespace xcore
@@ -19,7 +23,11 @@ namespace xcore
     class xmutex;
     class xevent;
     class xsemaphore;
-    class xthreading_data;
+
+    class xthreads_data;
+    class xevents_data;
+    class xmutexes_data;
+	class xsemaphores_data;
 
 	class xthreading
 	{
@@ -28,8 +36,8 @@ namespace xcore
 
 		xthread*            create_thread(const char* name, void* arg, xthread_functor* f, u32 stack_size, xthread::e_priority priority);
 		xmutex*				create_mutex();
-		xevent*				create_event();
-		xsemaphore*			create_semaphore();
+		xevent*				create_event(bool autoReset);
+		xsemaphore*			create_semaphore(s32 initial_count, s32 max_count);
 
 		void				destroy_thread(xthread*);
 		void				destroy_mutex(xmutex*);
@@ -44,13 +52,19 @@ namespace xcore
 		static void			yield();
 		static void			exit();
 
+		XCORE_CLASS_PLACEMENT_NEW_DELETE
+
 	private:
 							xthreading();
-							~xthreading();						/// Destroys the thread.
-							xthreading(const xthreading&);
-		xthreading&			operator = (const xthreading&);
+							~xthreading();
 
-		xthreading_data* m_data;
+							xthreading(const xthreading&) {}
+		xthreading&			operator = (const xthreading&) { return *this; }
+
+		xthreads_data*      m_threads;
+		xevents_data*       m_events;
+		xmutexes_data*      m_mutexes;
+		xsemaphores_data*   m_semaphores;
 	};
 
 } // namespace xcore

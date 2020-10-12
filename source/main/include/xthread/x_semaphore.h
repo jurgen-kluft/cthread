@@ -1,16 +1,12 @@
 #ifndef __XMTHREAD_SEMAPHORE_H__
 #define __XMTHREAD_SEMAPHORE_H__
 #include "xbase/x_target.h"
+#ifdef USE_PRAGMA_ONCE
+#pragma once
+#endif
 
 namespace xcore
 {
-	#if defined(TARGET_PC)
-		const int xsema_data_size64 = 1;
-	#elif defined(TARGET_MAC)
-		const int xsema_data_size64 = 10;
-	#else
-		const int xsema_data_size64 = -1;
-	#endif
 	
 	// A xsemaphore is a synchronization object with the following 
 	// characteristics:
@@ -63,7 +59,6 @@ namespace xcore
 		// if we got a signal.
 
 	private:
-		u64			m_data[xsema_data_size64];
 					xsemaphore();
 					xsemaphore(const xsemaphore&);
 

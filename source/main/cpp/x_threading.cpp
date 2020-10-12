@@ -1,22 +1,25 @@
 #include "xbase/x_target.h"
-#include "xbase/x_string_ascii.h"
 
 #include "xthread/x_threading.h"
-#include "xthread/x_mutex.h"
-
-#include <atomic>
+#include "xthread/private/x_threading.h"
 
 namespace xcore 
 {
-	static void sMakeName(xuchars& str, xthread::tid_t id)
-	{
-		ascii::sprintf(str, xcuchars("#%d"), x_va(id));
-	}
+	extern xthreads_data*		gCreateThreadsData(xalloc*, u32 max_threads);
+	extern xmutexes_data*		gCreateMutexesData(xalloc*, u32 max_mutexes);
+	extern xevents_data*		gCreateEventsData(xalloc*, u32 max_events);
+	extern xsemaphores_data*	gCreateSemaphoresData(xalloc*, u32 max_semaphores);
 
-	static s32 sUniqueId()
+	xthreading*	xthreading::create(xalloc* allocator, u32 max_threads, u32 max_mutexes, u32 max_events, u32 max_semaphores)
 	{
-		static std::atomic<int> count(0);
-		return count++;
+		void* threading_mem = allocator->allocate(sizeof(xthreading));
+		xthreading* threading = new (threading_mem) xthreading();
+
+		threading->m_threads = gCreateThreadsData(allocator, max_threads);
+		threading->m_mutexes = gCreateMutexesData(allocator, max_mutexes);
+		threading->m_events = gCreateEventsData(allocator, max_events);
+		threading->m_semaphores = gCreateSemaphoresData(allocator, max_semaphores);
+		return threading;
 	}
 
 
