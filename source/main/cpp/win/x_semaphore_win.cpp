@@ -79,16 +79,16 @@ namespace xcore
 	{
 	public:
 		xsemaphore*     m_semaphores;
-		xfsadexed_array m_alloc;
+		fsadexed_array_t m_alloc;
 		XCORE_CLASS_PLACEMENT_NEW_DELETE
 	};
 
 
-	xsemaphores_data*	gCreateSemaphoresData(xalloc* alloc, u32 max_semaphores)
+	xsemaphores_data*	gCreateSemaphoresData(alloc_t* alloc, u32 max_semaphores)
 	{
 		xsemaphores_data* semas = alloc->construct<xsemaphores_data>();
 		xsemaphore_win* sema_array = (xsemaphore_win*)alloc->allocate(sizeof(xsemaphore_win) * max_semaphores);
-		semas->m_alloc = xfsadexed_array(sema_array, sizeof(xsemaphore_win), max_semaphores);
+		semas->m_alloc = fsadexed_array_t(sema_array, sizeof(xsemaphore_win), max_semaphores);
 		return semas;
 	}
 

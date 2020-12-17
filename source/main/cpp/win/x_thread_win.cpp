@@ -2,7 +2,7 @@
 #include "xbase/x_allocator.h"
 #include "xbase/x_runes.h"
 #include "xbase/x_printf.h"
-#include "xbase/x_va_list.h"
+#include "xbase/va_list_t.h"
 
 #ifdef TARGET_PC
 #include "xthread/x_thread.h"
@@ -178,7 +178,7 @@ namespace xcore
     void xthread::sleep(u32 milliseconds) { ::Sleep(DWORD(milliseconds)); }
     void xthread::yield() { ::Sleep(0); }
 
-	static void sMakeName(ascii::runes& str, xthread::tid_t id) { ascii::sprintf(str, ascii::crunes("#%d"), x_va(id)); }
+	static void sMakeName(ascii::runes& str, xthread::tid_t id) { ascii::sprintf(str, ascii::crunes("#%d"), va_t(id)); }
 
     static s32 sUniqueId()
     {
@@ -220,15 +220,15 @@ namespace xcore
 	{
 	public:
 		xthread_win*   m_threads;
-		xfsadexed_array m_alloc;
+		fsadexed_array_t m_alloc;
 		XCORE_CLASS_PLACEMENT_NEW_DELETE
 	};
 
-	xthreads_data*		gCreateThreadsData(xalloc* alloc, u32 max_threads)
+	xthreads_data*		gCreateThreadsData(alloc_t* alloc, u32 max_threads)
 	{
 		xthreads_data* threads = alloc->construct<xthreads_data>();
 		xthread_win* threads_array = (xthread_win*)alloc->allocate(sizeof(xthread_win) * max_threads);
-		threads->m_alloc = xfsadexed_array(threads_array, sizeof(xthread_win), max_threads);
+		threads->m_alloc = fsadexed_array_t(threads_array, sizeof(xthread_win), max_threads);
 		return threads;
 
 	}

@@ -60,15 +60,15 @@ namespace xcore
 	{
 	public:
 		xmutex*         m_events;
-		xfsadexed_array m_alloc;
+		fsadexed_array_t m_alloc;
 		XCORE_CLASS_PLACEMENT_NEW_DELETE
 	};
 
-	xmutexes_data*	gCreateMutexesData(xalloc* alloc, u32 max_mutexes)
+	xmutexes_data*	gCreateMutexesData(alloc_t* alloc, u32 max_mutexes)
 	{
 		xmutexes_data* events = alloc->construct<xmutexes_data>();
 		xmutex_win* event_array = (xmutex_win*)alloc->allocate(sizeof(xmutex_win) * max_mutexes);
-		events->m_alloc = xfsadexed_array(event_array, sizeof(xmutex_win), max_mutexes);
+		events->m_alloc = fsadexed_array_t(event_array, sizeof(xmutex_win), max_mutexes);
 		return events;
 	}
 

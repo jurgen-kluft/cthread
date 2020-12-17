@@ -10,7 +10,7 @@
 #include "xunittest\xunittest.h"
 
 using namespace xcore;
-using xcore::xdatetime;
+using xcore::datetime_t;
 
 static xcore::xevent testEvent;
 
@@ -22,21 +22,21 @@ namespace
 		void run()
 		{
 			testEvent.wait();
-			_timestamp = xdatetime::sNow();
+			_timestamp = datetime_t::sNow();
 		}
 
-		const xdatetime& timestamp() const
+		const datetime_t& timestamp() const
 		{
 			return _timestamp;
 		}
 
 	private:
-		xcore::xdatetime _timestamp;
+		xcore::datetime_t _timestamp;
 	};
 }
 
 
-extern xcore::xalloc* gTestAllocator;
+extern xcore::alloc_t* gTestAllocator;
 
 
 UNITTEST_SUITE_BEGIN(xevent)
@@ -53,7 +53,7 @@ UNITTEST_SUITE_BEGIN(xevent)
 			TestEvent te;
 			xthread* thr1 = threading->create_thread("test1", threading, &te, xthread::default_stacksize(), xthread::default_priority());
 			thr1->start();
-			xdatetime now = xdatetime::sNow();
+			datetime_t now = datetime_t::sNow();
 			xthread::sleep(2000);
 			testEvent.set();
 			thr1->join();
@@ -61,7 +61,7 @@ UNITTEST_SUITE_BEGIN(xevent)
 
 			xthread* thr2= threading->create_thread("test2", threading, &te, xthread::default_stacksize(), xthread::default_priority());
 			thr2->start();
-			now = xdatetime::sNow();
+			now = datetime_t::sNow();
 			xthread::sleep(2000);
 			testEvent.set();
 			thr2->join();

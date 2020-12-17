@@ -10,7 +10,7 @@
 #include "xunittest/xunittest.h"
 
 using xcore::xthread;
-using xcore::xdatetime;
+using xcore::datetime_t;
 
 
 static xcore::xmutex testMutex;
@@ -24,17 +24,17 @@ namespace
 		void run()
 		{
 			testMutex.lock();
-			_timestamp = xdatetime::sNow();
+			_timestamp = datetime_t::sNow();
 			testMutex.unlock();
 		}
 
-		const xdatetime& timestamp() const
+		const datetime_t& timestamp() const
 		{
 			return _timestamp;
 		}
 
 	private:
-		xdatetime _timestamp;
+		datetime_t _timestamp;
 	};
 
 	class TestTryLock: public xcore::xthread_functor
@@ -76,7 +76,7 @@ UNITTEST_SUITE_BEGIN(xmutex)
 			xthread thr;
 			TestLock tl;
 			thr.start(&tl);
-			xdatetime now = xdatetime::sNow();
+			datetime_t now = datetime_t::sNow();
 			xthread::sleep(2000);
 			testMutex.unlock();
 			thr.join();

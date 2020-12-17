@@ -10,7 +10,7 @@
 
 namespace xcore
 {
-    class xalloc;
+    class alloc_t;
 
 	class xthread_functor
 	{
@@ -32,7 +32,7 @@ namespace xcore
 	class xthreading
 	{
 	public:
-		static xthreading*	create(xalloc* allocator, u32 max_threads = 32, u32 max_mutex = 32, u32 max_event = 32, u32 max_semaphore = 32);
+		static xthreading*	create(alloc_t* allocator, u32 max_threads = 32, u32 max_mutex = 32, u32 max_event = 32, u32 max_semaphore = 32);
 		static void         destroy(xthreading*&);
 
 		xthread*            create_thread(const char* name, void* arg, xthread_functor* f, u32 stack_size, xthread::e_priority priority);
@@ -62,8 +62,8 @@ namespace xcore
 							xthreading(const xthreading&) {}
 		xthreading&			operator = (const xthreading&) { return *this; }
 
-		friend class xalloc;
-		xalloc*             m_allocator;
+		friend class alloc_t;
+		alloc_t*             m_allocator;
 		xthreads_data*      m_threads;
 		xevents_data*       m_events;
 		xmutexes_data*      m_mutexes;

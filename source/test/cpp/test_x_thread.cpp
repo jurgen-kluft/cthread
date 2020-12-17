@@ -14,8 +14,8 @@
 
 using xcore::xthread;
 using xcore::xevent;
-using xcore::xdatetime;
-using xcore::xtimespan;
+using xcore::datetime_t;
+using xcore::timespan_t;
 using xcore::s32;
 
 
@@ -229,10 +229,10 @@ UNITTEST_SUITE_BEGIN(xthread)
 
 		UNITTEST_TEST(testSleep)
 		{
-			xdatetime start = xdatetime::sNow();
+			datetime_t start = datetime_t::sNow();
 			xthread::sleep(200);
-			xdatetime end = xdatetime::sNow();
-			xtimespan elapsed = end - start;
+			datetime_t end = datetime_t::sNow();
+			timespan_t elapsed = end - start;
 			CHECK_TRUE (elapsed.totalMilliseconds() >= 190 && elapsed.totalMilliseconds() < 250);
 		}
 

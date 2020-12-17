@@ -72,15 +72,15 @@ namespace xcore
 	{
 	public:
 		xevent*         m_events;
-		xfsadexed_array m_alloc;
+		fsadexed_array_t m_alloc;
 		XCORE_CLASS_PLACEMENT_NEW_DELETE
 	};
 
-	xevents_data*	gCreateEventsData(xalloc* alloc, u32 max_events)
+	xevents_data*	gCreateEventsData(alloc_t* alloc, u32 max_events)
 	{
 		xevents_data* events = alloc->construct<xevents_data>();
 		xevent_win* event_array = (xevent_win*)alloc->allocate(sizeof(xevent_win) * max_events);
-		events->m_alloc = xfsadexed_array(event_array, sizeof(xevent_win), max_events);
+		events->m_alloc = fsadexed_array_t(event_array, sizeof(xevent_win), max_events);
 		return events;
 	}
 
