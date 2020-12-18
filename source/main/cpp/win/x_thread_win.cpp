@@ -2,7 +2,7 @@
 #include "xbase/x_allocator.h"
 #include "xbase/x_runes.h"
 #include "xbase/x_printf.h"
-#include "xbase/va_list_t.h"
+#include "xbase/x_va_list.h"
 
 #ifdef TARGET_PC
 #include "xthread/x_thread.h"
