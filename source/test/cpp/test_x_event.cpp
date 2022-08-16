@@ -9,14 +9,14 @@
 
 #include "xunittest\xunittest.h"
 
-using namespace xcore;
-using xcore::datetime_t;
+using namespace ncore;
+using ncore::datetime_t;
 
-static xcore::xevent testEvent;
+static ncore::xevent testEvent;
 
 namespace
 {
-	class TestEvent: public xcore::xthread_functor
+	class TestEvent: public ncore::xthread_functor
 	{
 	public:
 		void run()
@@ -31,12 +31,12 @@ namespace
 		}
 
 	private:
-		xcore::datetime_t _timestamp;
+		ncore::datetime_t _timestamp;
 	};
 }
 
 
-extern xcore::alloc_t* gTestAllocator;
+extern ncore::alloc_t* gTestAllocator;
 
 
 UNITTEST_SUITE_BEGIN(xevent)

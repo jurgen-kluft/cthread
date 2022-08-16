@@ -3,7 +3,7 @@
 #include "xthread/x_threading.h"
 #include "xthread/private/x_threading.h"
 
-namespace xcore 
+namespace ncore 
 {
 	extern xthreads_data*		gCreateThreadsData(alloc_t*, u32 max_threads);
 	extern xmutexes_data*		gCreateMutexesData(alloc_t*, u32 max_mutexes);
@@ -29,4 +29,4 @@ namespace xcore
 		threading = nullptr;
 	}
 
-} // namespace xcore
+} // namespace ncore

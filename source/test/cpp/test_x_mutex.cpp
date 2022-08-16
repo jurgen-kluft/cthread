@@ -9,16 +9,16 @@
 
 #include "xunittest/xunittest.h"
 
-using xcore::xthread;
-using xcore::datetime_t;
+using ncore::xthread;
+using ncore::datetime_t;
 
 
-static xcore::xmutex testMutex;
+static ncore::xmutex testMutex;
 
 
 namespace
 {
-	class TestLock: public xcore::xthread_functor
+	class TestLock: public ncore::xthread_functor
 	{
 	public:
 		void run()
@@ -37,7 +37,7 @@ namespace
 		datetime_t _timestamp;
 	};
 
-	class TestTryLock: public xcore::xthread_functor
+	class TestTryLock: public ncore::xthread_functor
 	{
 	public:
 		TestTryLock(): _locked(false)

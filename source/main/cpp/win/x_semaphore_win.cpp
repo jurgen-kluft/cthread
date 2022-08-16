@@ -9,7 +9,7 @@
 #include <windows.h>
 #include <stdio.h>
 
-namespace xcore 
+namespace ncore 
 {
 	class xsemaphore_win : public xsemaphore
 	{
@@ -26,7 +26,7 @@ namespace xcore
 	{
 		ASSERT(n >= 0 && max > 0 && n <= max);
 		xsemaphore_win* data = (xsemaphore_win*)this;
-		data->_sema = CreateSemaphoreW(NULL, n, max, NULL);
+		data->_sema = CreateSemaphoreW(nullptr, n, max, nullptr);
 		if (!data->_sema)
 		{
 			// cannot create semaphore
@@ -42,7 +42,7 @@ namespace xcore
 	void xsemaphore::signal()
 	{
 		xsemaphore_win* data = (xsemaphore_win*)this;
-		if (!ReleaseSemaphore(data->_sema, 1, NULL))
+		if (!ReleaseSemaphore(data->_sema, 1, nullptr))
 		{
 			// cannot signal semaphore
 		}
@@ -105,6 +105,6 @@ namespace xcore
 	}
 
 
-} // namespace xcore
+} // namespace ncore
 
 #endif

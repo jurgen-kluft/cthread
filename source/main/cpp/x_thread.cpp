@@ -8,8 +8,8 @@
 
 #include <atomic>
 
-namespace xcore 
+namespace ncore 
 {
     
 
-} // namespace xcore
+} // namespace ncore

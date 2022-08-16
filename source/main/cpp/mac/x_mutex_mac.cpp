@@ -3,7 +3,7 @@
 #ifdef TARGET_MAC
 #include "xthread/x_mutex.h"
 
-namespace xcore
+namespace ncore
 {
 	struct xevent_data
 	{
@@ -47,6 +47,6 @@ namespace xcore
 		xmutex_data* data = (xmutex_data*)m_data;
 		pthread_mutex_unlock(&data->_mutex);
 	}
-} // namespace xcore
+} // namespace ncore
 
 #endif

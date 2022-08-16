@@ -7,7 +7,7 @@
 
 #include "xbase/x_allocator.h"
 
-namespace xcore
+namespace ncore
 {
 	class xthread_data;
 	class xmutex;
@@ -17,7 +17,7 @@ namespace xcore
 
 
 
-} // namespace xcore
+} // namespace ncore
 
 
 #endif 

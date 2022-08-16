@@ -17,7 +17,7 @@
 #include <Windows.h>
 #include <atomic>
 
-namespace xcore
+namespace ncore
 {
     const s32 xthread::e_priority::LOWEST  = THREAD_PRIORITY_LOWEST;
     const s32 xthread::e_priority::LOW    = THREAD_PRIORITY_BELOW_NORMAL;
@@ -58,7 +58,7 @@ namespace xcore
             _endthreadex(0);
         }
     };
-    thread_local xthread_win* tl_thread_ptr = NULL;
+    thread_local xthread_win* tl_thread_ptr = nullptr;
 
     xthread::~xthread()
     {
@@ -106,7 +106,7 @@ namespace xcore
             t->run();
             t->exit();
         }
-        tl_thread_ptr = NULL;
+        tl_thread_ptr = nullptr;
         return 0;
     }
 
@@ -256,7 +256,7 @@ namespace xcore
         xthread* thread    = &thread_win->m_thread;
 
         u32            threadId   = 0;
-        hnd_t          thread_hnd = (HANDLE)::_beginthreadex(NULL, stack_size, &__main_func, thread_win, CREATE_SUSPENDED, &threadId);
+        hnd_t          thread_hnd = (HANDLE)::_beginthreadex(nullptr, stack_size, &__main_func, thread_win, CREATE_SUSPENDED, &threadId);
         xthread::tid_t thread_tid = static_cast<DWORD>(threadId);
 
         if (thread_hnd)
@@ -280,6 +280,6 @@ namespace xcore
 		m_threads->m_alloc.destruct(thread_win);
     }
 
-} // namespace xcore
+} // namespace ncore
 
 #endif

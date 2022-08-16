@@ -5,7 +5,7 @@
 #pragma once
 #endif
 
-namespace xcore 
+namespace ncore 
 {
 	// A xmutex (mutual exclusion) is a synchronization 
 	// mechanism used to control access to a shared resource
@@ -39,7 +39,7 @@ namespace xcore
 	};
 
 
-} // namespace xcore
+} // namespace ncore
 
 
 #endif // __XMTHREAD_MUTEX_H__

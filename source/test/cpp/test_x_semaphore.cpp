@@ -8,10 +8,10 @@
 
 #include "xunittest/xunittest.h"
 
-using xcore::xthread;
-using xcore::xsemaphore;
+using ncore::xthread;
+using ncore::xsemaphore;
 
-class SemaRunnable: public xcore::xthread_functor
+class SemaRunnable: public ncore::xthread_functor
 {
 public:
 	SemaRunnable(int n, int max): _ran(false), _sema(n, max)
@@ -40,7 +40,7 @@ public:
 		return true;
 	}
 
-	bool try_wait(xcore::u32 ms)
+	bool try_wait(ncore::u32 ms)
 	{
 		return _sema.try_wait(ms);
 	}

@@ -5,7 +5,7 @@
 
 #include "xthread/x_semaphore.h"
 
-namespace xcore 
+namespace ncore 
 {
 	// Semaphore (Apple iOS and OSX)
 	struct xsema_data
@@ -40,7 +40,7 @@ namespace xcore
 	}
 
 
-} // namespace xcore
+} // namespace ncore
 
 
 #endif

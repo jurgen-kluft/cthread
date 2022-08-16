@@ -2,7 +2,7 @@
 #define __XMTHREAD_EVENT_H__
 #include "xbase/x_target.h"
 
-namespace xcore 
+namespace ncore 
 {
 
 	// An xevent is a synchronization object that allows one thread to signal one or more
@@ -39,7 +39,7 @@ namespace xcore
 	};
 
 
-} // namespace xcore
+} // namespace ncore
 
 
 #endif // __XMTHREAD_EVENT_H__

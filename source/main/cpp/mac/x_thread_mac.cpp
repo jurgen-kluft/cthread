@@ -1,7 +1,7 @@
 #include "xbase/x_target.h"
 
-namespace xcore 
+namespace ncore 
 {
 
 
-} // namespace xcore
+} // namespace ncore

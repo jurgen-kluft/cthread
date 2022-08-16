@@ -7,7 +7,7 @@
 #include "xthread/x_mutex.h"
 #include <Windows.h>
 
-namespace xcore
+namespace ncore
 {
 	class xmutex_win : public xmutex
 	{
@@ -84,6 +84,6 @@ namespace xcore
 		m_mutexes->m_alloc.destruct(win_mtx);
 	}
 
-} // namespace xcore
+} // namespace ncore
 
 #endif

@@ -5,7 +5,7 @@
 #pragma once
 #endif
 
-namespace xcore
+namespace ncore
 {
 	class xthread_functor;
 
@@ -85,7 +85,7 @@ namespace xcore
         ~xthread(); /// Destroys the thread.
 	};
 
-} // namespace xcore
+} // namespace ncore
 
 
 #endif // __XMTHREAD_THREAD_H__

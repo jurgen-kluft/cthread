@@ -3,7 +3,7 @@
 #ifdef TARGET_MAC
 #include "xthread/x_event.h"
 
-namespace xcore 
+namespace ncore 
 {
 	struct xevent_data
 	{
@@ -36,6 +36,6 @@ namespace xcore
 	}
 
 
-} // namespace xcore
+} // namespace ncore
 
 #endif

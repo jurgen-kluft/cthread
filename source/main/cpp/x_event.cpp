@@ -1,7 +1,7 @@
 #include "xthread/x_event.h"
 
-namespace xcore 
+namespace ncore 
 {
 
 
-} // namespace xcore
+} // namespace ncore

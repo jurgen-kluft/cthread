@@ -12,14 +12,14 @@
 
 #include "xunittest/xunittest.h"
 
-using xcore::xthread;
-using xcore::xevent;
-using xcore::datetime_t;
-using xcore::timespan_t;
-using xcore::s32;
+using ncore::xthread;
+using ncore::xevent;
+using ncore::datetime_t;
+using ncore::timespan_t;
+using ncore::s32;
 
 
-class MyRunnable: public xcore::xthread_functor
+class MyRunnable: public ncore::xthread_functor
 {
 public:
 	MyRunnable(): _ran(false)

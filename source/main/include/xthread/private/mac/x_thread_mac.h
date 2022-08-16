@@ -7,7 +7,7 @@
 #include <thread>
 #include <chrono>
 
-namespace xcore
+namespace ncore
 {
 #if defined(TARGET_DEVKIT)
 	#define XTHREAD_DEBUGGER_THREAD_NAMES
@@ -113,7 +113,7 @@ namespace xcore
 	}
 
 
-} // namespace xcore
+} // namespace ncore
 
 
 #endif // __XMTHREAD_THREAD_OSX_H__

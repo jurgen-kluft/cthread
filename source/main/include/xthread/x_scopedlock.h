@@ -5,7 +5,7 @@
 #pragma once
 #endif
 
-namespace xcore
+namespace ncore
 {
 	/// A class that simplifies thread synchronization
 	/// with a mutex.
@@ -32,7 +32,7 @@ namespace xcore
 	};
 
 
-} // namespace xcore
+} // namespace ncore
 
 
 #endif // __XMTHREAD_SCOPEDLOCK_H__

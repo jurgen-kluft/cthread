@@ -8,7 +8,7 @@
 #include "xbase/x_allocator.h"
 #include "xthread/x_thread.h"
 
-namespace xcore
+namespace ncore
 {
     class alloc_t;
 
@@ -70,7 +70,7 @@ namespace xcore
 		xsemaphores_data*   m_semaphores;
 	};
 
-} // namespace xcore
+} // namespace ncore
 
 
 #endif 

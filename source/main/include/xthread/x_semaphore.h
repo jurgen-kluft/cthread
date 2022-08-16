@@ -5,7 +5,7 @@
 #pragma once
 #endif
 
-namespace xcore
+namespace ncore
 {
 	
 	// A xsemaphore is a synchronization object with the following 
@@ -65,7 +65,7 @@ namespace xcore
 		xsemaphore& operator = (const xsemaphore&) {}
 	};
 
-} // namespace xcore
+} // namespace ncore
 
 
 #endif // __XMTHREAD_SEMAPHORE_H__

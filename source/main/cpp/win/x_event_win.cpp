@@ -7,7 +7,7 @@
 
 #include <Windows.h>
 
-namespace xcore 
+namespace ncore 
 {
 	class xevent_win : public xevent
 	{
@@ -22,7 +22,7 @@ namespace xcore
 	xevent::xevent(bool autoReset)
 	{
 		xevent_win* the = (xevent_win*)this;
-		the->m_event = CreateEventW(NULL, autoReset ? FALSE : TRUE, FALSE, NULL);
+		the->m_event = CreateEventW(nullptr, autoReset ? FALSE : TRUE, FALSE, nullptr);
 		if (!the->m_event)
 		{
 			// cannot create event
@@ -97,6 +97,6 @@ namespace xcore
 	}
 
 
-} // namespace xcore
+} // namespace ncore
 
 #endif
