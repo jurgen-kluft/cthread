@@ -1,7 +1,7 @@
-#include "xbase/x_target.h"
+#include "cbase/c_target.h"
 
-#include "xthread/x_threading.h"
-#include "xthread/private/x_threading.h"
+#include "cthread/c_threading.h"
+#include "cthread/private/c_threading.h"
 
 namespace ncore 
 {

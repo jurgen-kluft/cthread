@@ -1,12 +1,12 @@
-#include "xbase/x_target.h"
-#include "xbase/x_debug.h"
-#include "xbase/x_allocator.h"
+#include "cbase/c_target.h"
+#include "cbase/c_debug.h"
+#include "cbase/c_allocator.h"
 
-#include "xthread/x_thread.h"
-#include "xthread/x_threading.h"
-#include "xthread/x_semaphore.h"
+#include "cthread/c_thread.h"
+#include "cthread/c_threading.h"
+#include "cthread/c_semaphore.h"
 
-#include "xunittest/xunittest.h"
+#include "cunittest/xunittest.h"
 
 using ncore::xthread;
 using ncore::xsemaphore;

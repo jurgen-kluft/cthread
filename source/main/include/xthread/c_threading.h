@@ -1,12 +1,12 @@
 #ifndef __XMTHREAD_THREADING_H__
 #define __XMTHREAD_THREADING_H__
-#include "xbase/x_target.h"
+#include "cbase/c_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
 #endif
 
-#include "xbase/x_allocator.h"
-#include "xthread/x_thread.h"
+#include "cbase/c_allocator.h"
+#include "cthread/c_thread.h"
 
 namespace ncore
 {

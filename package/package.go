@@ -1,11 +1,10 @@
 package xthread
 
 import (
+	"github.com/jurgen-kluft/ccode/denv"
 	"github.com/jurgen-kluft/xbase/package"
-	"github.com/jurgen-kluft/xtime/package"
-	"github.com/jurgen-kluft/xcode/denv"
 	"github.com/jurgen-kluft/xentry/package"
-	"github.com/jurgen-kluft/xunittest/package"
+	"github.com/jurgen-kluft/xtime/package"
 )
 
 // GetPackage returns the package object of 'xthread'

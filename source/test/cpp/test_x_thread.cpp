@@ -1,16 +1,16 @@
-#include "xbase/x_target.h"
-#include "xbase/x_debug.h"
-#include "xbase/x_allocator.h"
+#include "cbase/c_target.h"
+#include "cbase/c_debug.h"
+#include "cbase/c_allocator.h"
 
-#include "xthread/x_thread.h"
-#include "xthread/x_threading.h"
+#include "cthread/c_thread.h"
+#include "cthread/c_threading.h"
 
-#include "xthread/x_event.h"
+#include "cthread/c_event.h"
 
-#include "xtime/x_datetime.h"
-#include "xtime/x_timespan.h"
+#include "ctime/c_datetime.h"
+#include "ctime/c_timespan.h"
 
-#include "xunittest/xunittest.h"
+#include "cunittest/xunittest.h"
 
 using ncore::xthread;
 using ncore::xevent;
