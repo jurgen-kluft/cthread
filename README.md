@@ -1,4 +1,4 @@
-# xthread, cross platform thread library (c++)
+# cthread, cross platform thread library (c++)
 
 - platforms: windows / mac
 - thread create/wait/destroy
@@ -11,7 +11,7 @@
 static void highest_priority_thread_fn(void* arg)
 {
     xthreading* threading = static_cast<xthreading>(arg);
-    xthread* current = threading->current_thread();
+    cthread* current = threading->current_thread();
 
     // Here the high priority thread code
     bool active = true;
@@ -25,7 +25,7 @@ static void highest_priority_thread_fn(void* arg)
 xthreading* threading = xthreading::create(xalloc::get_system());
 
 void* my_arg = threading;
-xthread* thread_main = threading->create_thread("main thread", my_arg, highest_priority_thread_fn, xthreading::HIGHEST_PRIORITY);
+cthread* thread_main = threading->create_thread("main thread", my_arg, highest_priority_thread_fn, xthreading::HIGHEST_PRIORITY);
 
 xmutex* mutex = threading->create_mutex("shared resource lock");
 xevent* event = threading->create_event("resource locked");

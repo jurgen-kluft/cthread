@@ -19,32 +19,32 @@
 
 namespace ncore
 {
-    const s32 xthread::e_priority::LOWEST  = THREAD_PRIORITY_LOWEST;
-    const s32 xthread::e_priority::LOW    = THREAD_PRIORITY_BELOW_NORMAL;
-    const s32 xthread::e_priority::NORMAL  = THREAD_PRIORITY_NORMAL;
-    const s32 xthread::e_priority::HIGH    = THREAD_PRIORITY_ABOVE_NORMAL;
-    const s32 xthread::e_priority::HIGHEST = THREAD_PRIORITY_HIGHEST;
+    const s32 cthread::e_priority::LOWEST  = THREAD_PRIORITY_LOWEST;
+    const s32 cthread::e_priority::LOW    = THREAD_PRIORITY_BELOW_NORMAL;
+    const s32 cthread::e_priority::NORMAL  = THREAD_PRIORITY_NORMAL;
+    const s32 cthread::e_priority::HIGH    = THREAD_PRIORITY_ABOVE_NORMAL;
+    const s32 cthread::e_priority::HIGHEST = THREAD_PRIORITY_HIGHEST;
 
     typedef void* hnd_t;
 
-    class xthread_win : public xthread
+    class xthread_win : public cthread
     {
     public:
-		xthread_win() : xthread() {}  
-		xthread_win(const char* name) : xthread(name) {}
-		xthread_win(const char* name, e_priority p, u32 stack_size) : xthread(name, p, stack_size) {}
+		xthread_win() : cthread() {}  
+		xthread_win(const char* name) : cthread(name) {}
+		xthread_win(const char* name, e_priority p, u32 stack_size) : cthread(name, p, stack_size) {}
 
 		~xthread_win() {}
 
         hnd_t               m_threadHandle;
-        xthread::idx_t      m_threadIdx;
-        xthread::tid_t      m_threadTid;
-        xthread::e_state    m_threadState;
-        xthread::e_priority m_priority;
+        cthread::idx_t      m_threadIdx;
+        cthread::tid_t      m_threadTid;
+        cthread::e_state    m_threadState;
+        cthread::e_priority m_priority;
         u32                 m_stack_size;
         xthread_functor*    m_functor;
         void*               m_arg;
-        xthread             m_thread;
+        cthread             m_thread;
         char                m_name[64];
 
 		XCORE_CLASS_PLACEMENT_NEW_DELETE
@@ -60,14 +60,14 @@ namespace ncore
     };
     thread_local xthread_win* tl_thread_ptr = nullptr;
 
-    xthread::~xthread()
+    cthread::~cthread()
     {
         xthread_win* data = (xthread_win*)this;
         if (data->m_threadHandle)
             ::CloseHandle(data->m_threadHandle);
     }
 
-    void xthread::set_priority(e_priority priority)
+    void cthread::set_priority(e_priority priority)
     {
         xthread_win* data = (xthread_win*)this;
         if (priority != data->m_priority)
@@ -83,7 +83,7 @@ namespace ncore
         }
     }
 
-    void xthread::start()
+    void cthread::start()
     {
         xthread_win* data = (xthread_win*)this;
         if (get_state() == STATE_RUNNING)
@@ -110,7 +110,7 @@ namespace ncore
         return 0;
     }
 
-    void xthread::join()
+    void cthread::join()
     {
         xthread_win* data = (xthread_win*)this;
         if (!data->m_threadHandle)
@@ -131,7 +131,7 @@ namespace ncore
         }
     }
 
-    bool xthread::join(u32 milliseconds)
+    bool cthread::join(u32 milliseconds)
     {
         xthread_win* data = (xthread_win*)this;
         if (!data->m_threadHandle)
@@ -151,34 +151,34 @@ namespace ncore
         return false;
     }
 
-    u32 xthread::get_stacksize() const 
+    u32 cthread::get_stacksize() const 
 	{
         xthread_win* data = (xthread_win*)this;
         return data->m_stack_size; 
 	}
 
-    xthread::e_state xthread::get_state() const 
+    cthread::e_state cthread::get_state() const 
 	{
         xthread_win* data = (xthread_win*)this;
         return data->m_threadState; 
 	}
 
-    xthread* xthread::current() { return &tl_thread_ptr->m_thread; }
+    cthread* cthread::current() { return &tl_thread_ptr->m_thread; }
 
-    xthread::tid_t xthread::current_tid()
+    cthread::tid_t cthread::current_tid()
     {
         return tl_thread_ptr->m_threadTid;
     }
 
-    xthread::idx_t xthread::current_idx()
+    cthread::idx_t cthread::current_idx()
     {
 		return tl_thread_ptr->m_threadIdx; 
 	}
 
-    void xthread::sleep(u32 milliseconds) { ::Sleep(DWORD(milliseconds)); }
-    void xthread::yield() { ::Sleep(0); }
+    void cthread::sleep(u32 milliseconds) { ::Sleep(DWORD(milliseconds)); }
+    void cthread::yield() { ::Sleep(0); }
 
-	static void sMakeName(ascii::runes& str, xthread::tid_t id) { ascii::sprintf(str, ascii::crunes("#%d"), va_t(id)); }
+	static void sMakeName(ascii::runes& str, cthread::tid_t id) { ascii::sprintf(str, ascii::crunes("#%d"), va_t(id)); }
 
     static s32 sUniqueId()
     {
@@ -186,7 +186,7 @@ namespace ncore
         return count++;
     }
 
-    xthread::xthread()
+    cthread::cthread()
     {
         xthread_win* data = (xthread_win*)this;
         data->m_threadTid = (sUniqueId());
@@ -196,7 +196,7 @@ namespace ncore
         sMakeName(name, data->m_threadTid);
     }
 
-    xthread::xthread(const char* _name)
+    cthread::cthread(const char* _name)
     {
         xthread_win* data = (xthread_win*)this;
         data->m_threadTid = (sUniqueId());
@@ -205,7 +205,7 @@ namespace ncore
     }
 
 
-    xthread::e_priority xthread::get_priority() const 
+    cthread::e_priority cthread::get_priority() const 
 	{
         xthread_win* data = (xthread_win*)this;
         return data->m_priority;
@@ -247,26 +247,26 @@ namespace ncore
 
 	}
 
-    xthread* xthreading::create_thread(const char* name, void* arg, xthread_functor* f, u32 stack_size, xthread::e_priority priority)
+    cthread* xthreading::create_thread(const char* name, void* arg, xthread_functor* f, u32 stack_size, cthread::e_priority priority)
     {
         xthread_win* thread_win = m_threads->m_alloc.construct<xthread_win>();
         thread_win->m_arg        = arg;
         thread_win->m_functor    = f;
-        thread_win->m_thread     = xthread(name, priority, stack_size);
-        xthread* thread    = &thread_win->m_thread;
+        thread_win->m_thread     = cthread(name, priority, stack_size);
+        cthread* thread    = &thread_win->m_thread;
 
         u32            threadId   = 0;
         hnd_t          thread_hnd = (HANDLE)::_beginthreadex(nullptr, stack_size, &__main_func, thread_win, CREATE_SUSPENDED, &threadId);
-        xthread::tid_t thread_tid = static_cast<DWORD>(threadId);
+        cthread::tid_t thread_tid = static_cast<DWORD>(threadId);
 
         if (thread_hnd)
         {
 			thread_win->m_threadHandle = thread_hnd;
 			thread_win->m_threadTid    = thread_tid;
-			thread_win->m_threadState  = xthread::STATE_CREATED;
+			thread_win->m_threadState  = cthread::STATE_CREATED;
         }
 
-        if (thread_win->m_priority.prio != xthread::e_priority::NORMAL && !SetThreadPriority(thread_hnd, thread_win->m_priority.prio))
+        if (thread_win->m_priority.prio != cthread::e_priority::NORMAL && !SetThreadPriority(thread_hnd, thread_win->m_priority.prio))
         {
             // cannot set thread priority
         }
@@ -274,7 +274,7 @@ namespace ncore
         return thread;
     }
 
-    void xthreading::destroy_thread(xthread* thread)
+    void xthreading::destroy_thread(cthread* thread)
     {
 		xthread_win* thread_win = (xthread_win*)thread;
 		m_threads->m_alloc.destruct(thread_win);

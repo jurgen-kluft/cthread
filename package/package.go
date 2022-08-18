@@ -1,38 +1,39 @@
-package xthread
+package cthread
 
 import (
+	cbase "github.com/jurgen-kluft/cbase/package"
 	"github.com/jurgen-kluft/ccode/denv"
-	"github.com/jurgen-kluft/xbase/package"
-	"github.com/jurgen-kluft/xentry/package"
-	"github.com/jurgen-kluft/xtime/package"
+	centry "github.com/jurgen-kluft/centry/package"
+	ctime "github.com/jurgen-kluft/ctime/package"
+	cunittest "github.com/jurgen-kluft/cunittest/package"
 )
 
-// GetPackage returns the package object of 'xthread'
+// GetPackage returns the package object of 'cthread'
 func GetPackage() *denv.Package {
 	// Dependencies
-	xunittestpkg := xunittest.GetPackage()
-	xentrypkg := xentry.GetPackage()
-	xbasepkg := xbase.GetPackage()
-	xtimepkg := xtime.GetPackage()
+	cunittestpkg := cunittest.GetPackage()
+	centrypkg := centry.GetPackage()
+	cbasepkg := cbase.GetPackage()
+	ctimepkg := ctime.GetPackage()
 
-	// The main (xthread) package
-	mainpkg := denv.NewPackage("xthread")
-	mainpkg.AddPackage(xunittestpkg)
-	mainpkg.AddPackage(xentrypkg)
-	mainpkg.AddPackage(xbasepkg)
-	mainpkg.AddPackage(xtimepkg)
+	// The main (cthread) package
+	mainpkg := denv.NewPackage("cthread")
+	mainpkg.AddPackage(cunittestpkg)
+	mainpkg.AddPackage(centrypkg)
+	mainpkg.AddPackage(cbasepkg)
+	mainpkg.AddPackage(ctimepkg)
 
-	// 'xthread' library
-	mainlib := denv.SetupDefaultCppLibProject("xthread", "github.com\\jurgen-kluft\\xthread")
-	mainlib.Dependencies = append(mainlib.Dependencies, xbasepkg.GetMainLib())
-	mainlib.Dependencies = append(mainlib.Dependencies, xtimepkg.GetMainLib())
+	// 'cthread' library
+	mainlib := denv.SetupDefaultCppLibProject("cthread", "github.com\\jurgen-kluft\\cthread")
+	mainlib.Dependencies = append(mainlib.Dependencies, cbasepkg.GetMainLib())
+	mainlib.Dependencies = append(mainlib.Dependencies, ctimepkg.GetMainLib())
 
-	// 'xthread' unittest project
-	maintest := denv.SetupDefaultCppTestProject("xthread_test", "github.com\\jurgen-kluft\\xthread")
-	maintest.Dependencies = append(maintest.Dependencies, xunittestpkg.GetMainLib())
-	maintest.Dependencies = append(maintest.Dependencies, xentrypkg.GetMainLib())
-	maintest.Dependencies = append(maintest.Dependencies, xbasepkg.GetMainLib())
-	maintest.Dependencies = append(maintest.Dependencies, xtimepkg.GetMainLib())
+	// 'cthread' unittest project
+	maintest := denv.SetupDefaultCppTestProject("cthread_test", "github.com\\jurgen-kluft\\cthread")
+	maintest.Dependencies = append(maintest.Dependencies, cunittestpkg.GetMainLib())
+	maintest.Dependencies = append(maintest.Dependencies, centrypkg.GetMainLib())
+	maintest.Dependencies = append(maintest.Dependencies, cbasepkg.GetMainLib())
+	maintest.Dependencies = append(maintest.Dependencies, ctimepkg.GetMainLib())
 	maintest.Dependencies = append(maintest.Dependencies, mainlib)
 
 	mainpkg.AddMainLib(mainlib)

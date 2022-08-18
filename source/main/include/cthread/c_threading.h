@@ -19,7 +19,7 @@ namespace ncore
 		virtual void	run() = 0;
 	};
 
-    class xthread;
+    class cthread;
     class xmutex;
     class xevent;
     class xsemaphore;
@@ -35,20 +35,20 @@ namespace ncore
 		static xthreading*	create(alloc_t* allocator, u32 max_threads = 32, u32 max_mutex = 32, u32 max_event = 32, u32 max_semaphore = 32);
 		static void         destroy(xthreading*&);
 
-		xthread*            create_thread(const char* name, void* arg, xthread_functor* f, u32 stack_size, xthread::e_priority priority);
+		cthread*            create_thread(const char* name, void* arg, xthread_functor* f, u32 stack_size, cthread::e_priority priority);
 		xmutex*				create_mutex();
 		xevent*				create_event(bool autoReset);
 		xsemaphore*			create_semaphore(s32 initial_count, s32 max_count);
 
-		void				destroy_thread(xthread*);
+		void				destroy_thread(cthread*);
 		void				destroy_mutex(xmutex*);
 		void				destroy_event(xevent*);
 		void				destroy_semaphore(xsemaphore*);
 
-		void				join(xthread*);
-		bool				join(xthread*, u32 milliseconds);
+		void				join(cthread*);
+		bool				join(cthread*, u32 milliseconds);
 
-		static xthread*		current();
+		static cthread*		current();
 		static void			sleep(u32 milliseconds);
 		static void			yield();
 		static void			exit();

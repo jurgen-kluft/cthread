@@ -5,7 +5,7 @@
 #include "cbase/c_context.h"
 #include "ctime/c_time.h"
 
-#include "cunittest/xunittest.h"
+#include "cunittest/cunittest.h"
 #include "cunittest/private/ut_ReportAssert.h"
 
 UNITTEST_SUITE_LIST(xMThreadUnitTest);
@@ -13,7 +13,7 @@ UNITTEST_SUITE_LIST(xMThreadUnitTest);
 UNITTEST_SUITE_DECLARE(xMThreadUnitTest, xevent);
 UNITTEST_SUITE_DECLARE(xMThreadUnitTest, xmutex);
 UNITTEST_SUITE_DECLARE(xMThreadUnitTest, xsemaphore);
-UNITTEST_SUITE_DECLARE(xMThreadUnitTest, xthread);
+UNITTEST_SUITE_DECLARE(xMThreadUnitTest, cthread);
 
 namespace ncore
 {
@@ -76,8 +76,8 @@ ncore::UnitTestAssertHandler gAssertHandler;
 
 bool gRunUnitTest(UnitTest::TestReporter& reporter)
 {
-	xbase::init();
-	xtime::init();
+	cbase::init();
+	ctime::init();
 
 #ifdef TARGET_DEBUG
 	ncore::context_t::set_assert_handler(&gAssertHandler);
@@ -98,7 +98,7 @@ bool gRunUnitTest(UnitTest::TestReporter& reporter)
 	int r = UNITTEST_SUITE_RUN(reporter, xMThreadUnitTest);
 	if (UnitTest::GetNumAllocations()!=0)
 	{
-		reporter.reportFailure(__FILE__, __LINE__, "xunittest", "memory leaks detected!");
+		reporter.reportFailure(__FILE__, __LINE__, "cunittest", "memory leaks detected!");
 		r = -1;
 	}
 
@@ -107,8 +107,8 @@ bool gRunUnitTest(UnitTest::TestReporter& reporter)
 	UnitTest::SetAllocator(nullptr);
 	ncore::context_t::set_system_alloc(systemAllocator);
 
-	xtime::exit();
-	xbase::exit();
+	ctime::exit();
+	cbase::exit();
 	return r==0;
 }
 

@@ -10,9 +10,9 @@
 #include "ctime/c_datetime.h"
 #include "ctime/c_timespan.h"
 
-#include "cunittest/xunittest.h"
+#include "cunittest/cunittest.h"
 
-using ncore::xthread;
+using ncore::cthread;
 using ncore::xevent;
 using ncore::datetime_t;
 using ncore::timespan_t;
@@ -28,7 +28,7 @@ public:
 	
 	void run()
 	{
-		xthread* pThread = xthread::current();
+		cthread* pThread = cthread::current();
 		if (pThread)
 			_threadName = pThread->get_name();
 		_ran = true;
@@ -78,7 +78,7 @@ void freeFunc(void* pData)
 	MyRunnable::_staticVar += *reinterpret_cast<s32*>(pData);
 }
 
-UNITTEST_SUITE_BEGIN(xthread)
+UNITTEST_SUITE_BEGIN(cthread)
 {
     UNITTEST_FIXTURE(main)
     {
@@ -88,11 +88,11 @@ UNITTEST_SUITE_BEGIN(xthread)
 
 		UNITTEST_TEST(testThread)
 		{
-			xthread thread;
+			cthread thread;
 			MyRunnable r;
 			CHECK_TRUE (!thread.is_running());
 			thread.start(&r);
-			xthread::sleep(200);
+			cthread::sleep(200);
 			CHECK_TRUE (thread.is_running());
 			r.notify();
 			thread.join();
@@ -105,7 +105,7 @@ UNITTEST_SUITE_BEGIN(xthread)
 
 		UNITTEST_TEST(testNamedThread)
 		{
-			xthread thread("MyThread");
+			cthread thread("MyThread");
 			MyRunnable r;
 			thread.start(&r);
 			r.notify();
@@ -117,16 +117,16 @@ UNITTEST_SUITE_BEGIN(xthread)
 
 		UNITTEST_TEST(testCurrent)
 		{
-			CHECK_NULL(xthread::current());
+			CHECK_NULL(cthread::current());
 		}
 
 
 		UNITTEST_TEST(testThreads)
 		{
-			xthread thread1("Thread1");
-			xthread thread2("Thread2");
-			xthread thread3("Thread3");
-			xthread thread4("Thread4");
+			cthread thread1("Thread1");
+			cthread thread2("Thread2");
+			cthread thread3("Thread3");
+			cthread thread4("Thread4");
 
 			MyRunnable r1;
 			MyRunnable r2;
@@ -137,7 +137,7 @@ UNITTEST_SUITE_BEGIN(xthread)
 			CHECK_TRUE (!thread3.is_running());
 			CHECK_TRUE (!thread4.is_running());
 			thread1.start(&r1);
-			xthread::sleep(200);
+			cthread::sleep(200);
 			CHECK_TRUE (thread1.is_running());
 			CHECK_TRUE (!thread2.is_running());
 			CHECK_TRUE (!thread3.is_running());
@@ -145,7 +145,7 @@ UNITTEST_SUITE_BEGIN(xthread)
 			thread2.start(&r2);
 			thread3.start(&r3);
 			thread4.start(&r4);
-			xthread::sleep(200);
+			cthread::sleep(200);
 			CHECK_TRUE (thread1.is_running());
 			CHECK_TRUE (thread2.is_running());
 			CHECK_TRUE (thread3.is_running());
@@ -182,11 +182,11 @@ UNITTEST_SUITE_BEGIN(xthread)
 
 		UNITTEST_TEST(testJoin)
 		{
-			xthread thread;
+			cthread thread;
 			MyRunnable r;
 			CHECK_TRUE (!thread.is_running());
 			thread.start(&r);
-			xthread::sleep(200);
+			cthread::sleep(200);
 			CHECK_TRUE (thread.is_running());
 			CHECK_TRUE (!thread.join(100));
 			r.notify();
@@ -197,7 +197,7 @@ UNITTEST_SUITE_BEGIN(xthread)
 
 		UNITTEST_TEST(testThreadFunction)
 		{
-			xthread thread;
+			cthread thread;
 
 			CHECK_TRUE (!thread.is_running());
 
@@ -221,16 +221,16 @@ UNITTEST_SUITE_BEGIN(xthread)
 		{
 			s32 stackSize = 50000000;
 
-			xthread::config cnfg;
+			cthread::config cnfg;
 			cnfg.m_stack_size = stackSize;
-			xthread thread(cnfg);
+			cthread thread(cnfg);
 			CHECK_TRUE (stackSize == thread.get_stacksize());
 		}
 
 		UNITTEST_TEST(testSleep)
 		{
 			datetime_t start = datetime_t::sNow();
-			xthread::sleep(200);
+			cthread::sleep(200);
 			datetime_t end = datetime_t::sNow();
 			timespan_t elapsed = end - start;
 			CHECK_TRUE (elapsed.totalMilliseconds() >= 190 && elapsed.totalMilliseconds() < 250);

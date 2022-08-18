@@ -9,7 +9,7 @@ namespace ncore
 {
 	class xthread_functor;
 
-	class xthread
+	class cthread
 	{
 	public:	
 		typedef s32       idx_t;
@@ -64,7 +64,7 @@ namespace ncore
 		void				join();
 		bool				join(u32 milliseconds);
 
-		static xthread*		current();
+		static cthread*		current();
         static tid_t        current_tid();
         static idx_t        current_idx();
 		static void			sleep(u32 milliseconds);
@@ -77,12 +77,12 @@ namespace ncore
 	protected:
         friend class xthreading;
 
-        xthread();                                               /// Creates a thread. Call start() to start it.
-        xthread(const char* name);                               /// Creates a named thread. Call start() to start it.
-        xthread(const char* name, e_priority p, u32 stack_size); /// Creates a thread using some configuration. Call start() to start it.
-        xthread(const xthread&);
-        xthread& operator=(const xthread&);
-        ~xthread(); /// Destroys the thread.
+        cthread();                                               /// Creates a thread. Call start() to start it.
+        cthread(const char* name);                               /// Creates a named thread. Call start() to start it.
+        cthread(const char* name, e_priority p, u32 stack_size); /// Creates a thread using some configuration. Call start() to start it.
+        cthread(const cthread&);
+        cthread& operator=(const cthread&);
+        ~cthread(); /// Destroys the thread.
 	};
 
 } // namespace ncore

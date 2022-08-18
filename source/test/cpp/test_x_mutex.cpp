@@ -7,9 +7,9 @@
 #include "cthread/c_threading.h"
 #include "ctime/c_datetime.h"
 
-#include "cunittest/xunittest.h"
+#include "cunittest/cunittest.h"
 
-using ncore::xthread;
+using ncore::cthread;
 using ncore::datetime_t;
 
 
@@ -73,11 +73,11 @@ UNITTEST_SUITE_BEGIN(xmutex)
 		UNITTEST_TEST(testLock)
 		{
 			testMutex.lock();
-			xthread thr;
+			cthread thr;
 			TestLock tl;
 			thr.start(&tl);
 			datetime_t now = datetime_t::sNow();
-			xthread::sleep(2000);
+			cthread::sleep(2000);
 			testMutex.unlock();
 			thr.join();
 			CHECK_TRUE (tl.timestamp() > now);
@@ -86,14 +86,14 @@ UNITTEST_SUITE_BEGIN(xmutex)
 
 		UNITTEST_TEST(testTryLock)
 		{
-			xthread thr1;
+			cthread thr1;
 			TestTryLock ttl1;
 			thr1.start(&ttl1);
 			thr1.join();
 			CHECK_TRUE (ttl1.locked());
 	
 			testMutex.lock();
-			xthread thr2;
+			cthread thr2;
 			TestTryLock ttl2;
 			thr2.start(&ttl2);
 			thr2.join();

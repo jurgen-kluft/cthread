@@ -7,7 +7,7 @@
 #include "cthread/c_threading.h"
 #include "ctime/c_datetime.h"
 
-#include "cunittest\xunittest.h"
+#include "cunittest\cunittest.h"
 
 using namespace ncore;
 using ncore::datetime_t;
@@ -51,18 +51,18 @@ UNITTEST_SUITE_BEGIN(xevent)
 			xthreading* threading = xthreading::create(gTestAllocator);
 
 			TestEvent te;
-			xthread* thr1 = threading->create_thread("test1", threading, &te, xthread::default_stacksize(), xthread::default_priority());
+			cthread* thr1 = threading->create_thread("test1", threading, &te, cthread::default_stacksize(), cthread::default_priority());
 			thr1->start();
 			datetime_t now = datetime_t::sNow();
-			xthread::sleep(2000);
+			cthread::sleep(2000);
 			testEvent.set();
 			thr1->join();
 			CHECK_TRUE (te.timestamp() > now);
 
-			xthread* thr2= threading->create_thread("test2", threading, &te, xthread::default_stacksize(), xthread::default_priority());
+			cthread* thr2= threading->create_thread("test2", threading, &te, cthread::default_stacksize(), cthread::default_priority());
 			thr2->start();
 			now = datetime_t::sNow();
-			xthread::sleep(2000);
+			cthread::sleep(2000);
 			testEvent.set();
 			thr2->join();
 			CHECK_TRUE(te.timestamp() > now);

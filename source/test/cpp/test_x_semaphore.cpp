@@ -6,9 +6,9 @@
 #include "cthread/c_threading.h"
 #include "cthread/c_semaphore.h"
 
-#include "cunittest/xunittest.h"
+#include "cunittest/cunittest.h"
 
-using ncore::xthread;
+using ncore::cthread;
 using ncore::xsemaphore;
 
 class SemaRunnable: public ncore::xthread_functor
@@ -75,9 +75,9 @@ UNITTEST_SUITE_BEGIN(xsemaphore)
 			r.wait();
 			CHECK_TRUE (!r.try_wait(10));
 	
-			xthread t;
+			cthread t;
 			t.start(&r);
-			xthread::sleep(100);
+			cthread::sleep(100);
 			CHECK_TRUE (!r.ran());
 			r.set();
 			t.join();
