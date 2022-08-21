@@ -3,10 +3,10 @@
         {
             "name": "Mac",
             "includePath": [
-                "/Users/obnosis1/Dev.Go/src/github.com/jurgen-kluft/xbase/source/main/include",
-                "/Users/obnosis1/Dev.Go/src/github.com/jurgen-kluft/xunittest/source/main/include",
-                "/Users/obnosis1/Dev.Go/src/github.com/jurgen-kluft/xtime/source/main/include",
-                "/Users/obnosis1/Dev.Go/src/github.com/jurgen-kluft/xthread/source/main/include",
+                "/Users/obnosis1/Dev.Go/src/github.com/jurgen-kluft/cbase/source/main/include",
+                "/Users/obnosis1/Dev.Go/src/github.com/jurgen-kluft/cunittest/source/main/include",
+                "/Users/obnosis1/Dev.Go/src/github.com/jurgen-kluft/ctime/source/main/include",
+                "/Users/obnosis1/Dev.Go/src/github.com/jurgen-kluft/cthread/source/main/include",
                 "${workspaceRoot}"
             ],
             "defines": [
