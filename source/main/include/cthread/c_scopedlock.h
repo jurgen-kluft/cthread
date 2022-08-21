@@ -1,5 +1,5 @@
-#ifndef __XMTHREAD_SCOPEDLOCK_H__
-#define __XMTHREAD_SCOPEDLOCK_H__
+#ifndef __CMTHREAD_SCOPEDLOCK_H__
+#define __CMTHREAD_SCOPEDLOCK_H__
 #include "cbase/c_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
@@ -35,4 +35,4 @@ namespace ncore
 } // namespace ncore
 
 
-#endif // __XMTHREAD_SCOPEDLOCK_H__
+#endif // __CMTHREAD_SCOPEDLOCK_H__

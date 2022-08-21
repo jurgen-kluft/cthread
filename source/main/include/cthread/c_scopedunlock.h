@@ -1,5 +1,5 @@
-#ifndef __XMTHREAD_SCOPEDUNLOCK_H__
-#define __XMTHREAD_SCOPEDUNLOCK_H__
+#ifndef __CMTHREAD_SCOPEDUNLOCK_H__
+#define __CMTHREAD_SCOPEDUNLOCK_H__
 #include "cbase/c_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once
@@ -37,4 +37,4 @@ namespace ncore
 } // namespace ncore
 
 
-#endif // __XMTHREAD_SCOPEDUNLOCK_H__
+#endif // __CMTHREAD_SCOPEDUNLOCK_H__

@@ -1,5 +1,5 @@
-#ifndef __XMTHREAD_THREADING_PRIVATE_H__
-#define __XMTHREAD_THREADING_PRIVATE_H__
+#ifndef __CMTHREAD_THREADING_PRIVATE_H__
+#define __CMTHREAD_THREADING_PRIVATE_H__
 #include "cbase/c_target.h"
 #ifdef USE_PRAGMA_ONCE
 #pragma once

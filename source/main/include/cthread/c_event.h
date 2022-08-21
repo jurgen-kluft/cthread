@@ -1,5 +1,5 @@
-#ifndef __XMTHREAD_EVENT_H__
-#define __XMTHREAD_EVENT_H__
+#ifndef __CMTHREAD_EVENT_H__
+#define __CMTHREAD_EVENT_H__
 #include "cbase/c_target.h"
 
 namespace ncore 
@@ -42,4 +42,4 @@ namespace ncore
 } // namespace ncore
 
 
-#endif // __XMTHREAD_EVENT_H__
+#endif // __CMTHREAD_EVENT_H__
