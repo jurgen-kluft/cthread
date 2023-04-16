@@ -53,7 +53,7 @@ namespace ncore
 		static void			yield();
 		static void			exit();
 
-		XCORE_CLASS_PLACEMENT_NEW_DELETE
+		DCORE_CLASS_PLACEMENT_NEW_DELETE
 
 	private:
 							xthreading();

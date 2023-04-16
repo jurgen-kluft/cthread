@@ -17,7 +17,7 @@ namespace ncore
 		xsemaphore_win(s32 n) : xsemaphore(n) {}
 		xsemaphore_win(s32 n, s32 max) : xsemaphore(n, max) {}
 
-		XCORE_CLASS_PLACEMENT_NEW_DELETE
+		DCORE_CLASS_PLACEMENT_NEW_DELETE
 
 		void* _sema;
 	};
@@ -80,7 +80,7 @@ namespace ncore
 	public:
 		xsemaphore*     m_semaphores;
 		fsadexed_array_t m_alloc;
-		XCORE_CLASS_PLACEMENT_NEW_DELETE
+		DCORE_CLASS_PLACEMENT_NEW_DELETE
 	};
 
 

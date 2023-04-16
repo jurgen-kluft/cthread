@@ -14,7 +14,7 @@ namespace ncore
 	public:
 		xevent_win(bool autoReset) : xevent(autoReset) {  }
 
-		XCORE_CLASS_PLACEMENT_NEW_DELETE
+		DCORE_CLASS_PLACEMENT_NEW_DELETE
 
 		void* m_event;
 	};
@@ -73,7 +73,7 @@ namespace ncore
 	public:
 		xevent*         m_events;
 		fsadexed_array_t m_alloc;
-		XCORE_CLASS_PLACEMENT_NEW_DELETE
+		DCORE_CLASS_PLACEMENT_NEW_DELETE
 	};
 
 	xevents_data*	gCreateEventsData(alloc_t* alloc, u32 max_events)

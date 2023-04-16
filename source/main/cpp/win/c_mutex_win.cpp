@@ -14,7 +14,7 @@ namespace ncore
 	public:
 		xmutex_win() : xmutex() {}
 
-		XCORE_CLASS_PLACEMENT_NEW_DELETE
+		DCORE_CLASS_PLACEMENT_NEW_DELETE
 
 		CRITICAL_SECTION _cs;
 	};
@@ -61,7 +61,7 @@ namespace ncore
 	public:
 		xmutex*         m_events;
 		fsadexed_array_t m_alloc;
-		XCORE_CLASS_PLACEMENT_NEW_DELETE
+		DCORE_CLASS_PLACEMENT_NEW_DELETE
 	};
 
 	xmutexes_data*	gCreateMutexesData(alloc_t* alloc, u32 max_mutexes)

@@ -47,7 +47,7 @@ namespace ncore
         cthread             m_thread;
         char                m_name[64];
 
-		XCORE_CLASS_PLACEMENT_NEW_DELETE
+		DCORE_CLASS_PLACEMENT_NEW_DELETE
 
         void run() { m_functor->run(); }
         void exit()
@@ -221,7 +221,7 @@ namespace ncore
 	public:
 		xthread_win*   m_threads;
 		fsadexed_array_t m_alloc;
-		XCORE_CLASS_PLACEMENT_NEW_DELETE
+		DCORE_CLASS_PLACEMENT_NEW_DELETE
 	};
 
 	xthreads_data*		gCreateThreadsData(alloc_t* alloc, u32 max_threads)
