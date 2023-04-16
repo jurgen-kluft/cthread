@@ -7,7 +7,7 @@
 #include "cthread/c_threading.h"
 #include "ctime/c_datetime.h"
 
-#include "cunittest\cunittest.h"
+#include "cunittest/cunittest.h"
 
 using namespace ncore;
 using ncore::datetime_t;
@@ -36,7 +36,7 @@ namespace
 }
 
 
-extern ncore::alloc_t* gTestAllocator;
+
 
 
 UNITTEST_SUITE_BEGIN(xevent)
