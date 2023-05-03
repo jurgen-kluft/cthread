@@ -3,7 +3,6 @@ package cthread
 import (
 	cbase "github.com/jurgen-kluft/cbase/package"
 	"github.com/jurgen-kluft/ccode/denv"
-	centry "github.com/jurgen-kluft/centry/package"
 	ctime "github.com/jurgen-kluft/ctime/package"
 	cunittest "github.com/jurgen-kluft/cunittest/package"
 )
@@ -12,14 +11,12 @@ import (
 func GetPackage() *denv.Package {
 	// Dependencies
 	cunittestpkg := cunittest.GetPackage()
-	centrypkg := centry.GetPackage()
 	cbasepkg := cbase.GetPackage()
 	ctimepkg := ctime.GetPackage()
 
 	// The main (cthread) package
 	mainpkg := denv.NewPackage("cthread")
 	mainpkg.AddPackage(cunittestpkg)
-	mainpkg.AddPackage(centrypkg)
 	mainpkg.AddPackage(cbasepkg)
 	mainpkg.AddPackage(ctimepkg)
 
@@ -31,7 +28,6 @@ func GetPackage() *denv.Package {
 	// 'cthread' unittest project
 	maintest := denv.SetupDefaultCppTestProject("cthread_test", "github.com\\jurgen-kluft\\cthread")
 	maintest.Dependencies = append(maintest.Dependencies, cunittestpkg.GetMainLib())
-	maintest.Dependencies = append(maintest.Dependencies, centrypkg.GetMainLib())
 	maintest.Dependencies = append(maintest.Dependencies, cbasepkg.GetMainLib())
 	maintest.Dependencies = append(maintest.Dependencies, ctimepkg.GetMainLib())
 	maintest.Dependencies = append(maintest.Dependencies, mainlib)
