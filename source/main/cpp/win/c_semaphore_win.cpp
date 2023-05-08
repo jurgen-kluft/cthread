@@ -1,6 +1,6 @@
-#include "cbase/c_target.h"
+#include "ccore/c_target.h"
 #include "cbase/c_allocator.h"
-#include "cbase/c_debug.h"
+#include "ccore/c_debug.h"
 
 #ifdef TARGET_PC
 #include "cthread/c_semaphore.h"

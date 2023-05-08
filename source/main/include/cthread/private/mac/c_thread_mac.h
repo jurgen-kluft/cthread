@@ -1,6 +1,6 @@
 #ifndef __CMTHREAD_THREAD_OSX_H__
 #define __CMTHREAD_THREAD_OSX_H__
-#include "cbase/c_target.h"
+#include "ccore/c_target.h"
 
 #include "cthread/c_thread_functor.h"
 

@@ -1,6 +1,6 @@
 #include "cbase/c_base.h"
 #include "cbase/c_allocator.h"
-#include "cbase/c_debug.h"
+#include "ccore/c_debug.h"
 #include "cbase/c_console.h"
 #include "cbase/c_context.h"
 #include "ctime/c_time.h"

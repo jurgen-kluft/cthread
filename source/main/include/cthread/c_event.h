@@ -1,6 +1,6 @@
 #ifndef __CMTHREAD_EVENT_H__
 #define __CMTHREAD_EVENT_H__
-#include "cbase/c_target.h"
+#include "ccore/c_target.h"
 
 namespace ncore 
 {
