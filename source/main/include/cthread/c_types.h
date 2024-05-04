@@ -53,11 +53,14 @@ namespace ncore
         }
         enum
         {
-            LOWEST  = 0,
-            LOW     = 1,
-            NORMAL  = 2,
-            HIGH    = 3,
-            HIGHEST = 4
+            IDLE         = 0,
+            LOW          = 1,
+            BELOW_NORMAL = 2,
+            NORMAL       = 3,
+            ABOVE_NORMAL = 4,
+            HIGH         = 5,
+            CRITICAL     = 6,
+            COUNT        = 7
         };
 
         bool operator==(const thread_priority_t& p) const { return prio == p.prio; }

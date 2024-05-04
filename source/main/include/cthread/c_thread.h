@@ -10,6 +10,7 @@
 namespace ncore
 {
     class thread_functor;
+    struct thread_data_t;
 
     class thread_t
     {
@@ -20,7 +21,7 @@ namespace ncore
             DEFAULT_PRIORITY  = thread_priority_t::NORMAL
         };
 
-        thread_t();
+        void init(thread_data_t* data);
 
         thread_id_t       get_tid() const;                   // Returns the native thread ID of the thread.
         thread_idx_t      get_idx() const;                   // Returns the unique thread index of the thread.
@@ -40,18 +41,17 @@ namespace ncore
         static thread_priority_t default_priority();
 
     protected:
-        friend class nthread;
+        friend class threading_t;
+        thread_t()
+            : m_data(nullptr)
+        {
+        }
+        thread_data_t* m_data;
 
+    private:
         thread_t(const thread_t&);
         thread_t& operator=(const thread_t&);
         ~thread_t(); /// Destroys the thread.
-
-        thread_state_t    m_state;
-        thread_id_t       m_tid;
-        thread_idx_t      m_idx;
-        char*             m_name;
-        thread_priority_t m_priority;
-        u32               m_stacksize;
     };
 
 } // namespace ncore

@@ -11,6 +11,21 @@
 
 namespace ncore
 {
+    typedef void* hnd_t;
+
+    struct thread_data_t
+    {
+        hnd_t             m_handle;
+        thread_idx_t      m_idx;
+        thread_id_t       m_tid;
+        thread_state_t    m_state;
+        thread_priority_t m_priority;
+        u32               m_stack_size;
+        thread_functor*   m_functor;
+        void*             m_arg;
+        char              m_name[64];
+    };
+
     struct event_data_t
     {
         void* m_event;

@@ -10,4 +10,6 @@ namespace ncore
     void thread_t::join() {}
     bool thread_t::join(u32 milliseconds) { return false; }
 
+    void thread_t::set_priority(thread_priority_t p) {}
+
 } // namespace ncore

@@ -24,6 +24,7 @@ namespace ncore
         DeleteCriticalSection((CRITICAL_SECTION*)&m_data->_cs);
         threading_t::instance()->destroy_mutex(this);
     }
+    
     void mutex_t::lock() { EnterCriticalSection((CRITICAL_SECTION*)&m_data->_cs); }
     bool mutex_t::tryLock() { return TryEnterCriticalSection((CRITICAL_SECTION*)&m_data->_cs) != 0; }
     void mutex_t::unlock() { LeaveCriticalSection((CRITICAL_SECTION*)&m_data->_cs); }

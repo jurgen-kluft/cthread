@@ -24,8 +24,8 @@ namespace ncore
 	void event_t::release()
 	{
 		CloseHandle(m_data->m_event);
+		threading_t::instance()->destroy(this);
 	}
-
 
 	void event_t::wait()
 	{

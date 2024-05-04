@@ -60,11 +60,11 @@ namespace ncore
         static void         yield();
         static void         exit();
 
-    private:
-        threading_t();
-        threading_t(const threading_t&) {}
-        ~threading_t() {}
-        threading_t& operator=(const threading_t&) { return *this; }
+    protected:
+        friend class thread_t;
+
+        // Platform specifics
+        static void init_thread_priority(u32* map);
 
         template <typename T> struct data_t
         {
@@ -73,18 +73,29 @@ namespace ncore
         static threading_t* s_instance;
         alloc_t*            m_allocator;
 
-        // data_t<thread_data_t> m_threads;
-        // data_t<event_data_t>  m_events;
-        // data_t<mutex_data_t>  m_mutexes;
-        // data_t<sema_data_t>   m_semaphores;
-        thread_data_t*   m_threads_data;
+        u32              m_thread_priority_map[thread_priority_t::COUNT];
+        thread_t*        m_threads;
         fsadexed_array_t m_threads_pool;
-        event_data_t*    m_events_data;
+        thread_data_t*   m_threads_data;
+        fsadexed_array_t m_threads_data_pool;
+        event_t*         m_events;
         fsadexed_array_t m_events_pool;
-        mutex_data_t*    m_mutexes_data;
+        event_data_t*    m_events_data;
+        fsadexed_array_t m_events_data_pool;
+        mutex_t*         m_mutexes;
         fsadexed_array_t m_mutexes_pool;
-        sema_data_t*     m_semaphores_data;
+        mutex_data_t*    m_mutexes_data;
+        fsadexed_array_t m_mutexes_data_pool;
+        sema_t*          m_semaphores;
         fsadexed_array_t m_semaphores_pool;
+        sema_data_t*     m_semaphores_data;
+        fsadexed_array_t m_semaphores_data_pool;
+
+    private:
+        threading_t();
+        threading_t(const threading_t&) {}
+        ~threading_t() {}
+        threading_t& operator=(const threading_t&) { return *this; }
     };
 
 } // namespace ncore
