@@ -18,7 +18,10 @@ namespace ncore
     {
     public:
         virtual ~thread_functor() {}
-        virtual void run(thread_t*) = 0;
+
+        virtual void start(thread_t* t, thread_data_t* d) = 0;
+        virtual void run()                                = 0;
+        virtual void exit()                               = 0;
     };
 
     class thread_t;
