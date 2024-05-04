@@ -33,6 +33,8 @@ namespace
 			return _timestamp;
 		}
 
+		DCORE_CLASS_PLACEMENT_NEW_DELETE
+
 	private:
 		mutex_t* testMutex;
 		datetime_t _timestamp;
@@ -59,13 +61,15 @@ namespace
 			return _locked;
 		}
 
+		DCORE_CLASS_PLACEMENT_NEW_DELETE
+
 	private:
 	mutex_t* testMutex;
 		bool _locked;
 	};
 }
 
-UNITTEST_SUITE_BEGIN(xmutex)
+UNITTEST_SUITE_BEGIN(mutex)
 {
     UNITTEST_FIXTURE(main)
     {
@@ -79,7 +83,7 @@ UNITTEST_SUITE_BEGIN(xmutex)
 			mutex_t* testMutex = threading_t::instance()->create_mutex();
 			testMutex->lock();
 			TestLock* tl = Allocator->construct<TestLock>(testMutex);
-			thread_t* thr1 = threading_t::instance()->create_thread("test", nullptr, tl, thread_t::default_stacksize(), thread_t::default_priority());
+			thread_t* thr1 = threading_t::instance()->create_thread("test", tl, thread_t::default_stacksize(), thread_t::default_priority());
 			thr1->start();
 			datetime_t now = datetime_t::sNow();
 			threading_t::sleep(2000);
@@ -113,7 +117,7 @@ UNITTEST_SUITE_BEGIN(xmutex)
 			mutex_t* testMutex = threading_t::instance()->create_mutex();
 
 			TestTryLock* tl1 = Allocator->construct<TestTryLock>(testMutex);
-			thread_t* thr1 = threading_t::instance()->create_thread("test1", nullptr, tl1, thread_t::default_stacksize(), thread_t::default_priority());
+			thread_t* thr1 = threading_t::instance()->create_thread("test1", tl1, thread_t::default_stacksize(), thread_t::default_priority());
 			thr1->start();
 			threading_t::instance()->join(thr1);
 			CHECK_TRUE (tl1->locked());
@@ -121,7 +125,7 @@ UNITTEST_SUITE_BEGIN(xmutex)
 			testMutex->lock();
 
 			TestTryLock* tl2 = Allocator->construct<TestTryLock>(testMutex);
-			thread_t* thr2 = threading_t::instance()->create_thread("test2", nullptr, tl2, thread_t::default_stacksize(), thread_t::default_priority());
+			thread_t* thr2 = threading_t::instance()->create_thread("test2", tl2, thread_t::default_stacksize(), thread_t::default_priority());
 			thr2->start();
 
 			threading_t::instance()->join(thr2);

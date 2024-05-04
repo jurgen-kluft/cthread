@@ -53,10 +53,10 @@ namespace ncore
         {
         }
 
-        // Initializes the semaphore. The current value of the semaphore is given in n. 
+        // Initializes the semaphore. The current value of the semaphore is given in n.
         // The maximum value of the semaphore is given in max.
         // If only n is given, it must be greater than zero.
-        // If both n and max are given, max must be greater than zero, n must be greater 
+        // If both n and max are given, max must be greater than zero, n must be greater
         // than or equal to zero and less than or equal to max.
         bool init(sema_data_t* data, s32 n);
         bool init(sema_data_t* data, s32 n, s32 max);
@@ -64,9 +64,8 @@ namespace ncore
         sema_data_t* m_data;
 
     private:
-        sema_t();
         sema_t(const sema_t&);
-        sema_t& operator=(const sema_t&) {}
+        sema_t& operator=(const sema_t&) { return *this; }
     };
 
 } // namespace ncore

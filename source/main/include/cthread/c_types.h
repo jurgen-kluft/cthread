@@ -5,8 +5,6 @@
 #    pragma once
 #endif
 
-#include "cthread/c_thread.h"
-
 namespace ncore
 {
     typedef s32 thread_idx_t;

@@ -37,7 +37,7 @@ namespace
     };
 } // namespace
 
-UNITTEST_SUITE_BEGIN(event_t)
+UNITTEST_SUITE_BEGIN(event)
 {
     UNITTEST_FIXTURE(main)
     {
@@ -52,7 +52,7 @@ UNITTEST_SUITE_BEGIN(event_t)
 			event_t* testEvent = threading->create_event("test", false);
 
             TestEvent te(testEvent);
-            thread_t* thr1 = threading->create_thread("test1", threading, &te, thread_t::default_stacksize(), thread_t::default_priority());
+            thread_t* thr1 = threading->create_thread("test1", &te, thread_t::default_stacksize(), thread_t::default_priority());
             thr1->start();
             datetime_t now = datetime_t::sNow();
             threading_t::sleep(2000);
@@ -60,7 +60,7 @@ UNITTEST_SUITE_BEGIN(event_t)
             threading_t::instance()->join(thr1);
             CHECK_TRUE(te.timestamp() > now);
 
-            thread_t* thr2 = threading->create_thread("test2", threading, &te, thread_t::default_stacksize(), thread_t::default_priority());
+            thread_t* thr2 = threading->create_thread("test2", &te, thread_t::default_stacksize(), thread_t::default_priority());
             thr2->start();
             now = datetime_t::sNow();
             threading_t::sleep(2000);

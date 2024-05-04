@@ -57,7 +57,7 @@ s32 MyRunnable::_staticVar = 0;
 void freeFunc() { ++MyRunnable::_staticVar; }
 void freeFunc(void* pData) { MyRunnable::_staticVar += *reinterpret_cast<s32*>(pData); }
 
-UNITTEST_SUITE_BEGIN(cthread)
+UNITTEST_SUITE_BEGIN(thread)
 {
     UNITTEST_FIXTURE(main)
     {
@@ -70,7 +70,7 @@ UNITTEST_SUITE_BEGIN(cthread)
         {
             event_t* e = threading_t::instance()->create_event("event", false);
             MyRunnable r(e);
-            thread_t*   thread = threading_t::instance()->create_thread("Thread", nullptr, &r, thread_t::default_stacksize(), thread_t::default_priority());
+            thread_t*   thread = threading_t::instance()->create_thread("Thread", &r, thread_t::default_stacksize(), thread_t::default_priority());
 
             CHECK_TRUE(!thread->is_running());
             thread->start();
@@ -91,7 +91,7 @@ UNITTEST_SUITE_BEGIN(cthread)
         {
             event_t* e = threading_t::instance()->create_event("event", false);
             MyRunnable r(e);
-            thread_t* thread = threading_t::instance()->create_thread("MyThread", nullptr, &r, thread_t::default_stacksize(), thread_t::default_priority());
+            thread_t* thread = threading_t::instance()->create_thread("MyThread", &r, thread_t::default_stacksize(), thread_t::default_priority());
 
             thread->start();
             r.notify();
@@ -117,10 +117,10 @@ UNITTEST_SUITE_BEGIN(cthread)
             MyRunnable r3(e3);
             MyRunnable r4(e4);
 
-            thread_t* thread1 = threading_t::instance()->create_thread("Thread1", nullptr, &r1, thread_t::default_stacksize(), thread_t::default_priority());
-            thread_t* thread2 = threading_t::instance()->create_thread("Thread2", nullptr, &r2, thread_t::default_stacksize(), thread_t::default_priority());
-            thread_t* thread3 = threading_t::instance()->create_thread("Thread3", nullptr, &r3, thread_t::default_stacksize(), thread_t::default_priority());
-            thread_t* thread4 = threading_t::instance()->create_thread("Thread4", nullptr, &r4, thread_t::default_stacksize(), thread_t::default_priority());
+            thread_t* thread1 = threading_t::instance()->create_thread("Thread1", &r1, thread_t::default_stacksize(), thread_t::default_priority());
+            thread_t* thread2 = threading_t::instance()->create_thread("Thread2", &r2, thread_t::default_stacksize(), thread_t::default_priority());
+            thread_t* thread3 = threading_t::instance()->create_thread("Thread3", &r3, thread_t::default_stacksize(), thread_t::default_priority());
+            thread_t* thread4 = threading_t::instance()->create_thread("Thread4", &r4, thread_t::default_stacksize(), thread_t::default_priority());
 
             CHECK_TRUE(!thread1->is_running());
             CHECK_TRUE(!thread2->is_running());
@@ -183,7 +183,7 @@ UNITTEST_SUITE_BEGIN(cthread)
         {
             event_t* e = threading_t::instance()->create_event("event", false);
             MyRunnable r(e);
-            thread_t*  thread = threading_t::instance()->create_thread("Thread", nullptr, &r, thread_t::default_stacksize(), thread_t::default_priority());
+            thread_t*  thread = threading_t::instance()->create_thread("Thread", &r, thread_t::default_stacksize(), thread_t::default_priority());
 
             CHECK_TRUE(!thread->is_running());
             thread->start();
@@ -202,7 +202,7 @@ UNITTEST_SUITE_BEGIN(cthread)
         {
             event_t* e = threading_t::instance()->create_event("event", false);
             MyRunnable f(e);
-            thread_t* thread = threading_t::instance()->create_thread("Thread", &f, nullptr, thread_t::default_stacksize(), thread_t::default_priority());
+            thread_t* thread = threading_t::instance()->create_thread("Thread", &f, thread_t::default_stacksize(), thread_t::default_priority());
 
             CHECK_TRUE(!thread->is_running());
 

@@ -20,20 +20,13 @@ namespace ncore
             DEFAULT_PRIORITY  = thread_priority_t::NORMAL
         };
 
-        enum e_state
-        {
-            STATE_CREATED = 0,
-            STATE_RUNNING = 1,
-            STATE_STOPPED = 2
-        };
-
         thread_t();
 
         thread_id_t       get_tid() const;                   // Returns the native thread ID of the thread.
         thread_idx_t      get_idx() const;                   // Returns the unique thread index of the thread.
         const char*       get_name() const;                  // Returns the name of the thread.
         thread_priority_t get_priority() const;              // Returns the thread's priority.
-        e_state           get_state() const;                 // Returns state of the thread
+        thread_state_t    get_state() const;                 // Returns state of the thread
         bool              is_running() const;                // Returns true if the thread is running.
         u32               get_stacksize() const;             // Returns the stack size of the thread.
         void              set_priority(thread_priority_t p); // Sets the thread's priority.
@@ -53,7 +46,7 @@ namespace ncore
         thread_t& operator=(const thread_t&);
         ~thread_t(); /// Destroys the thread.
 
-        e_state           m_state;
+        thread_state_t    m_state;
         thread_id_t       m_tid;
         thread_idx_t      m_idx;
         char*             m_name;

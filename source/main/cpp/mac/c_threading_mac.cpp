@@ -13,7 +13,7 @@ namespace ncore
     void         threading_t::set_instance(threading_t* instance) {}
     threading_t* threading_t::instance() { return nullptr; }
 
-    thread_t* threading_t::create_thread(const char* name, void* arg, thread_functor* f, u32 stack_size, thread_priority_t priority) { return nullptr; }
+    thread_t* threading_t::create_thread(const char* name, thread_functor* f, u32 stack_size, thread_priority_t priority) { return nullptr; }
     mutex_t*  threading_t::create_mutex() { return nullptr; }
     event_t*  threading_t::create_event(const char* name, bool autoReset) { return nullptr; }
     sema_t*   threading_t::create_sema(s32 initial_count, s32 max_count) { return nullptr; }
@@ -24,7 +24,7 @@ namespace ncore
     void threading_t::destroy(sema_t*) {}
 
     void threading_t::join(thread_t*) {}
-    bool threading_t::join(thread_t*, u32 milliseconds) {}
+    bool threading_t::join(thread_t*, u32 milliseconds) { return false; }
 
     thread_t*    threading_t::current() { return nullptr; }
     thread_id_t  threading_t::current_tid() { return 0; }

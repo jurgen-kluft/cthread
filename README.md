@@ -8,24 +8,26 @@
   - semaphore
 
 ```c++
-static void highest_priority_thread_fn(void* arg)
+class highest_priority_thread_fn : public thread_functor
 {
-    threading_t* threading = static_cast<threading_t>(arg);
-    thread_t* current = threading->current_thread();
+public:
+  void run(thread_t* thread)
+  {
+      thread_t* current = thread;
 
-    // Here the high priority thread code
-    bool active = true;
-    while (active)
-    {
+      // Here the high priority thread code
+      bool active = true;
+      while (active)
+      {
 
-        active = false;
-    }
-}
+          active = false;
+      }
+  }
+};
 
 threading_t* threading = threading_t::create(alloc_t::get_system());
 
-void* my_arg = threading;
-thread_t* thread_main = threading->create_thread("main thread", my_arg, highest_priority_thread_fn, threading_t::HIGHEST_PRIORITY);
+thread_t* thread_main = threading->create_thread("main thread", highest_priority_thread_fn, threading_t::HIGHEST_PRIORITY);
 
 mutex_t* mutex = threading->create_mutex("shared resource lock");
 event_t* event = threading->create_event("resource locked");
@@ -35,4 +37,6 @@ threading->destroy(thread_main);
 threading->destroy(mutex);
 threading->destroy(event);
 threading->destroy();
+
+threading::destroy(threading);
 ```

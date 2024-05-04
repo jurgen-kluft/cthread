@@ -15,6 +15,14 @@ namespace ncore
 		return true;
 	}
 
+    void event_t::set()
+	{
+		pthread_mutex_lock(&m_data->_mutex);
+		m_data->_triggered = true;
+		pthread_cond_broadcast(&m_data->_cond);
+		pthread_mutex_unlock(&m_data->_mutex);
+	}
+
 	void event_t::wait()
 	{
 		pthread_mutex_lock(&m_data->_mutex);
@@ -23,6 +31,10 @@ namespace ncore
 		pthread_mutex_unlock(&m_data->_mutex);
 	}
 
+	void event_t::release()
+	{
+		threading_t::instance()->destroy(this);
+	}
 
 } // namespace ncore
 

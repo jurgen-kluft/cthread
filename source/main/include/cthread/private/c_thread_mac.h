@@ -11,6 +11,11 @@
 
 namespace ncore
 {
+    struct thread_data_t
+    {
+        void* _data;
+    };
+
     struct event_data_t
     {
         pthread_mutex_t _mutex;
@@ -25,7 +30,7 @@ namespace ncore
 
     struct sema_data_t
     {
-        semaphore_t _sema;
+        ::semaphore_t _sema;
     };
 
 } // namespace ncore

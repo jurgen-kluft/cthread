@@ -46,7 +46,7 @@ private:
     sema_t* _sema;
 };
 
-UNITTEST_SUITE_BEGIN(xsemaphore)
+UNITTEST_SUITE_BEGIN(semaphore)
 {
     UNITTEST_FIXTURE(main)
     {
@@ -70,7 +70,7 @@ UNITTEST_SUITE_BEGIN(xsemaphore)
             r.wait();
             CHECK_TRUE(!r.try_wait(10));
 
-            thread_t* t = threading_t::instance()->create_thread("Thread", nullptr, &r, thread_t::default_stacksize(), thread_t::default_priority());
+            thread_t* t = threading_t::instance()->create_thread("Thread", &r, thread_t::default_stacksize(), thread_t::default_priority());
             t->start();
             threading_t::sleep(100);
             CHECK_TRUE(!r.ran());

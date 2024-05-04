@@ -8,8 +8,18 @@
 
 #include <atomic>
 
-namespace ncore 
+namespace ncore
 {
-    
+    thread_id_t       thread_t::get_tid() const { return m_tid; }
+    thread_idx_t      thread_t::get_idx() const { return m_idx; }
+    const char*       thread_t::get_name() const { return m_name; }
+    thread_priority_t thread_t::get_priority() const { return m_priority; }
+    thread_state_t    thread_t::get_state() const { return m_state; }
+    bool              thread_t::is_running() const { return m_state == thread_state_t::RUNNING; }
+    u32               thread_t::get_stacksize() const {}
+    void              thread_t::set_priority(thread_priority_t p) {}
+
+    u32               thread_t::default_stacksize() { return e_config::DEFAULT_STACKSIZE; }
+    thread_priority_t thread_t::default_priority() { return e_config::DEFAULT_PRIORITY; }
 
 } // namespace ncore

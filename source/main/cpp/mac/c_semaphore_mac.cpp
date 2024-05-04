@@ -16,27 +16,33 @@ namespace ncore
     bool sema_t::init(sema_data_t* data, s32 n, s32 max)
     {
         ASSERT(n >= 0 && max > 0 && n <= max);
-        sema_data_t* data = (sema_data_t*)m_data;
-        semaphore_create(mach_task_self(), &data->_sema, SYNC_POLICY_FIFO, n);
+        semaphore_create(mach_task_self(), &m_data->_sema, SYNC_POLICY_FIFO, n);
+        return true;
     }
 
     void sema_t::release()
     {
-        sema_data_t* data = (sema_data_t*)m_data;
-        semaphore_destroy(mach_task_self(), data->_sema);
-        threading_t::instance()->destroy_sema(this);
+        semaphore_destroy(mach_task_self(), m_data->_sema);
+        threading_t::instance()->destroy(this);
     }
 
     void sema_t::signal()
     {
-        sema_data_t* data = (sema_data_t*)m_data;
-        semaphore_signal(data->_sema);
+        semaphore_signal(m_data->_sema);
     }
 
     void sema_t::wait()
     {
         sema_data_t* data = (sema_data_t*)m_data;
-        semaphore_wait(data->_sema);
+        semaphore_wait(m_data->_sema);
+    }
+
+    bool sema_t::try_wait(u32 milliseconds)
+    {
+        mach_timespec_t ts;
+        ts.tv_sec = milliseconds / 1000;
+        ts.tv_nsec = (milliseconds % 1000) * 1000000;
+        return semaphore_timedwait(m_data->_sema, ts) == KERN_SUCCESS;
     }
 
 } // namespace ncore

@@ -12,6 +12,7 @@
 namespace ncore
 {
     class alloc_t;
+    class thread_t;
 
     class thread_functor
     {
@@ -39,7 +40,7 @@ namespace ncore
         static void         set_instance(threading_t* instance);
         static threading_t* instance();
 
-        thread_t* create_thread(const char* name, void* arg, thread_functor* f, u32 stack_size, thread_priority_t priority);
+        thread_t* create_thread(const char* name, thread_functor* f, u32 stack_size, thread_priority_t priority);
         mutex_t*  create_mutex();
         event_t*  create_event(const char* name, bool autoReset);
         sema_t*   create_sema(s32 initial_count, s32 max_count);
@@ -67,16 +68,23 @@ namespace ncore
 
         template <typename T> struct data_t
         {
-            T*               m_data;
-            fsadexed_array_t m_pool;
         };
 
-        static threading_t*   s_instance;
-        alloc_t*              m_allocator;
-        data_t<thread_data_t> m_threads;
-        data_t<event_data_t>  m_events;
-        data_t<mutex_data_t>  m_mutexes;
-        data_t<sema_data_t>   m_semaphores;
+        static threading_t* s_instance;
+        alloc_t*            m_allocator;
+
+        // data_t<thread_data_t> m_threads;
+        // data_t<event_data_t>  m_events;
+        // data_t<mutex_data_t>  m_mutexes;
+        // data_t<sema_data_t>   m_semaphores;
+        thread_data_t*   m_threads_data;
+        fsadexed_array_t m_threads_pool;
+        event_data_t*    m_events_data;
+        fsadexed_array_t m_events_pool;
+        mutex_data_t*    m_mutexes_data;
+        fsadexed_array_t m_mutexes_pool;
+        sema_data_t*     m_semaphores_data;
+        fsadexed_array_t m_semaphores_pool;
     };
 
 } // namespace ncore

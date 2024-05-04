@@ -20,7 +20,7 @@ namespace ncore
     void mutex_t::release()
     {
         pthread_mutex_destroy(&m_data->_mutex);
-        threading_t::instance()->destroy_mutex(this);
+        threading_t::instance()->destroy(this);
     }
 
     void mutex_t::lock()
