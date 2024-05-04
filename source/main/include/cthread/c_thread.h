@@ -2,45 +2,22 @@
 #define __CMTHREAD_THREAD_H__
 #include "ccore/c_target.h"
 #ifdef USE_PRAGMA_ONCE
-#pragma once
+#    pragma once
 #endif
+
+#include "cthread/c_types.h"
 
 namespace ncore
 {
-	class xthread_functor;
+    class thread_functor;
 
-	class cthread
-	{
-	public:	
-		typedef s32       idx_t;
-		typedef u64       tid_t;
-
-		class e_priority
+    class thread_t
+    {
+    public:
+        enum e_config
         {
-        public:
-            inline e_priority()
-                : prio(NORMAL)
-            {
-            }
-            inline e_priority(s32 p)
-                : prio(p)
-            {
-            }
-
-            bool operator==(const e_priority& p) const { return prio == p.prio; }
-            bool operator!=(const e_priority& p) const { return prio != p.prio; }
-            bool operator<(const e_priority& p) const { return prio < p.prio; }
-            bool operator<=(const e_priority& p) const { return prio <= p.prio; }
-            bool operator>(const e_priority& p) const { return prio > p.prio; }
-            bool operator>=(const e_priority& p) const { return prio >= p.prio; }
-
-            s32 prio;
-
-            static const s32 LOWEST;
-            static const s32 LOW;
-            static const s32 NORMAL;
-            static const s32 HIGH;
-            static const s32 HIGHEST;
+            DEFAULT_STACKSIZE = 256 * 1024,
+            DEFAULT_PRIORITY  = thread_priority_t::NORMAL
         };
 
         enum e_state
@@ -50,42 +27,37 @@ namespace ncore
             STATE_STOPPED = 2
         };
 
-		tid_t				get_tid() const;					/// Returns the native thread ID of the thread.
-		idx_t				get_idx() const;					/// Returns the unique thread ID of the thread.
-		const char*			get_name() const;					/// Returns the name of the thread.
-		e_priority			get_priority() const;				/// Returns the thread's priority.
-		e_state				get_state() const;					/// Returns state of the thread
-		u32					get_stacksize() const;
+        thread_t();
 
-		void                set_priority(e_priority p); /// Sets the thread's priority.
+        thread_id_t       get_tid() const;      /// Returns the native thread ID of the thread.
+        thread_idx_t      get_idx() const;      /// Returns the unique thread index of the thread.
+        const char*       get_name() const;     /// Returns the name of the thread.
+        thread_priority_t get_priority() const; /// Returns the thread's priority.
+        e_state           get_state() const;    /// Returns state of the thread
+        u32               get_stacksize() const;
+        void              set_priority(thread_priority_t p); /// Sets the thread's priority.
 
-		void				start();
+        void create(const char* name, thread_functor* functor, u32 stacksize = 0, thread_priority_t priority = thread_priority_t::NORMAL);
+        void start();
 
-		void				join();
-		bool				join(u32 milliseconds);
+        static u32               default_stacksize();
+        static thread_priority_t default_priority();
 
-		static cthread*		current();
-        static tid_t        current_tid();
-        static idx_t        current_idx();
-		static void			sleep(u32 milliseconds);
-		static void			yield();
-		static void			exit();
+    protected:
+        friend class nthread;
 
-		static u32          default_stacksize();
-		static e_priority   default_priority();
+        thread_t(const thread_t&);
+        thread_t& operator=(const thread_t&);
+        ~thread_t(); /// Destroys the thread.
 
-	protected:
-        friend class xthreading;
-
-        cthread();                                               /// Creates a thread. Call start() to start it.
-        cthread(const char* name);                               /// Creates a named thread. Call start() to start it.
-        cthread(const char* name, e_priority p, u32 stack_size); /// Creates a thread using some configuration. Call start() to start it.
-        cthread(const cthread&);
-        cthread& operator=(const cthread&);
-        ~cthread(); /// Destroys the thread.
-	};
+        e_state           m_state;
+        thread_id_t       m_tid;
+        thread_idx_t      m_idx;
+        char*             m_name;
+        thread_priority_t m_priority;
+        u32               m_stacksize;
+    };
 
 } // namespace ncore
-
 
 #endif // __CMTHREAD_THREAD_H__

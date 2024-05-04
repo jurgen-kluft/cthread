@@ -9,10 +9,10 @@
 
 namespace ncore
 {
-	class xthread_data;
-	class xmutex;
-	class xevent;
-	class xsemaphore;
+	class thread_data_t;
+	class mutex_t;
+	class event_t;
+	class semaphore_t;
 
 
 

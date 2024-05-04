@@ -1,52 +1,42 @@
 #include "ctime/c_datetime.h"
 
 #ifdef TARGET_MAC
-#include "cthread/c_mutex.h"
+#    include "cthread/c_threading.h"
+#    include "cthread/c_mutex.h"
+#    include "cthread/private/c_thread_mac.h"
 
 namespace ncore
 {
-	struct xevent_data
-	{
-		pthread_mutex_t		_mutex;
-	};
+    bool mutex_t::init(mutex_data_t* data)
+    {
+        m_data = data;
+        pthread_mutexattr_t attr;
+        pthread_mutexattr_init(&attr);
+        pthread_mutex_init(&m_data->_mutex, &attr);
+        pthread_mutexattr_destroy(&attr);
+        return true;
+    }
 
-	xmutex::xmutex()
-	{
-		xmutex_data* data = (xmutex_data*)m_data;
+    void mutex_t::release()
+    {
+        pthread_mutex_destroy(&m_data->_mutex);
+        threading_t::instance()->destroy_mutex(this);
+    }
 
-		pthread_mutexattr_t attr;
-		pthread_mutexattr_init(&attr);
+    void mutex_t::lock()
+    {
+        pthread_mutex_lock(&m_data->_mutex);
+    }
 
-		pthread_mutex_init(&data->_mutex, &attr)
+    bool mutex_t::tryLock()
+    {
+        return pthread_mutex_trylock(&m_data->_mutex) == 0;
+    }
 
-		pthread_mutexattr_destroy(&attr);
-	}
-
-	xmutex::~xmutex()
-	{
-		xmutex_data* data = (xmutex_data*)m_data;
-		pthread_mutex_destroy(&data->_mutex);
-	}
-
-	void xmutex_impl::lock()
-	{
-		xmutex_data* data = (xmutex_data*)m_data;
-		pthread_mutex_lock(&data->_mutex);
-	}
-
-
-	bool xmutex_impl::tryLock()
-	{
-		xmutex_data* data = (xmutex_data*)m_data;
-		return pthread_mutex_trylock(&data->_mutex) == 0;
-	}
-
-
-	void xmutex_impl::unlock()
-	{
-		xmutex_data* data = (xmutex_data*)m_data;
-		pthread_mutex_unlock(&data->_mutex);
-	}
+    void mutex_t::unlock()
+    {
+        pthread_mutex_unlock(&m_data->_mutex);
+    }
 } // namespace ncore
 
 #endif

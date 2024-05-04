@@ -3,44 +3,42 @@
 
 #ifdef TARGET_MAC
 
-#include "cthread/c_semaphore.h"
+#    include "cthread/c_semaphore.h"
+#    include "cthread/private/c_thread_mac.h"
 
-namespace ncore 
+#include <mach/mach.h>
+#include <mach/task.h>
+
+namespace ncore
 {
-	// Semaphore (Apple iOS and OSX)
-	struct xsema_data
-	{
-		semaphore_t _sema;
-	};
+    // Semaphore (Apple iOS and OSX)
 
-	xsemaphore::xsemaphore(s32 n, s32 max)
-	{
-		ASSERT(n >= 0 && max > 0 && n <= max);
-		xsema_data* data = (xsema_data*)m_data;		
-		semaphore_create(mach_task_self(), &data->_sema, SYNC_POLICY_FIFO, n);
-	}
+    bool sema_t::init(sema_data_t* data, s32 n, s32 max)
+    {
+        ASSERT(n >= 0 && max > 0 && n <= max);
+        sema_data_t* data = (sema_data_t*)m_data;
+        semaphore_create(mach_task_self(), &data->_sema, SYNC_POLICY_FIFO, n);
+    }
 
+    void sema_t::release()
+    {
+        sema_data_t* data = (sema_data_t*)m_data;
+        semaphore_destroy(mach_task_self(), data->_sema);
+        threading_t::instance()->destroy_sema(this);
+    }
 
-	xsemaphore::~xsemaphore()
-	{
-		xsema_data* data = (xsema_data*)m_data;		
-		semaphore_destroy(mach_task_self(), data->_sema);
-	}
+    void sema_t::signal()
+    {
+        sema_data_t* data = (sema_data_t*)m_data;
+        semaphore_signal(data->_sema);
+    }
 
-	void xsemaphore::signal()
-	{
-		xsema_data* data = (xsema_data*)m_data;		
-		semaphore_signal(data->_sema);
-	}
-
-	void xsemaphore::wait()
-	{
-		xsema_data* data = (xsema_data*)m_data;		
-		semaphore_wait(data->_sema);
-	}
-
+    void sema_t::wait()
+    {
+        sema_data_t* data = (sema_data_t*)m_data;
+        semaphore_wait(data->_sema);
+    }
 
 } // namespace ncore
-
 
 #endif

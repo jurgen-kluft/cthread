@@ -6,6 +6,7 @@
                 "${workspaceFolder}/../cunittest/source/main/include",
                 "${workspaceFolder}/../ctime/source/main/include",
                 "${workspaceFolder}/../cbase/source/main/include",
+                "${workspaceFolder}/../ccore/source/main/include",
                 "${workspaceFolder}/source/main/include"
             ],
             "defines": [

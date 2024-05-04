@@ -9,37 +9,27 @@
 
 namespace ncore 
 {
-	class xevent_win : public xevent
+	bool event_t::init(event_data_t* data, bool autoReset)
 	{
-	public:
-		xevent_win(bool autoReset) : xevent(autoReset) {  }
-
-		DCORE_CLASS_PLACEMENT_NEW_DELETE
-
-		void* m_event;
-	};
-
-	xevent::xevent(bool autoReset)
-	{
-		xevent_win* the = (xevent_win*)this;
-		the->m_event = CreateEventW(nullptr, autoReset ? FALSE : TRUE, FALSE, nullptr);
-		if (!the->m_event)
+		m_data = data;
+		m_data->m_event = CreateEventW(nullptr, autoReset ? FALSE : TRUE, FALSE, nullptr);
+		if (!m_data->m_event)
 		{
 			// cannot create event
+			return false;
 		}
+		return true;
 	}
 
-	xevent::~xevent()
+	void event_t::release()
 	{
-		xevent_win* the = (xevent_win*)this;
-		CloseHandle(the->m_event);
+		CloseHandle(m_data->m_event);
 	}
 
 
-	void xevent::wait()
+	void event_t::wait()
 	{
-		xevent_win* the = (xevent_win*)this;
-		switch (WaitForSingleObject(the->m_event, INFINITE))
+		switch (WaitForSingleObject(m_data->m_event, INFINITE))
 		{
 		case WAIT_OBJECT_0:
 			return;
@@ -49,51 +39,21 @@ namespace ncore
 		}
 	}
 
-	void xevent::set()
+	void event_t::set()
 	{
-		xevent_win* the = (xevent_win*)this;
-		if (!SetEvent(the->m_event))
+		if (!SetEvent(m_data->m_event))
 		{
 			// cannot signal event
 		}
 	}
 
 
-	void xevent::reset()
+	void event_t::reset()
 	{
-		xevent_win* the = (xevent_win*)this;
-		if (!ResetEvent(the->m_event))
+		if (!ResetEvent(m_data->m_event))
 		{
 			// cannot reset event
 		}
-	}
-
-	class xevents_data
-	{
-	public:
-		xevent*         m_events;
-		fsadexed_array_t m_alloc;
-		DCORE_CLASS_PLACEMENT_NEW_DELETE
-	};
-
-	xevents_data*	gCreateEventsData(alloc_t* alloc, u32 max_events)
-	{
-		xevents_data* events = alloc->construct<xevents_data>();
-		xevent_win* event_array = (xevent_win*)alloc->allocate(sizeof(xevent_win) * max_events);
-		events->m_alloc = fsadexed_array_t(event_array, sizeof(xevent_win), max_events);
-		return events;
-	}
-
-	xevent* xthreading::create_event(bool autoReset)
-	{
-		xevent_win* evt = m_events->m_alloc.construct<xevent_win>(autoReset);
-		return evt;
-	}
-
-	void xthreading::destroy_event(xevent* evt)
-	{
-		xevent_win* win_evt = (xevent_win*)evt;
-		m_events->m_alloc.destruct(win_evt);
 	}
 
 

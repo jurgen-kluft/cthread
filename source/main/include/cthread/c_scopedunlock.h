@@ -12,25 +12,25 @@ namespace ncore
 	/// The constructor accepts a xmutex and unlocks it.
 	/// The destructor locks the mutex.
 	template <class M>
-	class xscopedunlock
+	class unlock_t
 	{
 	public:
-		inline xscopedunlock(M& mutex, bool unlockNow = true)
+		inline unlock_t(M& mutex, bool unlockNow = true)
 			: _mutex(mutex)
 		{
 			if (unlockNow)
 				_mutex.unlock();
 		}
 
-		inline	~xscopedunlock()		{ _mutex.lock(); }
+		inline	~unlock_t()		{ _mutex.lock(); }
 
 	private:
 		M&		_mutex;
 
-				xscopedunlock();
-				xscopedunlock(const xscopedunlock&);
+				unlock_t();
+				unlock_t(const unlock_t&);
 
-		xscopedunlock& operator = (const xscopedunlock&);
+		unlock_t& operator = (const unlock_t&);
 	};
 
 
