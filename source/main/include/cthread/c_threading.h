@@ -5,6 +5,8 @@
 #    pragma once
 #endif
 
+#include "cbase/c_allocator.h"
+#include "cbase/c_hbb.h"
 #include "cthread/c_types.h"
 
 namespace ncore
@@ -24,14 +26,14 @@ namespace ncore
     class sema_t;
 
     struct thread_data_t;
-    struct events_data_t;
-    struct mutexes_data_t;
-    struct semaphores_data_t;
+    struct event_data_t;
+    struct mutex_data_t;
+    struct sema_data_t;
 
     class threading_t
     {
     public:
-        static threading_t* create(alloc_t* allocator, u32 max_threads = 32, u32 max_mutex = 32, u32 max_event = 32, u32 max_semaphore = 32);
+        static threading_t* create(alloc_t* allocator, u32 max_threads = 32, u32 max_mutex = 256, u32 max_event = 256, u32 max_semaphore = 256);
         static void         destroy(threading_t*&);
 
         static void         set_instance(threading_t* instance);
@@ -42,10 +44,10 @@ namespace ncore
         event_t*  create_event(bool autoReset);
         sema_t*   create_sema(s32 initial_count, s32 max_count);
 
-        void destroy_thread(thread_t*);
-        void destroy_mutex(mutex_t*);
-        void destroy_event(event_t*);
-        void destroy_sema(sema_t*);
+        void destroy(thread_t*);
+        void destroy(mutex_t*);
+        void destroy(event_t*);
+        void destroy(sema_t*);
 
         void join(thread_t*);
         bool join(thread_t*, u32 milliseconds);
@@ -59,19 +61,22 @@ namespace ncore
 
     private:
         threading_t();
-        ~threading_t();
-
         threading_t(const threading_t&) {}
+        ~threading_t() {}
         threading_t& operator=(const threading_t&) { return *this; }
 
-        static threading_t* instance_;
+        template <typename T> struct data_t
+        {
+            T*               m_data;
+            fsadexed_array_t m_pool;
+        };
 
-        friend class alloc_t;
-        alloc_t*       m_allocator;
-        thread_data_t* m_threads;
-        event_data_t*  m_events;
-        mutex_data_t*  m_mutexes;
-        sema_data_t*   m_semaphores;
+        static threading_t*   s_instance;
+        alloc_t*              m_allocator;
+        data_t<thread_data_t> m_threads;
+        data_t<event_data_t>  m_events;
+        data_t<mutex_data_t>  m_mutexes;
+        data_t<sema_data_t>   m_semaphores;
     };
 
 } // namespace ncore

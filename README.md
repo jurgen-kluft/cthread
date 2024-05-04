@@ -10,8 +10,8 @@
 ```c++
 static void highest_priority_thread_fn(void* arg)
 {
-    xthreading* threading = static_cast<xthreading>(arg);
-    cthread* current = threading->current_thread();
+    threading_t* threading = static_cast<threading_t>(arg);
+    thread_t* current = threading->current_thread();
 
     // Here the high priority thread code
     bool active = true;
@@ -22,13 +22,13 @@ static void highest_priority_thread_fn(void* arg)
     }
 }
 
-xthreading* threading = xthreading::create(xalloc::get_system());
+threading_t* threading = threading_t::create(alloc_t::get_system());
 
 void* my_arg = threading;
-cthread* thread_main = threading->create_thread("main thread", my_arg, highest_priority_thread_fn, xthreading::HIGHEST_PRIORITY);
+thread_t* thread_main = threading->create_thread("main thread", my_arg, highest_priority_thread_fn, threading_t::HIGHEST_PRIORITY);
 
-xmutex* mutex = threading->create_mutex("shared resource lock");
-xevent* event = threading->create_event("resource locked");
+mutex_t* mutex = threading->create_mutex("shared resource lock");
+event_t* event = threading->create_event("resource locked");
 
 threading->wait(thread_main);
 threading->destroy(thread_main);
