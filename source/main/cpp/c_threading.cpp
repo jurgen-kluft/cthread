@@ -58,6 +58,7 @@ namespace ncore
     void threading_t::destroy(threading_t*& threading)
     {
         alloc_t* allocator = threading->m_allocator;
+        
         gDestroyData(threading->m_threads, threading->m_threads_pool, allocator);
         gDestroyData(threading->m_mutexes, threading->m_mutexes_pool, allocator);
         gDestroyData(threading->m_events, threading->m_events_pool, allocator);

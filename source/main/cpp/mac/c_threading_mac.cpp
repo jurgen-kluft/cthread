@@ -26,8 +26,14 @@ namespace ncore
                 t->m_data->m_idx        = m_threads_pool.ptr2idx(t);
                 t->m_data->m_tid        = 0;
                 t->m_data->m_name[0]    = 0;
-                if (name)
-                    strncpy(t->m_data->m_name, name, 63);
+
+                const char* src         = name;
+                char*       dst         = t->m_data->m_name;
+                const char* end         = dst + sizeof(t->m_data->m_name) - 1;
+                while (*src && dst < end)
+                    *dst++ = *src++;
+                *dst = 0;
+
                 return t;
             }
             m_threads_data_pool.deallocate(data);
