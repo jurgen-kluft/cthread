@@ -8,24 +8,24 @@
 #include "ctime/c_datetime.h"
 
 #include "cunittest/cunittest.h"
+#include "cthread/test_allocator.h"
 
-using ncore::cthread;
-using ncore::datetime_t;
-
-
-static ncore::xmutex testMutex;
-
+using namespace ncore;
 
 namespace
 {
-	class TestLock: public ncore::xthread_functor
+	class TestLock: public ncore::thread_functor
 	{
 	public:
-		void run()
+		TestLock(mutex_t* m)
 		{
-			testMutex.lock();
+		}
+
+		void run(thread_t* thread)
+		{
+			testMutex->lock();
 			_timestamp = datetime_t::sNow();
-			testMutex.unlock();
+			testMutex->unlock();
 		}
 
 		const datetime_t& timestamp() const
@@ -34,22 +34,23 @@ namespace
 		}
 
 	private:
+		mutex_t* testMutex;
 		datetime_t _timestamp;
 	};
 
-	class TestTryLock: public ncore::xthread_functor
+	class TestTryLock: public ncore::thread_functor
 	{
 	public:
-		TestTryLock(): _locked(false)
+		TestTryLock(mutex_t* m) :testMutex(m), _locked(false)
 		{
 		}
 		
-		void run()
+		void run(thread_t* thread)
 		{
-			if (testMutex.tryLock())
+			if (testMutex->tryLock())
 			{
 				_locked = true;
-				testMutex.unlock();
+				testMutex->unlock();
 			}
 		}
 
@@ -59,6 +60,7 @@ namespace
 		}
 
 	private:
+	mutex_t* testMutex;
 		bool _locked;
 	};
 }
@@ -67,38 +69,73 @@ UNITTEST_SUITE_BEGIN(xmutex)
 {
     UNITTEST_FIXTURE(main)
     {
+		UNITTEST_ALLOCATOR;
+
         UNITTEST_FIXTURE_SETUP() {}
         UNITTEST_FIXTURE_TEARDOWN() {}
 
 		UNITTEST_TEST(testLock)
 		{
-			testMutex.lock();
-			cthread thr;
-			TestLock tl;
-			thr.start(&tl);
+			mutex_t* testMutex = threading_t::instance()->create_mutex();
+			testMutex->lock();
+			TestLock* tl = Allocator->construct<TestLock>(testMutex);
+			thread_t* thr1 = threading_t::instance()->create_thread("test", nullptr, tl, thread_t::default_stacksize(), thread_t::default_priority());
+			thr1->start();
 			datetime_t now = datetime_t::sNow();
-			cthread::sleep(2000);
-			testMutex.unlock();
-			thr.join();
-			CHECK_TRUE (tl.timestamp() > now);
+			threading_t::sleep(2000);
+			testMutex->unlock();
+			threading_t::instance()->join(thr1);
+			CHECK_TRUE (tl->timestamp() > now);
+			threading_t::instance()->destroy(thr1);	
+			threading_t::instance()->destroy(testMutex);	
+			Allocator->destruct(tl);
 		}
 
 
 		UNITTEST_TEST(testTryLock)
 		{
-			cthread thr1;
-			TestTryLock ttl1;
-			thr1.start(&ttl1);
-			thr1.join();
-			CHECK_TRUE (ttl1.locked());
+			// mutex_t* testMutex = threading_t::instance()->create_mutex();
+
+			// thread_t thr1;
+			// TestTryLock ttl1;
+			// thr1.start(&ttl1);
+			// threading_t::instance()->join(&thr1);
+			// CHECK_TRUE (ttl1.locked());
 	
-			testMutex.lock();
-			cthread thr2;
-			TestTryLock ttl2;
-			thr2.start(&ttl2);
-			thr2.join();
-			testMutex.unlock();
-			CHECK_TRUE (!ttl2.locked());
+			// testMutex->lock();
+			// thread_t thr2;
+			// TestTryLock ttl2;
+			// thr2.start(&ttl2);
+			// threading_t::instance()->join(&thr2);
+			// testMutex->unlock();
+			// CHECK_TRUE (!ttl2.locked());
+
+			mutex_t* testMutex = threading_t::instance()->create_mutex();
+
+			TestTryLock* tl1 = Allocator->construct<TestTryLock>(testMutex);
+			thread_t* thr1 = threading_t::instance()->create_thread("test1", nullptr, tl1, thread_t::default_stacksize(), thread_t::default_priority());
+			thr1->start();
+			threading_t::instance()->join(thr1);
+			CHECK_TRUE (tl1->locked());
+			
+			testMutex->lock();
+
+			TestTryLock* tl2 = Allocator->construct<TestTryLock>(testMutex);
+			thread_t* thr2 = threading_t::instance()->create_thread("test2", nullptr, tl2, thread_t::default_stacksize(), thread_t::default_priority());
+			thr2->start();
+
+			threading_t::instance()->join(thr2);
+
+			testMutex->unlock();
+			CHECK_TRUE (!tl2->locked());
+
+			Allocator->destruct(tl2);
+			Allocator->destruct(tl1);
+
+			threading_t::instance()->destroy(testMutex);	
+
+			threading_t::instance()->destroy(thr1);	
+			threading_t::instance()->destroy(thr2);
 		}
 
 	}

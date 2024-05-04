@@ -29,16 +29,19 @@ namespace ncore
 
         thread_t();
 
-        thread_id_t       get_tid() const;      /// Returns the native thread ID of the thread.
-        thread_idx_t      get_idx() const;      /// Returns the unique thread index of the thread.
-        const char*       get_name() const;     /// Returns the name of the thread.
-        thread_priority_t get_priority() const; /// Returns the thread's priority.
-        e_state           get_state() const;    /// Returns state of the thread
-        u32               get_stacksize() const;
-        void              set_priority(thread_priority_t p); /// Sets the thread's priority.
+        thread_id_t       get_tid() const;                   // Returns the native thread ID of the thread.
+        thread_idx_t      get_idx() const;                   // Returns the unique thread index of the thread.
+        const char*       get_name() const;                  // Returns the name of the thread.
+        thread_priority_t get_priority() const;              // Returns the thread's priority.
+        e_state           get_state() const;                 // Returns state of the thread
+        bool              is_running() const;                // Returns true if the thread is running.
+        u32               get_stacksize() const;             // Returns the stack size of the thread.
+        void              set_priority(thread_priority_t p); // Sets the thread's priority.
 
         void create(const char* name, thread_functor* functor, u32 stacksize = 0, thread_priority_t priority = thread_priority_t::NORMAL);
         void start();
+        void join();
+        bool join(u32 milliseconds);
 
         static u32               default_stacksize();
         static thread_priority_t default_priority();

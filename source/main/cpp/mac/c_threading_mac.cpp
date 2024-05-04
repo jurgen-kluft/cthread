@@ -15,13 +15,13 @@ namespace ncore
 
     thread_t* threading_t::create_thread(const char* name, void* arg, thread_functor* f, u32 stack_size, thread_priority_t priority) { return nullptr; }
     mutex_t*  threading_t::create_mutex() { return nullptr; }
-    event_t*  threading_t::create_event(bool autoReset) { return nullptr; }
+    event_t*  threading_t::create_event(const char* name, bool autoReset) { return nullptr; }
     sema_t*   threading_t::create_sema(s32 initial_count, s32 max_count) { return nullptr; }
 
-    void threading_t::destroy_thread(thread_t*) {}
-    void threading_t::destroy_mutex(mutex_t*) {}
-    void threading_t::destroy_event(event_t*) {}
-    void threading_t::destroy_sema(sema_t*) {}
+    void threading_t::destroy(thread_t*) {}
+    void threading_t::destroy(mutex_t*) {}
+    void threading_t::destroy(event_t*) {}
+    void threading_t::destroy(sema_t*) {}
 
     void threading_t::join(thread_t*) {}
     bool threading_t::join(thread_t*, u32 milliseconds) {}

@@ -41,7 +41,7 @@ namespace ncore
 
         thread_t* create_thread(const char* name, void* arg, thread_functor* f, u32 stack_size, thread_priority_t priority);
         mutex_t*  create_mutex();
-        event_t*  create_event(bool autoReset);
+        event_t*  create_event(const char* name, bool autoReset);
         sema_t*   create_sema(s32 initial_count, s32 max_count);
 
         void destroy(thread_t*);

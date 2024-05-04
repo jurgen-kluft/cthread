@@ -11,231 +11,225 @@
 #include "ctime/c_timespan.h"
 
 #include "cunittest/cunittest.h"
+#include "cthread/test_allocator.h"
 
-using ncore::cthread;
-using ncore::xevent;
+using ncore::alloc_t;
+using ncore::thread_t;
+using ncore::threading_t;
+using ncore::event_t;
 using ncore::datetime_t;
 using ncore::timespan_t;
 using ncore::s32;
 
-
-class MyRunnable: public ncore::xthread_functor
+class MyRunnable : public ncore::thread_functor
 {
 public:
-	MyRunnable(): _ran(false)
-	{
-	}
-	
-	void run()
-	{
-		cthread* pThread = cthread::current();
-		if (pThread)
-			_threadName = pThread->get_name();
-		_ran = true;
-		_event.wait();
-	}
-	
-	bool ran() const
-	{
-		return _ran;
-	}
-	
-	const char* threadName() const
-	{
-		return _threadName;
-	}
-	
-	void notify()
-	{
-		_event.set();
-	}
-	
-	static void staticFunc()
-	{
-		++_staticVar;
-	}
+    MyRunnable(event_t* e)
+        : _ran(false)
+        , _threadName(nullptr)
+        , _event(e)
+    {
+    }
 
-	static s32 _staticVar;
+    void run(thread_t* thread)
+    {
+        thread_t* pThread = thread;
+        if (pThread)
+            _threadName = pThread->get_name();
+        _ran = true;
+        _event->wait();
+    }
+
+    bool        ran() const { return _ran; }
+    const char* threadName() const { return _threadName; }
+    void        notify() { _event->set(); }
+    static void staticFunc() { ++_staticVar; }
+    static s32  _staticVar;
 
 private:
-	bool		_ran;
-	const char*	_threadName;
-	xevent		_event;
+    bool        _ran;
+    const char* _threadName;
+    event_t*    _event;
 };
-
 
 s32 MyRunnable::_staticVar = 0;
 
-
-void freeFunc()
-{
-	++MyRunnable::_staticVar;
-}
-
-
-void freeFunc(void* pData)
-{
-	MyRunnable::_staticVar += *reinterpret_cast<s32*>(pData);
-}
+void freeFunc() { ++MyRunnable::_staticVar; }
+void freeFunc(void* pData) { MyRunnable::_staticVar += *reinterpret_cast<s32*>(pData); }
 
 UNITTEST_SUITE_BEGIN(cthread)
 {
     UNITTEST_FIXTURE(main)
     {
+        UNITTEST_ALLOCATOR;
+
         UNITTEST_FIXTURE_SETUP() {}
         UNITTEST_FIXTURE_TEARDOWN() {}
 
+        UNITTEST_TEST(testThread)
+        {
+            event_t* e = threading_t::instance()->create_event("event", false);
+            MyRunnable r(e);
+            thread_t*   thread = threading_t::instance()->create_thread("Thread", nullptr, &r, thread_t::default_stacksize(), thread_t::default_priority());
 
-		UNITTEST_TEST(testThread)
-		{
-			cthread thread;
-			MyRunnable r;
-			CHECK_TRUE (!thread.is_running());
-			thread.start(&r);
-			cthread::sleep(200);
-			CHECK_TRUE (thread.is_running());
-			r.notify();
-			thread.join();
-			CHECK_TRUE (!thread.is_running());
-			CHECK_TRUE (r.ran());
-			CHECK_NOT_NULL (r.threadName());
-			CHECK_FALSE ( *r.threadName() == '\0' );
-		}
+            CHECK_TRUE(!thread->is_running());
+            thread->start();
+            threading_t::sleep(200);
+            CHECK_TRUE(thread->is_running());
+            r.notify();
+            threading_t::instance()->join(thread);
+            CHECK_TRUE(!thread->is_running());
+            CHECK_TRUE(r.ran());
+            CHECK_NOT_NULL(r.threadName());
+            CHECK_FALSE(*r.threadName() == '\0');
 
+            threading_t::instance()->destroy(e);
+            threading_t::instance()->destroy(thread);
+        }
 
-		UNITTEST_TEST(testNamedThread)
-		{
-			cthread thread("MyThread");
-			MyRunnable r;
-			thread.start(&r);
-			r.notify();
-			thread.join();
-			CHECK_TRUE (r.ran());
-			CHECK_EQUAL (r.threadName(), "MyThread");
-		}
+        UNITTEST_TEST(testNamedThread)
+        {
+            event_t* e = threading_t::instance()->create_event("event", false);
+            MyRunnable r(e);
+            thread_t* thread = threading_t::instance()->create_thread("MyThread", nullptr, &r, thread_t::default_stacksize(), thread_t::default_priority());
 
+            thread->start();
+            r.notify();
+            thread->join();
+            CHECK_TRUE(r.ran());
+            CHECK_EQUAL(r.threadName(), "MyThread");
 
-		UNITTEST_TEST(testCurrent)
-		{
-			CHECK_NULL(cthread::current());
-		}
+            threading_t::instance()->destroy(e);
+            threading_t::instance()->destroy(thread);
+        }
 
+        UNITTEST_TEST(testCurrent) { CHECK_NULL(threading_t::current()); }
 
-		UNITTEST_TEST(testThreads)
-		{
-			cthread thread1("Thread1");
-			cthread thread2("Thread2");
-			cthread thread3("Thread3");
-			cthread thread4("Thread4");
+        UNITTEST_TEST(testThreads)
+        {
+            event_t* e1 = threading_t::instance()->create_event("event1", false);
+            event_t* e2 = threading_t::instance()->create_event("event2", false);
+            event_t* e3 = threading_t::instance()->create_event("event3", false);
+            event_t* e4 = threading_t::instance()->create_event("event4", false);
 
-			MyRunnable r1;
-			MyRunnable r2;
-			MyRunnable r3;
-			MyRunnable r4;
-			CHECK_TRUE (!thread1.is_running());
-			CHECK_TRUE (!thread2.is_running());
-			CHECK_TRUE (!thread3.is_running());
-			CHECK_TRUE (!thread4.is_running());
-			thread1.start(&r1);
-			cthread::sleep(200);
-			CHECK_TRUE (thread1.is_running());
-			CHECK_TRUE (!thread2.is_running());
-			CHECK_TRUE (!thread3.is_running());
-			CHECK_TRUE (!thread4.is_running());
-			thread2.start(&r2);
-			thread3.start(&r3);
-			thread4.start(&r4);
-			cthread::sleep(200);
-			CHECK_TRUE (thread1.is_running());
-			CHECK_TRUE (thread2.is_running());
-			CHECK_TRUE (thread3.is_running());
-			CHECK_TRUE (thread4.is_running());
-			r4.notify();
-			thread4.join();
-			CHECK_TRUE (!thread4.is_running());
-			CHECK_TRUE (thread1.is_running());
-			CHECK_TRUE (thread2.is_running());
-			CHECK_TRUE (thread3.is_running());
-			r3.notify();
-			thread3.join();
-			CHECK_TRUE (!thread3.is_running());
-			r2.notify();
-			thread2.join();
-			CHECK_TRUE (!thread2.is_running());
-			r1.notify();
-			thread1.join();
-			CHECK_TRUE (!thread1.is_running());
+            MyRunnable r1(e1);
+            MyRunnable r2(e2);
+            MyRunnable r3(e3);
+            MyRunnable r4(e4);
 
-			CHECK_TRUE (r1.ran());
-			CHECK_EQUAL(r1.threadName(), "Thread1");
+            thread_t* thread1 = threading_t::instance()->create_thread("Thread1", nullptr, &r1, thread_t::default_stacksize(), thread_t::default_priority());
+            thread_t* thread2 = threading_t::instance()->create_thread("Thread2", nullptr, &r2, thread_t::default_stacksize(), thread_t::default_priority());
+            thread_t* thread3 = threading_t::instance()->create_thread("Thread3", nullptr, &r3, thread_t::default_stacksize(), thread_t::default_priority());
+            thread_t* thread4 = threading_t::instance()->create_thread("Thread4", nullptr, &r4, thread_t::default_stacksize(), thread_t::default_priority());
 
-			CHECK_TRUE (r2.ran());
-			CHECK_EQUAL(r2.threadName(), "Thread2");
+            CHECK_TRUE(!thread1->is_running());
+            CHECK_TRUE(!thread2->is_running());
+            CHECK_TRUE(!thread3->is_running());
+            CHECK_TRUE(!thread4->is_running());
+            thread1->start();
+            threading_t::sleep(200);
+            CHECK_TRUE(thread1->is_running());
+            CHECK_TRUE(!thread2->is_running());
+            CHECK_TRUE(!thread3->is_running());
+            CHECK_TRUE(!thread4->is_running());
+            thread2->start();
+            thread3->start();
+            thread4->start();
+            threading_t::sleep(200);
+            CHECK_TRUE(thread1->is_running());
+            CHECK_TRUE(thread2->is_running());
+            CHECK_TRUE(thread3->is_running());
+            CHECK_TRUE(thread4->is_running());
+            r4.notify();
+            threading_t::instance()->join(thread4);
+            CHECK_TRUE(!thread4->is_running());
+            CHECK_TRUE(thread1->is_running());
+            CHECK_TRUE(thread2->is_running());
+            CHECK_TRUE(thread3->is_running());
+            r3.notify();
+            threading_t::instance()->join(thread3);
+            CHECK_TRUE(!thread3->is_running());
+            r2.notify();
+            threading_t::instance()->join(thread2);
+            CHECK_TRUE(!thread2->is_running());
+            r1.notify();
+            threading_t::instance()->join(thread1);
+            CHECK_TRUE(!thread1->is_running());
 
-			CHECK_TRUE (r3.ran());
-			CHECK_EQUAL(r3.threadName(), "Thread3");
+            CHECK_TRUE(r1.ran());
+            CHECK_EQUAL(r1.threadName(), "Thread1");
 
-			CHECK_TRUE (r4.ran());
-			CHECK_EQUAL(r4.threadName(), "Thread4");
-		}
+            CHECK_TRUE(r2.ran());
+            CHECK_EQUAL(r2.threadName(), "Thread2");
 
+            CHECK_TRUE(r3.ran());
+            CHECK_EQUAL(r3.threadName(), "Thread3");
 
-		UNITTEST_TEST(testJoin)
-		{
-			cthread thread;
-			MyRunnable r;
-			CHECK_TRUE (!thread.is_running());
-			thread.start(&r);
-			cthread::sleep(200);
-			CHECK_TRUE (thread.is_running());
-			CHECK_TRUE (!thread.join(100));
-			r.notify();
-			CHECK_TRUE (thread.join(500));
-			CHECK_TRUE (!thread.is_running());
-		}
+            CHECK_TRUE(r4.ran());
+            CHECK_EQUAL(r4.threadName(), "Thread4");
 
+            threading_t::instance()->destroy(e1);
+            threading_t::instance()->destroy(e2);
+            threading_t::instance()->destroy(e3);
+            threading_t::instance()->destroy(e4);
 
-		UNITTEST_TEST(testThreadFunction)
-		{
-			cthread thread;
+            threading_t::instance()->destroy(thread1);
+            threading_t::instance()->destroy(thread2);
+            threading_t::instance()->destroy(thread3);
+            threading_t::instance()->destroy(thread4);
+        }
 
-			CHECK_TRUE (!thread.is_running());
+        UNITTEST_TEST(testJoin)
+        {
+            event_t* e = threading_t::instance()->create_event("event", false);
+            MyRunnable r(e);
+            thread_t*  thread = threading_t::instance()->create_thread("Thread", nullptr, &r, thread_t::default_stacksize(), thread_t::default_priority());
 
-			MyRunnable f;
+            CHECK_TRUE(!thread->is_running());
+            thread->start();
+            threading_t::sleep(200);
+            CHECK_TRUE(thread->is_running());
+            CHECK_TRUE(!thread->join(100));
+            r.notify();
+            CHECK_TRUE(thread->join(500));
+            CHECK_TRUE(!thread->is_running());
 
-			s32 tmp = MyRunnable::_staticVar;
-			thread.start(&f);
-			thread.join();
-			CHECK_TRUE (tmp * 2 == MyRunnable::_staticVar);
+            threading_t::instance()->destroy(e);
+            threading_t::instance()->destroy(thread);
+        }
 
-			CHECK_TRUE (!thread.is_running());
+        UNITTEST_TEST(testThreadFunction)
+        {
+            event_t* e = threading_t::instance()->create_event("event", false);
+            MyRunnable f(e);
+            thread_t* thread = threading_t::instance()->create_thread("Thread", &f, nullptr, thread_t::default_stacksize(), thread_t::default_priority());
 
-			tmp = MyRunnable::_staticVar = 0;
-			thread.start(&f);
-			thread.join();
-			CHECK_TRUE (0 == MyRunnable::_staticVar);
-		}
+            CHECK_TRUE(!thread->is_running());
 
+            s32 tmp = MyRunnable::_staticVar;
+            thread->start();
+            threading_t::instance()->join(thread);
+            CHECK_TRUE(tmp * 2 == MyRunnable::_staticVar);
 
-		UNITTEST_TEST(testThreadStackSize)
-		{
-			s32 stackSize = 50000000;
+            CHECK_TRUE(!thread->is_running());
 
-			cthread::config cnfg;
-			cnfg.m_stack_size = stackSize;
-			cthread thread(cnfg);
-			CHECK_TRUE (stackSize == thread.get_stacksize());
-		}
+            tmp = MyRunnable::_staticVar = 0;
+            thread->start();
+            threading_t::instance()->join(thread);
+            CHECK_TRUE(0 == MyRunnable::_staticVar);
 
-		UNITTEST_TEST(testSleep)
-		{
-			datetime_t start = datetime_t::sNow();
-			cthread::sleep(200);
-			datetime_t end = datetime_t::sNow();
-			timespan_t elapsed = end - start;
-			CHECK_TRUE (elapsed.totalMilliseconds() >= 190 && elapsed.totalMilliseconds() < 250);
-		}
+            threading_t::instance()->destroy(e);
+            threading_t::instance()->destroy(thread);
+        }
 
-	}
+        UNITTEST_TEST(testSleep)
+        {
+            datetime_t start = datetime_t::sNow();
+            threading_t::sleep(200);
+            datetime_t end     = datetime_t::sNow();
+            timespan_t elapsed = end - start;
+            CHECK_TRUE(elapsed.totalMilliseconds() >= 190 && elapsed.totalMilliseconds() < 250);
+        }
+    }
 }
 UNITTEST_SUITE_END

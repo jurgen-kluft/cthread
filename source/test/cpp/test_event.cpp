@@ -8,68 +8,68 @@
 #include "ctime/c_datetime.h"
 
 #include "cunittest/cunittest.h"
+#include "cthread/test_allocator.h"
 
 using namespace ncore;
 using ncore::datetime_t;
 
-static ncore::xevent testEvent;
-
 namespace
 {
-	class TestEvent: public ncore::xthread_functor
-	{
-	public:
-		void run()
+    class TestEvent : public ncore::thread_functor
+    {
+    public:
+		TestEvent(ncore::event_t* data)
 		{
-			testEvent.wait();
-			_timestamp = datetime_t::sNow();
+			testEvent = data;
 		}
 
-		const datetime_t& timestamp() const
-		{
-			return _timestamp;
-		}
+        void run(thread_t* thread)
+        {
+            testEvent->wait();
+            _timestamp = datetime_t::sNow();
+        }
 
-	private:
-		ncore::datetime_t _timestamp;
-	};
-}
+        const datetime_t& timestamp() const { return _timestamp; }
 
+    private:
+        ncore::event_t*   testEvent;
+        ncore::datetime_t _timestamp;
+    };
+} // namespace
 
-
-
-
-UNITTEST_SUITE_BEGIN(xevent)
+UNITTEST_SUITE_BEGIN(event_t)
 {
     UNITTEST_FIXTURE(main)
     {
+        UNITTEST_ALLOCATOR;
+
         UNITTEST_FIXTURE_SETUP() {}
         UNITTEST_FIXTURE_TEARDOWN() {}
 
-		UNITTEST_TEST(testNamedEvent)
-		{
-			xthreading* threading = xthreading::create(gTestAllocator);
+        UNITTEST_TEST(testNamedEvent)
+        {
+            threading_t* threading = threading_t::create(Allocator);
+			event_t* testEvent = threading->create_event("test", false);
 
-			TestEvent te;
-			cthread* thr1 = threading->create_thread("test1", threading, &te, cthread::default_stacksize(), cthread::default_priority());
-			thr1->start();
-			datetime_t now = datetime_t::sNow();
-			cthread::sleep(2000);
-			testEvent.set();
-			thr1->join();
-			CHECK_TRUE (te.timestamp() > now);
+            TestEvent te(testEvent);
+            thread_t* thr1 = threading->create_thread("test1", threading, &te, thread_t::default_stacksize(), thread_t::default_priority());
+            thr1->start();
+            datetime_t now = datetime_t::sNow();
+            threading_t::sleep(2000);
+            testEvent->set();
+            threading_t::instance()->join(thr1);
+            CHECK_TRUE(te.timestamp() > now);
 
-			cthread* thr2= threading->create_thread("test2", threading, &te, cthread::default_stacksize(), cthread::default_priority());
-			thr2->start();
-			now = datetime_t::sNow();
-			cthread::sleep(2000);
-			testEvent.set();
-			thr2->join();
-			CHECK_TRUE(te.timestamp() > now);
+            thread_t* thr2 = threading->create_thread("test2", threading, &te, thread_t::default_stacksize(), thread_t::default_priority());
+            thr2->start();
+            now = datetime_t::sNow();
+            threading_t::sleep(2000);
+            testEvent->set();
+            threading_t::instance()->join(thr2);
+            CHECK_TRUE(te.timestamp() > now);
 
-			xthreading::destroy(threading);
-		}
-
-	}
+            threading_t::destroy(threading);
+        }
+    }
 }
 UNITTEST_SUITE_END
