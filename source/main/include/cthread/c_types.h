@@ -17,7 +17,8 @@ namespace ncore
         {
             CREATED = 0,
             RUNNING = 1,
-            STOPPED = 2
+            SUSPENDED = 2,
+            STOPPED = 3
         };
 
         inline thread_state_t()

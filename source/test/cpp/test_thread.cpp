@@ -15,6 +15,7 @@
 
 using ncore::alloc_t;
 using ncore::thread_t;
+using ncore::thread_data_t;
 using ncore::threading_t;
 using ncore::event_t;
 using ncore::datetime_t;
@@ -31,14 +32,19 @@ public:
     {
     }
 
-    void run(thread_t* thread)
+    thread_t* pThread;
+
+    void start(thread_t* t, thread_data_t* d) { pThread = t; }
+
+    void run()
     {
-        thread_t* pThread = thread;
         if (pThread)
             _threadName = pThread->get_name();
         _ran = true;
         _event->wait();
     }
+
+    void exit() {}
 
     bool        ran() const { return _ran; }
     const char* threadName() const { return _threadName; }

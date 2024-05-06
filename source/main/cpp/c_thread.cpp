@@ -4,8 +4,14 @@
 #include "cbase/c_printf.h"
 
 #include "cthread/c_thread.h"
-#include "cthread/private/c_thread_mac.h"
-#include "cthread/c_mutex.h"
+
+#ifdef TARGET_MAC
+#    include "cthread/private/c_thread_mac.h"
+#endif
+
+#ifdef TARGET_PC
+#    include "cthread/private/c_thread_win.h"
+#endif
 
 #include <atomic>
 

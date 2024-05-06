@@ -25,7 +25,7 @@ namespace ncore
     void sema_t::release()
     {
         CloseHandle(m_data->_sema);
-        threading_t::instance()->destroy_semaphore(this);
+        threading_t::instance()->destroy(this);
     }
 
     void sema_t::signal()

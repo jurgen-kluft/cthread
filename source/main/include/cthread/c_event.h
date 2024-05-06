@@ -1,6 +1,9 @@
 #ifndef __CMTHREAD_EVENT_H__
 #define __CMTHREAD_EVENT_H__
 #include "ccore/c_target.h"
+#ifdef USE_PRAGMA_ONCE
+#    pragma once
+#endif
 
 namespace ncore
 {

@@ -17,12 +17,13 @@ namespace ncore
         // the return only checks if the input address of &_cs was valid, so it is
         // safe to omit it.
         InitializeCriticalSectionAndSpinCount((CRITICAL_SECTION*)&m_data->_cs, 4000);
+        return true;
     }
 
     void mutex_t::release()
     {
         DeleteCriticalSection((CRITICAL_SECTION*)&m_data->_cs);
-        threading_t::instance()->destroy_mutex(this);
+        threading_t::instance()->destroy(this);
     }
     
     void mutex_t::lock() { EnterCriticalSection((CRITICAL_SECTION*)&m_data->_cs); }

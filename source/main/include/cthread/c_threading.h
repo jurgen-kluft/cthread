@@ -7,12 +7,22 @@
 
 #include "cbase/c_allocator.h"
 #include "cbase/c_hbb.h"
+
 #include "cthread/c_types.h"
 
 namespace ncore
 {
     class alloc_t;
+
     class thread_t;
+    class mutex_t;
+    class event_t;
+    class sema_t;
+
+    struct thread_data_t;
+    struct event_data_t;
+    struct mutex_data_t;
+    struct sema_data_t;
 
     class thread_functor
     {
@@ -24,15 +34,6 @@ namespace ncore
         virtual void exit()                               = 0;
     };
 
-    class thread_t;
-    class mutex_t;
-    class event_t;
-    class sema_t;
-
-    struct thread_data_t;
-    struct event_data_t;
-    struct mutex_data_t;
-    struct sema_data_t;
 
     class threading_t
     {

@@ -1,7 +1,5 @@
 #include "ccore/c_target.h"
 
-#include "cthread/c_threading.h"
-
 #include "cthread/c_types.h"
 #include "cthread/c_thread.h"
 #include "cthread/c_mutex.h"
@@ -12,9 +10,11 @@
 #    include "cthread/private/c_thread_mac.h"
 #endif
 
-#ifdef TARGET_WIN
+#ifdef TARGET_PC
 #    include "cthread/private/c_thread_win.h"
 #endif
+
+#include "cthread/c_threading.h"
 
 namespace ncore
 {

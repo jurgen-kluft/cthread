@@ -28,14 +28,32 @@ namespace ncore
 
     void thread_t::start()
     {
-        if (get_state() == thread_state_t::RUNNING)
+        if (m_data->m_state == thread_state_t::RUNNING)
         {
             // thread already running
         }
-        else if (get_state() == thread_state_t::CREATED)
+        else if (m_data->m_state == thread_state_t::CREATED)
         {
             // Create a data structure to wrap the data we need to pass to the entry function.
             // ResumeThread(m_data->m_handle);
+        }
+    }
+
+    void thread_t::suspend()
+    {
+        if (m_data->m_state == thread_state_t::RUNNING)
+        {
+            //SuspendThread(m_data->m_handle);
+            m_data->m_state = thread_state_t::SUSPENDED;
+        }
+    }
+
+    void thread_t::resume()
+    {
+        if (m_data->m_state == thread_state_t::SUSPENDED)
+        {
+            //ResumeThread(m_data->m_handle);
+            m_data->m_state = thread_state_t::RUNNING;
         }
     }
 
@@ -44,9 +62,11 @@ namespace ncore
         // Call the real entry point function, passing the provided context.
         thread_t*      t = reinterpret_cast<thread_t*>(arg1);
         thread_data_t* d = reinterpret_cast<thread_data_t*>(arg2);
+        thread_functor* f = d->m_functor;
         {
-            // t->run();
-            // t->exit();
+            f->start(t, d);
+            f->run();
+            f->exit();
         }
         return 0;
     }

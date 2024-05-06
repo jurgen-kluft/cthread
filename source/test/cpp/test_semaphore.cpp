@@ -10,6 +10,7 @@
 #include "cthread/test_allocator.h"
 
 using ncore::thread_t;
+using ncore::thread_data_t;
 using ncore::threading_t;
 using ncore::sema_t;
 
@@ -24,11 +25,15 @@ public:
 
     ~SemaRunnable() { threading_t::instance()->destroy(_sema); }
 
-    void run(thread_t* thread)
+    void start(thread_t* t, thread_data_t* d) {}
+
+    void run()
     {
         _sema->wait();
         _ran = true;
     }
+
+    void exit() {}
 
     bool ran() const { return _ran; }
     void set() { _sema->signal(); }

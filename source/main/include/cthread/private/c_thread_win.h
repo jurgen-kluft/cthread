@@ -5,9 +5,7 @@
 #include "cthread/c_threading.h"
 #include "cthread/c_types.h"
 
-#ifdef TARGET_PC
-
-#    include <Windows.h>
+#include <Windows.h>
 
 namespace ncore
 {
@@ -43,5 +41,4 @@ namespace ncore
 
 } // namespace ncore
 
-#endif // TARGET_PC
 #endif // __CMTHREAD_THREAD_WIN_H__

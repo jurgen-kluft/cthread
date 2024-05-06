@@ -3,7 +3,7 @@
 #ifdef TARGET_PC
 #include "cthread/c_event.h"
 #include "cthread/c_threading.h"
-#include "cthread/private/c_threading.h"
+#include "cthread/private/c_thread_win.h"
 
 #include <Windows.h>
 

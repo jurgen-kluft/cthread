@@ -23,10 +23,20 @@ namespace
 			testEvent = data;
 		}
 
-        void run(thread_t* thread)
+        void start(thread_t* t, thread_data_t* d)
+        {
+
+        }
+
+        void run()
         {
             testEvent->wait();
             _timestamp = datetime_t::sNow();
+        }
+
+        void exit()
+        {
+
         }
 
         const datetime_t& timestamp() const { return _timestamp; }

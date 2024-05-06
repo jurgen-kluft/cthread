@@ -14,18 +14,25 @@ using namespace ncore;
 
 namespace
 {
-	class TestLock: public ncore::thread_functor
+	class TestLock: public thread_functor
 	{
 	public:
 		TestLock(mutex_t* m)
 		{
 		}
 
-		void run(thread_t* thread)
+        void start(thread_t* t, thread_data_t* d) {}
+
+		void run()
 		{
 			testMutex->lock();
 			_timestamp = datetime_t::sNow();
 			testMutex->unlock();
+		}
+
+		void exit()
+		{
+
 		}
 
 		const datetime_t& timestamp() const
@@ -40,14 +47,16 @@ namespace
 		datetime_t _timestamp;
 	};
 
-	class TestTryLock: public ncore::thread_functor
+	class TestTryLock: public thread_functor
 	{
 	public:
 		TestTryLock(mutex_t* m) :testMutex(m), _locked(false)
 		{
 		}
 		
-		void run(thread_t* thread)
+		void start(thread_t* t, thread_data_t* d) {}
+
+		void run()
 		{
 			if (testMutex->tryLock())
 			{
@@ -55,6 +64,8 @@ namespace
 				testMutex->unlock();
 			}
 		}
+
+		void exit() {}
 
 		bool locked() const
 		{

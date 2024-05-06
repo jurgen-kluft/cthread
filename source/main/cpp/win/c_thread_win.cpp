@@ -7,7 +7,7 @@
 #ifdef TARGET_PC
 #    include "cthread/c_thread.h"
 #    include "cthread/c_threading.h"
-#    include "cthread/private/c_threading.h"
+#    include "cthread/private/c_thread_win.h"
 
 #    include "cthread/c_mutex.h"
 #    include "cthread/c_event.h"
@@ -23,8 +23,8 @@ namespace ncore
 
     void thread_t::release()
     {
-        if (m_data->m_threadHandle)
-            ::CloseHandle(m_data->m_threadHandle);
+        if (m_data->m_handle)
+            ::CloseHandle(m_data->m_handle);
     }
 
     void thread_t::set_priority(thread_priority_t priority)
@@ -32,9 +32,12 @@ namespace ncore
         if (priority != m_data->m_priority)
         {
             m_data->m_priority = priority;
-            if (m_data->m_threadHandle)
+            if (m_data->m_handle)
             {
-                if (::SetThreadPriority(m_data->m_threadHandle, m_data->m_priority.to_platform_value()) == 0)
+                threading_t* threading = threading_t::instance();
+                s32 const p = threading->m_thread_priority_map[priority.prio];
+
+                if (::SetThreadPriority(m_data->m_handle, p) == 0)
                 {
                     // cannot set thread priority
                 }
@@ -44,41 +47,47 @@ namespace ncore
 
     void thread_t::start()
     {
-        if (get_state() == STATE_RUNNING)
+        if (get_state() == thread_state_t::RUNNING)
         {
             // thread already running
         }
-        else if (get_state() == STATE_CREATED)
+        else if (get_state() == thread_state_t::CREATED)
         {
             // Create a data structure to wrap the data we need to pass to the entry function.
-            ResumeThread(m_data->m_threadHandle);
+            ResumeThread(m_data->m_handle);
         }
     }
 
-    unsigned __stdcall __main_func(void* arg)
+    void thread_t::suspend()
     {
-        // Call the real entry point function, passing the provided context.
-        thread_ata_t* t = reinterpret_cast<thread_data_t*>(arg);
+        if (get_state() == thread_state_t::RUNNING)
         {
-            t->run();
-            t->exit();
+			SuspendThread(m_data->m_handle);
+            m_data->m_state = thread_state_t::SUSPENDED;
+		}
+	}
+
+    void thread_t::resume()
+    {
+		if (get_state() == thread_state_t::SUSPENDED) 
+        {
+            ResumeThread(m_data->m_handle);
+			m_data->m_state = thread_state_t::RUNNING;
         }
-        return 0;
     }
 
     void thread_t::join()
     {
-        thread_win_t* data = (thread_win_t*)this;
-        if (!m_data->m_threadHandle)
+        if (!m_data->m_handle)
             return;
 
-        switch (WaitForSingleObject(m_data->m_threadHandle, INFINITE))
+        switch (WaitForSingleObject(m_data->m_handle, INFINITE))
         {
             case WAIT_OBJECT_0:
             {
-                ::CloseHandle(m_data->m_threadHandle);
-                m_data->m_threadHandle = 0;
-                m_data->m_threadState  = STATE_STOPPED;
+                ::CloseHandle(m_data->m_handle);
+                m_data->m_handle = 0;
+                m_data->m_state = thread_state_t::STOPPED;
                 return;
             }
             default:
@@ -89,16 +98,15 @@ namespace ncore
 
     bool thread_t::join(u32 milliseconds)
     {
-        thread_win_t* data = (thread_win_t*)this;
-        if (!m_data->m_threadHandle)
+        if (!m_data->m_handle)
             return true;
 
-        switch (WaitForSingleObject(m_data->m_threadHandle, milliseconds))
+        switch (WaitForSingleObject(m_data->m_handle, milliseconds))
         {
             case WAIT_OBJECT_0:
-                ::CloseHandle(m_data->m_threadHandle);
-                m_data->m_threadHandle = 0;
-                m_data->m_threadState  = STATE_STOPPED;
+                ::CloseHandle(m_data->m_handle);
+                m_data->m_handle = 0;
+                m_data->m_state  = thread_state_t::STOPPED;
                 return true;
             default:
                 // cannot join thread
@@ -106,10 +114,6 @@ namespace ncore
         }
         return false;
     }
-
-    u32               thread_t::get_stacksize() const { return m_data->m_stack_size; }
-    thread_state_t    thread_t::get_state() const { return m_data->m_threadState; }
-    thread_priority_t thread_t::get_priority() const { return m_data->m_priority; }
 
 } // namespace ncore
 
