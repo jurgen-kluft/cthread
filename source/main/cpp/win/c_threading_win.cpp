@@ -59,9 +59,14 @@ namespace ncore
     void threading_t::join(thread_t* t) {}
     bool threading_t::join(thread_t* t, u32 ms) { return false; }
 
-    thread_t*    threading_t::current() { return nullptr; }
-    thread_id_t  threading_t::current_tid() { return 0; }
-    thread_idx_t threading_t::current_idx() { return 0; }
+    thread_t*    threading_t::current() 
+    { 
+        thread_t*    t = nullptr;
+        
+
+        return t; 
+    }
+
     void         threading_t::sleep(u32 ms) {}
     void         threading_t::yield() {}
     void         threading_t::exit() {}

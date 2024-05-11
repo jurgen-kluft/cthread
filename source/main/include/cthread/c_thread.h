@@ -21,8 +21,6 @@ namespace ncore
             DEFAULT_PRIORITY  = thread_priority_t::NORMAL
         };
 
-        void init(thread_data_t* data);
-
         thread_id_t       get_tid() const;                   // Returns the native thread ID of the thread.
         thread_idx_t      get_idx() const;                   // Returns the unique thread index of the thread.
         const char*       get_name() const;                  // Returns the name of the thread.
@@ -32,6 +30,7 @@ namespace ncore
         u32               get_stacksize() const;             // Returns the stack size of the thread.
         void              set_priority(thread_priority_t p); // Sets the thread's priority.
 
+        void create(thread_data_t* data);
         void start();
         void suspend();
         void resume();

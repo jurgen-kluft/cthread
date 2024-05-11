@@ -38,7 +38,7 @@ namespace ncore
     class threading_t
     {
     public:
-        static threading_t* create(alloc_t* allocator, u32 max_threads = 32, u32 max_mutex = 256, u32 max_event = 256, u32 max_semaphore = 256);
+        static threading_t* create(alloc_t* allocator,  u32 max_threads = 32, u32 max_mutex = 256, u32 max_event = 256, u32 max_semaphore = 256);
         static void         destroy(threading_t*&);
 
         static void         set_instance(threading_t* instance);
@@ -58,8 +58,7 @@ namespace ncore
         bool join(thread_t*, u32 milliseconds);
 
         static thread_t*    current();
-        static thread_id_t  current_tid();
-        static thread_idx_t current_idx();
+
         static void         sleep(u32 milliseconds);
         static void         yield();
         static void         exit();
