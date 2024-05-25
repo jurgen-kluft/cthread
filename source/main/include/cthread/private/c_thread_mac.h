@@ -7,6 +7,8 @@
 
 #include <thread>
 #include <chrono>
+
+#include <mach/mach.h>
 #include <mach/semaphore.h>
 
 namespace ncore
@@ -28,9 +30,10 @@ namespace ncore
 
     struct event_data_t
     {
-        pthread_mutex_t _mutex;
-        pthread_cond_t  _cond;
-        bool            _triggered;
+        std::atomic<s32> m_status;
+        // Lightweight semaphore
+        std::atomic<s32> m_count;
+        ::semaphore_t    m_sema;
     };
 
     struct mutex_data_t
