@@ -5,9 +5,9 @@
 
 namespace ncore
 {
-    void thread_t::init(thread_data_t* data) { m_data = data; }
+    void thread_t::create(thread_data_t* data) { m_data = data; }
 
-    void thread_t::release() {}
+    void thread_t::destroy() {}
 
     void thread_t::set_priority(thread_priority_t priority)
     {
@@ -84,9 +84,5 @@ namespace ncore
 
         return false;
     }
-
-    u32               thread_t::get_stacksize() const { return m_data->m_stack_size; }
-    thread_state_t    thread_t::get_state() const { return m_data->m_state; }
-    thread_priority_t thread_t::get_priority() const { return m_data->m_priority; }
 
 } // namespace ncore

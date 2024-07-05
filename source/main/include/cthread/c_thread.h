@@ -31,13 +31,14 @@ namespace ncore
         void              set_priority(thread_priority_t p); // Sets the thread's priority.
 
         void create(thread_data_t* data);
+        void destroy();
+
         void start();
         void suspend();
         void resume();
 
         void join();
         bool join(u32 milliseconds);
-        void release();
 
         static u32               default_stacksize();
         static thread_priority_t default_priority();
