@@ -17,32 +17,28 @@ namespace ncore
     {
     public:
         void set();
-        // Signals the event. If autoReset is true,
-        // only one thread waiting for the event
-        // can resume execution.
-        // If autoReset is false, all waiting threads
-        // can resume execution.
+        // Signals the event.
+        // If autoReset is true, only one thread waiting for the event can resume execution.
+        // If autoReset is false, all waiting threads/ can resume execution.
 
-        void wait();
-        // Waits for the event to become signalled.
-
-        void reset();
-        // Resets the event to unsignalled state.
-
-        void release();
-        // Releases the event object back to threading
+        void wait(); // Waits for the event to become signalled.
+        void reset(); // Resets the event to unsignalled state.
+        void release(); // Releases the event object back to threading
 
     protected:
         friend class threading_t;
-        event_t() : m_data(nullptr) {}
+        event_t()
+            : m_data(nullptr)
+        {
+        }
 
-    	bool init(event_data_t* data, bool autoReset = true);
+        bool          init(event_data_t* data, bool autoReset = true);
         event_data_t* m_data;
 
     private:
-        event_t(const event_t&) = delete;
+        event_t(const event_t&)            = delete;
         event_t& operator=(const event_t&) = delete;
-        ~event_t() = default;
+        ~event_t()                         = default;
     };
 
 } // namespace ncore
