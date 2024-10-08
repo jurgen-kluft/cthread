@@ -24,7 +24,7 @@ namespace ncore
         u32               get_stacksize() const;             // Returns the stack size of the thread.
         void              set_priority(thread_priority_t p); // Sets the thread's priority.
 
-        void create(thread_data_t* data);
+        void create();
         void destroy();
 
         void start();

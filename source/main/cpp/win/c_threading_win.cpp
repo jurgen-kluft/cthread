@@ -7,15 +7,16 @@
 #    include "cthread/c_event.h"
 #    include "cthread/c_semaphore.h"
 #    include "cthread/private/c_thread_win.h"
+#    include "cthread/private/c_threading_data.h"
 
 namespace ncore
 {
     thread_t* threading_t::create_thread(const char* name, thread_fn_t* f, u32 stack_size, thread_priority_t priority)
     {
-        thread_data_t* data = (thread_data_t*)m_threads_data_pool.allocate();
+        thread_data_t* data = (thread_data_t*)m_data->m_threads_data_pool.allocate();
         if (data)
         {
-            thread_t* t = (thread_t*)m_threads_pool.allocate();
+            thread_t* t = (thread_t*)m_data->m_threads_pool.allocate();
             if (t)
             {
                 t->m_data               = data;
@@ -23,31 +24,33 @@ namespace ncore
                 t->m_data->m_stack_size = stack_size;
                 t->m_data->m_priority   = priority;
                 t->m_data->m_state      = thread_state_t::CREATED;
-                t->m_data->m_idx        = m_threads_pool.ptr2idx(t);
+                t->m_data->m_idx        = m_data->m_threads_pool.ptr2idx(t);
                 t->m_data->m_tid        = 0;
                 t->m_data->m_name[0]    = 0;
 
-                const char* src         = name;
-                char*       dst         = t->m_data->m_name;
-                const char* end         = dst + sizeof(t->m_data->m_name) - 1;
-                while (*src && dst < end)
-                    *dst++ = *src++;
-                *dst = 0;
-
+                s32       i = 0;
+                s32 const n = g_array_size(t->m_data->m_name) - 1;
+                while (i < n)
+                {
+                    t->m_data->m_name[i] = name[i];
+                    if (name[i] == 0)
+                        break;
+                    i += 1;
+                }
+                t->m_data->m_name[i] = 0;
                 return t;
             }
-            m_threads_data_pool.deallocate(data);
+            m_data->m_threads_data_pool.deallocate(data);
         }
         return nullptr;
     }
 
-    
     unsigned __stdcall __thread_main(void* arg1, void* arg2)
     {
         // Call the real entry point function, passing the provided context.
-        thread_t*       t = reinterpret_cast<thread_t*>(arg1);
-        thread_data_t*  d = reinterpret_cast<thread_data_t*>(arg2);
-        thread_fn_t* f = d->m_functor;
+        thread_t*      t = reinterpret_cast<thread_t*>(arg1);
+        thread_data_t* d = reinterpret_cast<thread_data_t*>(arg2);
+        thread_fn_t*   f = d->m_functor;
         {
             f->start(t, d);
             f->run();
@@ -56,25 +59,45 @@ namespace ncore
         return 0;
     }
 
-    void threading_t::join(thread_t* t) {}
-    bool threading_t::join(thread_t* t, u32 ms) { return false; }
-
-    thread_t*    threading_t::current() 
-    { 
-        thread_t*    t = nullptr;
-        
-
-        return t; 
+    void threading_t::join(thread_t* t)
+    {
+        //@TODO: Implement this
     }
 
-    void         threading_t::sleep(u32 ms) {}
-    void         threading_t::yield() {}
-    void         threading_t::exit() {}
+    bool threading_t::join(thread_t* t, u32 ms)
+    {
+        //@TODO: Implement this
 
+        return false;
+    }
+
+    thread_t* threading_t::current()
+    {
+        thread_t* t = nullptr;
+
+        //@TODO: Implement this
+
+        return t;
+    }
+
+    void threading_t::sleep(u32 ms)
+    {
+        //@TODO: Implement this
+    }
+
+    void threading_t::yield()
+    {
+        //@TODO: Implement this
+    }
+
+    void threading_t::exit()
+    {
+        //@TODO: Implement this
+    }
 
     void threading_t::init_thread_priority(u32* map)
     {
-        
+        //@TODO: Implement this
     }
 
 } // namespace ncore

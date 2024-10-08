@@ -8,6 +8,7 @@
 #    include "cthread/c_thread.h"
 #    include "cthread/c_threading.h"
 #    include "cthread/private/c_thread_win.h"
+#    include "cthread/private/c_threading_data.h"
 
 #    include "cthread/c_mutex.h"
 #    include "cthread/c_event.h"
@@ -33,7 +34,7 @@ namespace ncore
             if (m_data->m_handle)
             {
                 threading_t* threading = threading_t::instance();
-                s32 const    p         = threading->m_thread_priority_map[priority.prio];
+                s32 const    p         = threading->m_data->m_thread_priority_map[priority.prio];
 
                 if (::SetThreadPriority(m_data->m_handle, p) == 0)
                 {
@@ -62,10 +63,8 @@ namespace ncore
         }
     }
 
-    void thread_t::create(thread_data_t* data)
+    void thread_t::create()
     {
-        m_data = data;
-
         DWORD flags = CREATE_SUSPENDED;
 
         // Without this flag the 'dwStackSize' parameter to CreateThread specifies the "Stack Commit Size"
@@ -86,7 +85,7 @@ namespace ncore
 
         DWORD  threadId;
         HANDLE handle = CreateThread(NULL, // LPSECURITY_ATTRIBUTES lpsa, //-V513
-                                     data->m_stack_size, (LPTHREAD_START_ROUTINE)data->m_functor, data->m_arg, flags, &threadId);
+                                     m_data->m_stack_size, (LPTHREAD_START_ROUTINE)m_data->m_functor, m_data->m_arg, flags, &threadId);
         if (handle == 0)
         {
             return;

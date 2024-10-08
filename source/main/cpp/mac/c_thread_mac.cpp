@@ -5,9 +5,19 @@
 
 namespace ncore
 {
-    void thread_t::create(thread_data_t* data) { m_data = data; }
+    void thread_t::create() 
+    {  
 
-    void thread_t::destroy() {}
+        //@TODO: Implement this
+
+    }
+
+    void thread_t::destroy() 
+    {
+
+        //@TODO: Implement this
+
+    }
 
     void thread_t::set_priority(thread_priority_t priority)
     {
@@ -35,6 +45,8 @@ namespace ncore
         else if (m_data->m_state == thread_state_t::CREATED)
         {
             // Create a data structure to wrap the data we need to pass to the entry function.
+
+            //@TODO: Implement this
             // ResumeThread(m_data->m_handle);
         }
     }
@@ -43,6 +55,9 @@ namespace ncore
     {
         if (m_data->m_state == thread_state_t::RUNNING)
         {
+    
+            //@TODO: Implement this
+
             //SuspendThread(m_data->m_handle);
             m_data->m_state = thread_state_t::SUSPENDED;
         }
@@ -52,6 +67,9 @@ namespace ncore
     {
         if (m_data->m_state == thread_state_t::SUSPENDED)
         {
+
+            //@TODO: Implement this
+
             //ResumeThread(m_data->m_handle);
             m_data->m_state = thread_state_t::RUNNING;
         }
@@ -75,12 +93,17 @@ namespace ncore
     {
         if (!m_data->m_handle)
             return;
+
+        //@TODO: Implement this
+
     }
 
     bool thread_t::join(u32 milliseconds)
     {
         if (!m_data->m_handle)
             return true;
+
+        //@TODO: Implement this
 
         return false;
     }

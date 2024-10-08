@@ -5,9 +5,6 @@
 #    pragma once
 #endif
 
-#include "cbase/c_allocator.h"
-#include "cbase/c_hbb.h"
-
 #include "cthread/c_types.h"
 
 namespace ncore
@@ -34,11 +31,11 @@ namespace ncore
         virtual void exit()                               = 0;
     };
 
-
+    struct threading_data_t;
     class threading_t
     {
     public:
-        static threading_t* create(alloc_t* allocator,  u32 max_threads = 32, u32 max_mutex = 256, u32 max_event = 256, u32 max_semaphore = 256);
+        static threading_t* create(alloc_t* allocator, u32 max_threads = 32, u32 max_mutex = 256, u32 max_event = 256, u32 max_semaphore = 256);
         static void         destroy(threading_t*&);
 
         static void         set_instance(threading_t* instance);
@@ -57,13 +54,11 @@ namespace ncore
         void join(thread_t*);
         bool join(thread_t*, u32 milliseconds);
 
-        static thread_t*    current();
+        static thread_t* current();
 
-        static void         sleep(u32 milliseconds);
-        static void         yield();
-        static void         exit();
-
-        DCORE_CLASS_PLACEMENT_NEW_DELETE
+        static void sleep(u32 milliseconds);
+        static void yield();
+        static void exit();
 
     protected:
         friend class thread_t;
@@ -71,29 +66,7 @@ namespace ncore
         // Platform specifics
         static void init_thread_priority(u32* map);
 
-        template <typename T> struct data_t
-        {
-        };
-
-        static threading_t* s_instance;
-        alloc_t*            m_allocator;
-        u32              m_thread_priority_map[thread_priority_t::COUNT];
-        thread_t*        m_threads;
-        fsadexed_array_t m_threads_pool;
-        thread_data_t*   m_threads_data;
-        fsadexed_array_t m_threads_data_pool;
-        event_t*         m_events;
-        fsadexed_array_t m_events_pool;
-        event_data_t*    m_events_data;
-        fsadexed_array_t m_events_data_pool;
-        mutex_t*         m_mutexes;
-        fsadexed_array_t m_mutexes_pool;
-        mutex_data_t*    m_mutexes_data;
-        fsadexed_array_t m_mutexes_data_pool;
-        sema_t*          m_semaphores;
-        fsadexed_array_t m_semaphores_pool;
-        sema_data_t*     m_semaphores_data;
-        fsadexed_array_t m_semaphores_data_pool;
+        threading_data_t* m_data;
 
     private:
         threading_t();
