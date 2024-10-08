@@ -2,17 +2,18 @@
 
 #include "cthread/c_thread.h"
 #include "cthread/private/c_thread_mac.h"
+#include "cthread/private/c_threading_data.h"
 
 namespace ncore
 {
-    void thread_t::create() 
-    {  
+    void thread_t::create()
+    {
 
         //@TODO: Implement this
 
     }
 
-    void thread_t::destroy() 
+    void thread_t::destroy()
     {
 
         //@TODO: Implement this
@@ -27,7 +28,7 @@ namespace ncore
             if (m_data->m_handle)
             {
                 threading_t* threading = threading_t::instance();
-                u32 const    prio      = threading->m_thread_priority_map[m_data->m_priority.prio];
+                u32 const    prio      = threading->m_data->m_thread_priority_map[m_data->m_priority.prio];
 
                 {
                     // cannot set thread priority
@@ -55,7 +56,7 @@ namespace ncore
     {
         if (m_data->m_state == thread_state_t::RUNNING)
         {
-    
+
             //@TODO: Implement this
 
             //SuspendThread(m_data->m_handle);

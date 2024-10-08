@@ -7,15 +7,16 @@
 #    include "cthread/c_event.h"
 #    include "cthread/c_semaphore.h"
 #    include "cthread/private/c_thread_mac.h"
+#    include "cthread/private/c_threading_data.h"
 
 namespace ncore
 {
     thread_t* threading_t::create_thread(const char* name, thread_fn_t* f, u32 stack_size, thread_priority_t priority)
     {
-        thread_data_t* data = (thread_data_t*)m_threads_data_pool.allocate();
+        thread_data_t* data = (thread_data_t*)m_data->m_threads_data_pool.allocate();
         if (data)
         {
-            thread_t* t = (thread_t*)m_threads_pool.allocate();
+            thread_t* t = (thread_t*)m_data->m_threads_pool.allocate();
             if (t)
             {
                 t->m_data               = data;
@@ -23,20 +24,24 @@ namespace ncore
                 t->m_data->m_stack_size = stack_size;
                 t->m_data->m_priority   = priority;
                 t->m_data->m_state      = thread_state_t::CREATED;
-                t->m_data->m_idx        = m_threads_pool.ptr2idx(t);
+                t->m_data->m_idx        = m_data->m_threads_pool.ptr2idx(t);
                 t->m_data->m_tid        = 0;
                 t->m_data->m_name[0]    = 0;
 
-                const char* src         = name;
-                char*       dst         = t->m_data->m_name;
-                const char* end         = dst + sizeof(t->m_data->m_name) - 1;
-                while (*src && dst < end)
-                    *dst++ = *src++;
-                *dst = 0;
+                s32       i = 0;
+                s32 const n = g_array_size(t->m_data->m_name) - 1;
+                while (i < n)
+                {
+                    t->m_data->m_name[i] = name[i];
+                    if (name[i] == 0)
+                        break;
+                    i += 1;
+                }
+                t->m_data->m_name[i] = 0;
 
                 return t;
             }
-            m_threads_data_pool.deallocate(data);
+            m_data->m_threads_data_pool.deallocate(data);
         }
         return nullptr;
     }

@@ -1,4 +1,5 @@
 #include "ccore/c_target.h"
+#include "ccore/c_debug.h"
 
 #ifdef TARGET_MAC
 #    include "cthread/c_event.h"
