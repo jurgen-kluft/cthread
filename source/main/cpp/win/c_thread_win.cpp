@@ -19,7 +19,7 @@
 
 namespace ncore
 {
-    void thread_t::release()
+    void thread_t::destroy()
     {
         if (m_data->m_handle)
             ::CloseHandle(m_data->m_handle);
@@ -42,14 +42,14 @@ namespace ncore
             }
         }
     }
-    static void SetThreadDescription(PCWSTR lpThreadDescription)
+    static void SetThreadDescription(const char* threadDescription)
     {
         // SetThreadDescription is only available from Windows 10 version 1607 / Windows Server 2016
         //
         // So in order to be compatible with older Windows versions we probe for the API at runtime
         // and call it only if available.
 
-        typedef HRESULT(WINAPI * SetThreadDescriptionFnPtr)(HANDLE hThread, PCWSTR lpThreadDescription);
+        typedef HRESULT(WINAPI * SetThreadDescriptionFnPtr)(HANDLE hThread, PCWSTR threadDescription);
 
 #    pragma warning(push)
 #    pragma warning(disable : 4191) // unsafe conversion from 'type of expression' to 'type required'
@@ -58,7 +58,7 @@ namespace ncore
 
         if (RealSetThreadDescription)
         {
-            RealSetThreadDescription(::GetCurrentThread(), lpThreadDescription);
+            RealSetThreadDescription(::GetCurrentThread(), (PCWSTR)threadDescription);
         }
     }
 
@@ -86,13 +86,13 @@ namespace ncore
 
         DWORD  threadId;
         HANDLE handle = CreateThread(NULL, // LPSECURITY_ATTRIBUTES lpsa, //-V513
-                                     stackSize, (LPTHREAD_START_ROUTINE)function, parms, flags, &threadId);
+                                     data->m_stack_size, (LPTHREAD_START_ROUTINE)data->m_functor, data->m_arg, flags, &threadId);
         if (handle == 0)
         {
             return;
         }
 
-        SetThreadDescription(TCHAR_TO_WCHAR(m_data->m_name));
+        SetThreadDescription(m_data->m_name);
 
         if (m_data->m_priority == thread_priority_t::HIGH)
         {

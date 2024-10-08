@@ -62,7 +62,7 @@ namespace ncore
         // Call the real entry point function, passing the provided context.
         thread_t*      t = reinterpret_cast<thread_t*>(arg1);
         thread_data_t* d = reinterpret_cast<thread_data_t*>(arg2);
-        thread_functor* f = d->m_functor;
+        thread_fn_t* f = d->m_functor;
         {
             f->start(t, d);
             f->run();

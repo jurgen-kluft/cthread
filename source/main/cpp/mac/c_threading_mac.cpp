@@ -10,7 +10,7 @@
 
 namespace ncore
 {
-    thread_t* threading_t::create_thread(const char* name, thread_functor* f, u32 stack_size, thread_priority_t priority)
+    thread_t* threading_t::create_thread(const char* name, thread_fn_t* f, u32 stack_size, thread_priority_t priority)
     {
         thread_data_t* data = (thread_data_t*)m_threads_data_pool.allocate();
         if (data)

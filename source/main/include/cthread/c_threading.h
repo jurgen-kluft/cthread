@@ -44,7 +44,7 @@ namespace ncore
         static void         set_instance(threading_t* instance);
         static threading_t* instance();
 
-        thread_t* create_thread(const char* name, thread_functor* f, u32 stack_size, thread_priority_t priority);
+        thread_t* create_thread(const char* name, thread_fn_t* f, u32 stack_size, thread_priority_t priority);
         mutex_t*  create_mutex();
         event_t*  create_event(const char* name, bool autoReset);
         sema_t*   create_sema(s32 initial_count, s32 max_count);
@@ -77,7 +77,6 @@ namespace ncore
 
         static threading_t* s_instance;
         alloc_t*            m_allocator;
-
         u32              m_thread_priority_map[thread_priority_t::COUNT];
         thread_t*        m_threads;
         fsadexed_array_t m_threads_pool;
@@ -98,7 +97,7 @@ namespace ncore
 
     private:
         threading_t();
-        threading_t(const threading_t&) {}
+        threading_t(const threading_t&) = delete;
         ~threading_t() {}
         threading_t& operator=(const threading_t&) { return *this; }
     };

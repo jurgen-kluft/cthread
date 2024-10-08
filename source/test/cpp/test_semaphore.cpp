@@ -14,7 +14,7 @@ using ncore::thread_data_t;
 using ncore::threading_t;
 using ncore::sema_t;
 
-class SemaRunnable : public ncore::thread_functor
+class SemaRunnable : public ncore::thread_fn_t
 {
 public:
     SemaRunnable(int n, int max)

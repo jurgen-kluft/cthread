@@ -10,7 +10,7 @@
 
 namespace ncore
 {
-    thread_t* threading_t::create_thread(const char* name, thread_functor* f, u32 stack_size, thread_priority_t priority)
+    thread_t* threading_t::create_thread(const char* name, thread_fn_t* f, u32 stack_size, thread_priority_t priority)
     {
         thread_data_t* data = (thread_data_t*)m_threads_data_pool.allocate();
         if (data)
@@ -47,7 +47,7 @@ namespace ncore
         // Call the real entry point function, passing the provided context.
         thread_t*       t = reinterpret_cast<thread_t*>(arg1);
         thread_data_t*  d = reinterpret_cast<thread_data_t*>(arg2);
-        thread_functor* f = d->m_functor;
+        thread_fn_t* f = d->m_functor;
         {
             f->start(t, d);
             f->run();

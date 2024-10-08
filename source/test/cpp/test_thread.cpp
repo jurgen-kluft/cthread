@@ -22,7 +22,7 @@ using ncore::datetime_t;
 using ncore::timespan_t;
 using ncore::s32;
 
-class MyRunnable : public ncore::thread_functor
+class MyRunnable : public ncore::thread_fn_t
 {
 public:
     MyRunnable(event_t* e)

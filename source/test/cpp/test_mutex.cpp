@@ -14,7 +14,7 @@ using namespace ncore;
 
 namespace
 {
-	class TestLock: public thread_functor
+    class TestLock : public thread_fn_t
 	{
 	public:
 		TestLock(mutex_t* m)
@@ -47,7 +47,7 @@ namespace
 		datetime_t _timestamp;
 	};
 
-	class TestTryLock: public thread_functor
+	class TestTryLock : public thread_fn_t
 	{
 	public:
 		TestTryLock(mutex_t* m) :testMutex(m), _locked(false)

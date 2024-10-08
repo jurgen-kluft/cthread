@@ -15,7 +15,7 @@ using ncore::datetime_t;
 
 namespace
 {
-    class TestEvent : public ncore::thread_functor
+    class TestEvent : public ncore::thread_fn_t
     {
     public:
 		TestEvent(ncore::event_t* data)

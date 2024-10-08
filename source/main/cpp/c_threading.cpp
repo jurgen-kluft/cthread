@@ -21,7 +21,7 @@ namespace ncore
     template <typename T> static void s_alloc_data(T*& data, fsadexed_array_t& fsa, alloc_t* allocator, u32 capacity)
     {
         data = g_allocate_array_and_memset<T>(allocator, capacity);
-        fsa = fsadexed_array_t(data, sizeof(T), capacity);
+        fsa  = fsadexed_array_t(data, sizeof(T), capacity);
     }
 
     template <typename T> static void s_dealloc_data(T*& data, fsadexed_array_t& fsa, alloc_t* allocator)
@@ -31,9 +31,31 @@ namespace ncore
         data = nullptr;
     }
 
+    threading_t::threading_t()
+        : m_allocator(nullptr)
+        , m_threads(nullptr)
+        , m_threads_pool()
+        , m_threads_data(nullptr)
+        , m_threads_data_pool()
+        , m_events(nullptr)
+        , m_events_pool()
+        , m_events_data(nullptr)
+        , m_events_data_pool()
+        , m_mutexes(nullptr)
+        , m_mutexes_pool()
+        , m_mutexes_data(nullptr)
+        , m_mutexes_data_pool()
+        , m_semaphores(nullptr)
+        , m_semaphores_pool()
+        , m_semaphores_data(nullptr)
+        , m_semaphores_data_pool()
+    {
+    }
+
     threading_t* threading_t::create(alloc_t* allocator, u32 max_threads, u32 max_mutexes, u32 max_events, u32 max_semaphores)
     {
-        threading_t* threading = g_construct<threading_t>(allocator);
+        void*        threading_mem = allocator->allocate(sizeof(threading_t));
+        threading_t* threading     = new (threading_mem) threading_t();
 
         // Initialize threading instance
         init_thread_priority(threading->m_thread_priority_map);

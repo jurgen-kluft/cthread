@@ -19,7 +19,7 @@ namespace ncore
         thread_state_t    m_state;
         thread_priority_t m_priority;
         u32               m_stack_size;
-        thread_functor*   m_functor;
+        thread_fn_t*      m_functor;
         void*             m_arg;
         char              m_name[64];
     };
