@@ -195,9 +195,9 @@ UNITTEST_SUITE_BEGIN(thread)
             thread->start();
             threading_t::sleep(200);
             CHECK_TRUE(thread->is_running());
-            CHECK_TRUE(!thread->join(100));
+            CHECK_TRUE(!thread->join());
             r.notify();
-            CHECK_TRUE(thread->join(500));
+            CHECK_TRUE(thread->join());
             CHECK_TRUE(!thread->is_running());
 
             threading_t::instance()->destroy(e);

@@ -28,6 +28,7 @@ namespace ncore
     const char*       thread_t::get_name() const { return m_data->m_name; }
     thread_priority_t thread_t::get_priority() const { return m_data->m_priority; }
     thread_state_t    thread_t::get_state() const { return m_data->m_state; }
+    thread_data_t*    thread_t::get_data() const { return m_data; }
     bool              thread_t::is_running() const { return m_data->m_state == thread_state_t::RUNNING; }
     u32               thread_t::get_stacksize() const { return m_data->m_stack_size; }
 

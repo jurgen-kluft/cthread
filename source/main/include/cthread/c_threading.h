@@ -52,7 +52,6 @@ namespace ncore
         void destroy(sema_t*);
 
         void join(thread_t*);
-        bool join(thread_t*, u32 milliseconds);
 
         static thread_t* current();
 

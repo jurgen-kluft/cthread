@@ -45,30 +45,9 @@ namespace ncore
         return nullptr;
     }
 
-    unsigned __stdcall __thread_main(void* arg1, void* arg2)
-    {
-        // Call the real entry point function, passing the provided context.
-        thread_t*      t = reinterpret_cast<thread_t*>(arg1);
-        thread_data_t* d = reinterpret_cast<thread_data_t*>(arg2);
-        thread_fn_t*   f = d->m_functor;
-        {
-            f->start(t, d);
-            f->run();
-            f->exit();
-        }
-        return 0;
-    }
-
     void threading_t::join(thread_t* t)
     {
-        //@TODO: Implement this
-    }
-
-    bool threading_t::join(thread_t* t, u32 ms)
-    {
-        //@TODO: Implement this
-
-        return false;
+        t->join();
     }
 
     thread_t* threading_t::current()

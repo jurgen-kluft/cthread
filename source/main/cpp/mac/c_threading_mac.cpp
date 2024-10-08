@@ -32,9 +32,9 @@ namespace ncore
                 s32 const n = g_array_size(t->m_data->m_name) - 1;
                 while (i < n)
                 {
-                    t->m_data->m_name[i] = name[i];
                     if (name[i] == 0)
                         break;
+                    t->m_data->m_name[i] = name[i];
                     i += 1;
                 }
                 t->m_data->m_name[i] = 0;
@@ -46,14 +46,16 @@ namespace ncore
         return nullptr;
     }
 
-    void threading_t::join(thread_t* t) {}
-    bool threading_t::join(thread_t* t, u32 ms) { return false; }
+    void threading_t::join(thread_t* t)
+    {
+        t->join();
+    }
 
-    thread_t*    threading_t::current() { return nullptr; }
+    thread_t* threading_t::current() { return nullptr; }
 
-    void         threading_t::sleep(u32 ms) {}
-    void         threading_t::yield() {}
-    void         threading_t::exit() {}
+    void threading_t::sleep(u32 ms) {}
+    void threading_t::yield() {}
+    void threading_t::exit() {}
 
     void threading_t::init_thread_priority(u32* map)
     {

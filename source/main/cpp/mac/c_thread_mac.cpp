@@ -4,83 +4,20 @@
 #include "cthread/private/c_thread_mac.h"
 #include "cthread/private/c_threading_data.h"
 
+#include <pthread.h>
+#include <semaphore.h>
+#include <sys/time.h>
+
 namespace ncore
 {
-    void thread_t::create()
+    void* __thread_main(void* arg)
     {
+        thread_t*      t = reinterpret_cast<thread_t*>(arg);
+        thread_data_t* d = t->get_data();
 
-        //@TODO: Implement this
+        // Set the thread ID now that we are in the thread
+        d->m_tid = (int)reinterpret_cast<long long>(pthread_self());
 
-    }
-
-    void thread_t::destroy()
-    {
-
-        //@TODO: Implement this
-
-    }
-
-    void thread_t::set_priority(thread_priority_t priority)
-    {
-        if (priority != m_data->m_priority)
-        {
-            m_data->m_priority = priority;
-            if (m_data->m_handle)
-            {
-                threading_t* threading = threading_t::instance();
-                u32 const    prio      = threading->m_data->m_thread_priority_map[m_data->m_priority.prio];
-
-                {
-                    // cannot set thread priority
-                }
-            }
-        }
-    }
-
-    void thread_t::start()
-    {
-        if (m_data->m_state == thread_state_t::RUNNING)
-        {
-            // thread already running
-        }
-        else if (m_data->m_state == thread_state_t::CREATED)
-        {
-            // Create a data structure to wrap the data we need to pass to the entry function.
-
-            //@TODO: Implement this
-            // ResumeThread(m_data->m_handle);
-        }
-    }
-
-    void thread_t::suspend()
-    {
-        if (m_data->m_state == thread_state_t::RUNNING)
-        {
-
-            //@TODO: Implement this
-
-            //SuspendThread(m_data->m_handle);
-            m_data->m_state = thread_state_t::SUSPENDED;
-        }
-    }
-
-    void thread_t::resume()
-    {
-        if (m_data->m_state == thread_state_t::SUSPENDED)
-        {
-
-            //@TODO: Implement this
-
-            //ResumeThread(m_data->m_handle);
-            m_data->m_state = thread_state_t::RUNNING;
-        }
-    }
-
-    u32 s__main_func(void* arg1, void* arg2)
-    {
-        // Call the real entry point function, passing the provided context.
-        thread_t*      t = reinterpret_cast<thread_t*>(arg1);
-        thread_data_t* d = reinterpret_cast<thread_data_t*>(arg2);
         thread_fn_t* f = d->m_functor;
         {
             f->start(t, d);
@@ -90,23 +27,117 @@ namespace ncore
         return 0;
     }
 
-    void thread_t::join()
+    s32 thread_t::create()
     {
-        if (!m_data->m_handle)
-            return;
+        s32 error = 0;
+        if (m_data->m_thread == 0)
+        {
+            pthread_attr_t attr;
+            if (pthread_attr_init(&attr))
+            {
+                error = -1; // Could not initialize pthread attribute structure
+                return error;
+            }
 
-        //@TODO: Implement this
+            if (pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE))
+            {
+                // Could not set detach state in thread attribute structure
+                error = -2;
+                return error;
+            }
 
+            if (pthread_create(&m_data->m_thread, &attr, __thread_main, reinterpret_cast<void*>(this)))
+            {
+                //  pthread_create failed
+                error = -3;
+                return error;
+            }
+            m_data->m_state = thread_state_t::RUNNING;
+        }
+
+        return error;
     }
 
-    bool thread_t::join(u32 milliseconds)
+    void thread_t::destroy()
     {
-        if (!m_data->m_handle)
-            return true;
+        if (m_data->m_thread != 0)
+        {
+            pthread_detach(m_data->m_thread);
+            m_data->m_thread = 0;
+        }
+    }
 
-        //@TODO: Implement this
+    void thread_t::set_priority(thread_priority_t priority)
+    {
+        if (priority != m_data->m_priority)
+        {
+            m_data->m_priority = priority;
+            if (m_data->m_thread)
+            {
+                threading_t* threading = threading_t::instance();
+                u32 const    prio      = threading->m_data->m_thread_priority_map[m_data->m_priority.prio];
 
-        return false;
+                sched_param sp;
+                int         sched_policy = 0;
+                if (pthread_getschedparam(m_data->m_thread, &sched_policy, &sp) == 0)
+                {
+                    s32 minPriority     = sched_get_priority_min(sched_policy);
+                    s32 maxPriority     = sched_get_priority_max(sched_policy);
+                    s32 priorityQuantum = (maxPriority - minPriority) / 6;
+                    s32 normalPriority  = (maxPriority - minPriority) / 2;
+
+                    sp.sched_priority = normalPriority;
+                    if (m_data->m_priority == thread_priority_t::HIGH || m_data->m_priority == thread_priority_t::ABOVE_NORMAL)
+                    {
+                        sp.sched_priority = normalPriority + priorityQuantum;
+                    }
+                    else if (m_data->m_priority == thread_priority_t::IDLE)
+                    {
+                        sp.sched_priority = minPriority;
+                    }
+                    else if (m_data->m_priority == thread_priority_t::BELOW_NORMAL || m_data->m_priority == thread_priority_t::LOW)
+                    {
+                        sp.sched_priority = normalPriority - priorityQuantum;
+                    }
+                    else if (m_data->m_priority == thread_priority_t::CRITICAL)
+                    {
+                        sp.sched_priority = maxPriority;
+                    }
+
+                    pthread_setschedparam(m_data->m_thread, sched_policy, &sp);
+                }
+            }
+        }
+    }
+
+    void thread_t::start()
+    {
+        if (m_data->m_state != thread_state_t::RUNNING)
+        {
+            create();
+        }
+    }
+
+    s32 thread_t::join()
+    {
+        if (!m_data->m_thread || m_data->m_state == thread_state_t::STOPPED)
+            return 0;
+
+        if (pthread_self() == m_data->m_thread)
+        {
+            // Thread waiting on itself to finish?
+            return -1;
+        }
+
+        void* returnValue = 0L;
+        int   r           = pthread_join(m_data->m_thread, &returnValue);
+        if (r != 0)
+        {
+            // pthread_join failed!
+            return -1;
+        }
+        m_data->m_state = thread_state_t::STOPPED;
+        return 0;
     }
 
 } // namespace ncore

@@ -17,7 +17,6 @@ namespace ncore
         {
             CREATED = 0,
             RUNNING = 1,
-            SUSPENDED = 2,
             STOPPED = 3
         };
 

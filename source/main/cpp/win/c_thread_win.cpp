@@ -20,6 +20,23 @@
 
 namespace ncore
 {
+    DWORD WINAPI __thread_main(LPVOID lpParam)
+    {
+        thread_t*      t = reinterpret_cast<thread_t*>(lpParam);
+        thread_data_t* d = t->get_data();
+
+        // Set the thread ID now that we are in the thread
+        d->m_tid = ::GetCurrentThreadId();
+
+        thread_fn_t* f = d->m_functor;
+        {
+            f->start(t, d);
+            f->run();
+            f->exit();
+        }
+        return 0;
+    }
+
     void thread_t::destroy()
     {
         if (m_data->m_handle)
@@ -43,9 +60,10 @@ namespace ncore
             }
         }
     }
-    static void SetThreadDescription(const char* threadDescription)
+
+    static void s_set_thread_description(const char* threadDescription)
     {
-        // SetThreadDescription is only available from Windows 10 version 1607 / Windows Server 2016
+        // s_set_thread_description is only available from Windows 10 version 1607 / Windows Server 2016
         //
         // So in order to be compatible with older Windows versions we probe for the API at runtime
         // and call it only if available.
@@ -54,18 +72,21 @@ namespace ncore
 
 #    pragma warning(push)
 #    pragma warning(disable : 4191) // unsafe conversion from 'type of expression' to 'type required'
-        static SetThreadDescriptionFnPtr RealSetThreadDescription = (SetThreadDescriptionFnPtr)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "SetThreadDescription");
+        static SetThreadDescriptionFnPtr RealSetThreadDescription = (SetThreadDescriptionFnPtr)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "s_set_thread_description");
 #    pragma warning(pop)
 
         if (RealSetThreadDescription)
         {
-            RealSetThreadDescription(::GetCurrentThread(), (PCWSTR)threadDescription);
+            ::RealSetThreadDescription(::GetCurrentThread(), (PCWSTR)threadDescription);
         }
     }
 
     void thread_t::create()
     {
-        DWORD flags = CREATE_SUSPENDED;
+        // DWORD flags = CREATE_SUSPENDED;
+
+        // Actually we want the thread to start running immediately
+        DWORD flags = 0;
 
         // Without this flag the 'dwStackSize' parameter to CreateThread specifies the "Stack Commit Size"
         // and the "Stack Reserve Size" is set to the value specified at link-time.
@@ -84,72 +105,49 @@ namespace ncore
         flags |= STACK_SIZE_PARAM_IS_A_RESERVATION;
 
         DWORD  threadId;
-        HANDLE handle = CreateThread(NULL, // LPSECURITY_ATTRIBUTES lpsa, //-V513
-                                     m_data->m_stack_size, (LPTHREAD_START_ROUTINE)m_data->m_functor, m_data->m_arg, flags, &threadId);
+        HANDLE handle = ::CreateThread(NULL, // LPSECURITY_ATTRIBUTES lpsa, //-V513
+                                       m_data->m_stack_size, (LPTHREAD_START_ROUTINE)__thread_main, m_data->m_arg, flags, &threadId);
         if (handle == 0)
         {
             return;
         }
 
-        SetThreadDescription(m_data->m_name);
+        s_set_thread_description(m_data->m_name);
 
         if (m_data->m_priority == thread_priority_t::HIGH)
         {
-            SetThreadPriority((HANDLE)handle, THREAD_PRIORITY_HIGHEST); //  we better sleep enough to do this
+            ::SetThreadPriority((HANDLE)handle, THREAD_PRIORITY_HIGHEST); //  we better sleep enough to do this
         }
         else if (m_data->m_priority == thread_priority_t::ABOVE_NORMAL)
         {
-            SetThreadPriority((HANDLE)handle, THREAD_PRIORITY_ABOVE_NORMAL);
+            ::SetThreadPriority((HANDLE)handle, THREAD_PRIORITY_ABOVE_NORMAL);
         }
         else if (m_data->m_priority == thread_priority_t::BELOW_NORMAL)
         {
-            SetThreadPriority((HANDLE)handle, THREAD_PRIORITY_BELOW_NORMAL);
+            ::SetThreadPriority((HANDLE)handle, THREAD_PRIORITY_BELOW_NORMAL);
         }
         else if (m_data->m_priority == thread_priority_t::LOW)
         {
-            SetThreadPriority((HANDLE)handle, THREAD_PRIORITY_LOWEST);
+            ::SetThreadPriority((HANDLE)handle, THREAD_PRIORITY_LOWEST);
         }
 
         // Under Windows, we don't set the thread affinity and let the OS deal with scheduling
-        m_data->m_state  = thread_state_t::SUSPENDED;
+        m_data->m_state  = thread_state_t::RUNNING;
         m_data->m_handle = (hnd_t)handle;
     }
 
     void thread_t::start()
     {
-        if (get_state() == thread_state_t::RUNNING)
+        if (get_state() != thread_state_t::RUNNING)
         {
-            // thread already running
-        }
-        else if (get_state() == thread_state_t::SUSPENDED)
-        {
-            ResumeThread(m_data->m_handle);
-            m_data->m_state = thread_state_t::RUNNING;
+            create();
         }
     }
 
-    void thread_t::suspend()
+    s32 thread_t::join()
     {
-        if (get_state() == thread_state_t::RUNNING)
-        {
-            SuspendThread(m_data->m_handle);
-            m_data->m_state = thread_state_t::SUSPENDED;
-        }
-    }
-
-    void thread_t::resume()
-    {
-        if (get_state() == thread_state_t::SUSPENDED)
-        {
-            ResumeThread(m_data->m_handle);
-            m_data->m_state = thread_state_t::RUNNING;
-        }
-    }
-
-    void thread_t::join()
-    {
-        if (!m_data->m_handle)
-            return;
+        if (!m_data->m_handle || m_data->m_state == thread_state_t::STOPPED)
+            return 0;
 
         switch (WaitForSingleObject(m_data->m_handle, INFINITE))
         {
@@ -158,31 +156,13 @@ namespace ncore
                 ::CloseHandle(m_data->m_handle);
                 m_data->m_handle = 0;
                 m_data->m_state  = thread_state_t::STOPPED;
-                return;
+                return 0;
             }
             default:
                 // cannot join thread
                 break;
         }
-    }
-
-    bool thread_t::join(u32 milliseconds)
-    {
-        if (!m_data->m_handle)
-            return true;
-
-        switch (WaitForSingleObject(m_data->m_handle, milliseconds))
-        {
-            case WAIT_OBJECT_0:
-                ::CloseHandle(m_data->m_handle);
-                m_data->m_handle = 0;
-                m_data->m_state  = thread_state_t::STOPPED;
-                return true;
-            default:
-                // cannot join thread
-                break;
-        }
-        return false;
+        return -1;
     }
 
 } // namespace ncore

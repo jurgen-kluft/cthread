@@ -8,16 +8,15 @@
 #include <thread>
 #include <chrono>
 
+#include <pthread.h>
 #include <mach/mach.h>
 #include <mach/semaphore.h>
 
 namespace ncore
 {
-    typedef void* hnd_t;
-
     struct thread_data_t
     {
-        hnd_t             m_handle;
+        pthread_t         m_thread;
         thread_idx_t      m_idx;
         thread_id_t       m_tid;
         thread_state_t    m_state;

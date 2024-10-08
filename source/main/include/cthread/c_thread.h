@@ -20,29 +20,28 @@ namespace ncore
         const char*       get_name() const;                  // Returns the name of the thread.
         thread_priority_t get_priority() const;              // Returns the thread's priority.
         thread_state_t    get_state() const;                 // Returns state of the thread
+        thread_data_t*    get_data() const;                  // Returns the thread data.
         bool              is_running() const;                // Returns true if the thread is running.
         u32               get_stacksize() const;             // Returns the stack size of the thread.
         void              set_priority(thread_priority_t p); // Sets the thread's priority.
 
-        void create();
-        void destroy();
-
         void start();
-        void suspend();
-        void resume();
-
-        void join();
-        bool join(u32 milliseconds);
+        s32 join(); // Returns 0 if the thread is joined successfully, otherwise negative value.
 
         static u32               default_stacksize();
         static thread_priority_t default_priority();
 
     protected:
         friend class threading_t;
+
+        s32  create(); // return any negative value if failed
+        void destroy();
+
         thread_t()
             : m_data(nullptr)
         {
         }
+
         thread_data_t* m_data;
 
     private:
