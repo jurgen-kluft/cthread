@@ -24,10 +24,10 @@ namespace ncore
     struct mutex_data_t;
     struct sema_data_t;
 
-    class thread_functor
+    class thread_fn_t
     {
     public:
-        virtual ~thread_functor() {}
+        virtual ~thread_fn_t() {}
 
         virtual void start(thread_t* t, thread_data_t* d) = 0;
         virtual void run()                                = 0;
@@ -62,6 +62,8 @@ namespace ncore
         static void         sleep(u32 milliseconds);
         static void         yield();
         static void         exit();
+
+        DCORE_CLASS_PLACEMENT_NEW_DELETE
 
     protected:
         friend class thread_t;

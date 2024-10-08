@@ -17,6 +17,12 @@
 
 namespace ncore
 {
+    enum e_config
+    {
+        DEFAULT_STACKSIZE = 256 * 1024,
+        DEFAULT_PRIORITY  = thread_priority_t::NORMAL
+    };
+
     thread_id_t       thread_t::get_tid() const { return m_data->m_tid; }
     thread_idx_t      thread_t::get_idx() const { return m_data->m_idx; }
     const char*       thread_t::get_name() const { return m_data->m_name; }

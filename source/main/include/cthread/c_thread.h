@@ -15,12 +15,6 @@ namespace ncore
     class thread_t
     {
     public:
-        enum e_config
-        {
-            DEFAULT_STACKSIZE = 256 * 1024,
-            DEFAULT_PRIORITY  = thread_priority_t::NORMAL
-        };
-
         thread_id_t       get_tid() const;                   // Returns the native thread ID of the thread.
         thread_idx_t      get_idx() const;                   // Returns the unique thread index of the thread.
         const char*       get_name() const;                  // Returns the name of the thread.

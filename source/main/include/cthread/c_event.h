@@ -40,9 +40,9 @@ namespace ncore
         event_data_t* m_data;
 
     private:
-        event_t(const event_t&);
-        event_t& operator=(const event_t&);
-        ~event_t();
+        event_t(const event_t&) = delete;
+        event_t& operator=(const event_t&) = delete;
+        ~event_t() = default;
     };
 
 } // namespace ncore

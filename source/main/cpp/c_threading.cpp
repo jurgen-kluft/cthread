@@ -18,14 +18,13 @@
 
 namespace ncore
 {
-    template <typename T> void gInitData(T*& data, fsadexed_array_t& fsa, alloc_t* allocator, u32 capacity)
+    template <typename T> static void s_alloc_data(T*& data, fsadexed_array_t& fsa, alloc_t* allocator, u32 capacity)
     {
-        data = (T*)allocator->allocate(sizeof(T) * capacity);
-        nmem::memclr(data, sizeof(T) * capacity);
+        data = g_allocate_array_and_memset<T>(allocator, capacity);
         fsa = fsadexed_array_t(data, sizeof(T), capacity);
     }
 
-    template <typename T> void gDestroyData(T*& data, fsadexed_array_t& fsa, alloc_t* allocator)
+    template <typename T> static void s_dealloc_data(T*& data, fsadexed_array_t& fsa, alloc_t* allocator)
     {
         fsa = fsadexed_array_t();
         allocator->deallocate(data);
@@ -34,23 +33,21 @@ namespace ncore
 
     threading_t* threading_t::create(alloc_t* allocator, u32 max_threads, u32 max_mutexes, u32 max_events, u32 max_semaphores)
     {
-        void* threading_mem = allocator->allocate(sizeof(threading_t), alignof(threading_t));
-        nmem::memclr(threading_mem, sizeof(threading_t));
-        threading_t* threading = (threading_t*)(threading_mem);
+        threading_t* threading = g_construct<threading_t>(allocator);
 
         // Initialize threading instance
         init_thread_priority(threading->m_thread_priority_map);
 
         threading->m_allocator = allocator;
-        gInitData(threading->m_threads, threading->m_threads_pool, allocator, max_threads);
-        gInitData(threading->m_mutexes, threading->m_mutexes_pool, allocator, max_mutexes);
-        gInitData(threading->m_events, threading->m_events_pool, allocator, max_events);
-        gInitData(threading->m_semaphores, threading->m_semaphores_pool, allocator, max_semaphores);
+        s_alloc_data(threading->m_threads, threading->m_threads_pool, allocator, max_threads);
+        s_alloc_data(threading->m_mutexes, threading->m_mutexes_pool, allocator, max_mutexes);
+        s_alloc_data(threading->m_events, threading->m_events_pool, allocator, max_events);
+        s_alloc_data(threading->m_semaphores, threading->m_semaphores_pool, allocator, max_semaphores);
 
-        gInitData(threading->m_threads_data, threading->m_threads_data_pool, allocator, max_threads);
-        gInitData(threading->m_mutexes_data, threading->m_mutexes_data_pool, allocator, max_mutexes);
-        gInitData(threading->m_events_data, threading->m_events_data_pool, allocator, max_events);
-        gInitData(threading->m_semaphores_data, threading->m_semaphores_data_pool, allocator, max_semaphores);
+        s_alloc_data(threading->m_threads_data, threading->m_threads_data_pool, allocator, max_threads);
+        s_alloc_data(threading->m_mutexes_data, threading->m_mutexes_data_pool, allocator, max_mutexes);
+        s_alloc_data(threading->m_events_data, threading->m_events_data_pool, allocator, max_events);
+        s_alloc_data(threading->m_semaphores_data, threading->m_semaphores_data_pool, allocator, max_semaphores);
 
         return threading;
     }
@@ -58,16 +55,16 @@ namespace ncore
     void threading_t::destroy(threading_t*& threading)
     {
         alloc_t* allocator = threading->m_allocator;
-        
-        gDestroyData(threading->m_threads, threading->m_threads_pool, allocator);
-        gDestroyData(threading->m_mutexes, threading->m_mutexes_pool, allocator);
-        gDestroyData(threading->m_events, threading->m_events_pool, allocator);
-        gDestroyData(threading->m_semaphores, threading->m_semaphores_pool, allocator);
 
-        gDestroyData(threading->m_threads_data, threading->m_threads_data_pool, allocator);
-        gDestroyData(threading->m_mutexes_data, threading->m_mutexes_data_pool, allocator);
-        gDestroyData(threading->m_events_data, threading->m_events_data_pool, allocator);
-        gDestroyData(threading->m_semaphores_data, threading->m_semaphores_data_pool, allocator);
+        s_dealloc_data(threading->m_threads, threading->m_threads_pool, allocator);
+        s_dealloc_data(threading->m_mutexes, threading->m_mutexes_pool, allocator);
+        s_dealloc_data(threading->m_events, threading->m_events_pool, allocator);
+        s_dealloc_data(threading->m_semaphores, threading->m_semaphores_pool, allocator);
+
+        s_dealloc_data(threading->m_threads_data, threading->m_threads_data_pool, allocator);
+        s_dealloc_data(threading->m_mutexes_data, threading->m_mutexes_data_pool, allocator);
+        s_dealloc_data(threading->m_events_data, threading->m_events_data_pool, allocator);
+        s_dealloc_data(threading->m_semaphores_data, threading->m_semaphores_data_pool, allocator);
 
         if (instance() == threading)
             set_instance(nullptr);
