@@ -7,7 +7,6 @@
 #include "cthread/c_semaphore.h"
 
 #include "cunittest/cunittest.h"
-#include "cthread/test_allocator.h"
 
 using ncore::thread_t;
 using ncore::thread_data_t;

@@ -11,7 +11,6 @@
 #include "ctime/c_timespan.h"
 
 #include "cunittest/cunittest.h"
-#include "cthread/test_allocator.h"
 
 using ncore::alloc_t;
 using ncore::thread_t;
