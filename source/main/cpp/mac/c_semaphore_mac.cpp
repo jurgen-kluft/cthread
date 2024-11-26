@@ -1,7 +1,7 @@
 #include "ccore/c_target.h"
 #include "ccore/c_debug.h"
 
-#ifdef TARGET_MAC
+#if defined( TARGET_MAC) && !defined(TARGET_TEST)
 
 #    include "cthread/c_semaphore.h"
 #    include "cthread/private/c_thread_mac.h"

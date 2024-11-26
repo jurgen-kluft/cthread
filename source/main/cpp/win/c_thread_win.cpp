@@ -4,7 +4,7 @@
 #include "cbase/c_printf.h"
 #include "cbase/c_va_list.h"
 
-#ifdef TARGET_PC
+#if defined(TARGET_PC) && !defined(TARGET_TEST)
 #    include "cthread/c_thread.h"
 #    include "cthread/c_threading.h"
 #    include "cthread/private/c_thread_win.h"

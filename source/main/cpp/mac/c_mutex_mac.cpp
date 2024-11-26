@@ -1,6 +1,6 @@
 #include "ctime/c_datetime.h"
 
-#ifdef TARGET_MAC
+#if defined( TARGET_MAC) && !defined(TARGET_TEST)
 #    include "cthread/c_threading.h"
 #    include "cthread/c_mutex.h"
 #    include "cthread/private/c_thread_mac.h"

@@ -5,15 +5,17 @@
 
 #include "cthread/c_thread.h"
 
-#ifdef TARGET_MAC
+#if defined(TARGET_MAC) && !defined(TARGET_TEST)
 #    include "cthread/private/c_thread_mac.h"
+#    include <atomic>
 #endif
-
-#ifdef TARGET_PC
+#if defined(TARGET_PC) && !defined(TARGET_TEST)
 #    include "cthread/private/c_thread_win.h"
+#    include <atomic>
 #endif
-
-#include <atomic>
+#if defined(TARGET_TEST)
+#    include "cthread/private/c_thread_mock.h"
+#endif
 
 namespace ncore
 {

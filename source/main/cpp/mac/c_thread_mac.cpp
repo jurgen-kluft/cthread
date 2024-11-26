@@ -1,5 +1,7 @@
 #include "ccore/c_target.h"
 
+#if defined( TARGET_MAC) && !defined(TARGET_TEST)
+
 #include "cthread/c_thread.h"
 #include "cthread/private/c_thread_mac.h"
 #include "cthread/private/c_threading_data.h"
@@ -141,3 +143,5 @@ namespace ncore
     }
 
 } // namespace ncore
+
+#endif

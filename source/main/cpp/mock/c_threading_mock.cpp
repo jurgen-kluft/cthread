@@ -1,13 +1,13 @@
 #include "ccore/c_target.h"
 
-#if defined(TARGET_PC) && !defined(TARGET_TEST)
+#if defined(TARGET_TEST)
 #    include "cthread/c_types.h"
 #    include "cthread/c_thread.h"
 #    include "cthread/c_mutex.h"
 #    include "cthread/c_event.h"
 #    include "cthread/c_semaphore.h"
-#    include "cthread/private/c_thread_win.h"
 #    include "cthread/private/c_threading_data.h"
+#    include "cthread/private/c_thread_mock.h"
 
 namespace ncore
 {

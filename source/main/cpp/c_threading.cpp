@@ -8,12 +8,14 @@
 #include "cthread/c_event.h"
 #include "cthread/c_semaphore.h"
 
-#ifdef TARGET_MAC
+#if defined(TARGET_MAC) && !defined(TARGET_TEST)
 #    include "cthread/private/c_thread_mac.h"
 #endif
-
-#ifdef TARGET_PC
+#if defined(TARGET_PC) && !defined(TARGET_TEST)
 #    include "cthread/private/c_thread_win.h"
+#endif
+#if defined(TARGET_TEST)
+#    include "cthread/private/c_thread_mock.h"
 #endif
 
 #include "cthread/c_threading.h"

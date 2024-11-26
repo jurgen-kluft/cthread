@@ -2,7 +2,7 @@
 #include "cbase/c_allocator.h"
 #include "ctime/c_datetime.h"
 
-#if defined(TARGET_PC) && !defined(TARGET_TEST)
+#if defined(TARGET_TEST)
 #    include "cthread/c_threading.h"
 #    include "cthread/c_mutex.h"
 #    include "cthread/private/c_thread_win.h"

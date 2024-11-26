@@ -1,6 +1,6 @@
 #include "ccore/c_target.h"
 
-#ifdef TARGET_MAC
+#if defined( TARGET_MAC) && !defined(TARGET_TEST)
 #    include "cthread/c_types.h"
 #    include "cthread/c_thread.h"
 #    include "cthread/c_mutex.h"
