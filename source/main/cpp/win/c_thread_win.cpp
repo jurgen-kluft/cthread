@@ -77,11 +77,11 @@ namespace ncore
 
         if (RealSetThreadDescription)
         {
-            ::RealSetThreadDescription(::GetCurrentThread(), (PCWSTR)threadDescription);
+            RealSetThreadDescription(::GetCurrentThread(), (PCWSTR)threadDescription);
         }
     }
 
-    void thread_t::create()
+    s32 thread_t::create()
     {
         // DWORD flags = CREATE_SUSPENDED;
 
@@ -109,7 +109,7 @@ namespace ncore
                                        m_data->m_stack_size, (LPTHREAD_START_ROUTINE)__thread_main, m_data->m_arg, flags, &threadId);
         if (handle == 0)
         {
-            return;
+            return -1;
         }
 
         s_set_thread_description(m_data->m_name);
@@ -134,6 +134,7 @@ namespace ncore
         // Under Windows, we don't set the thread affinity and let the OS deal with scheduling
         m_data->m_state  = thread_state_t::RUNNING;
         m_data->m_handle = (hnd_t)handle;
+        return 0;
     }
 
     void thread_t::start()

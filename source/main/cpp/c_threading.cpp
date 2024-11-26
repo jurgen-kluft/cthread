@@ -51,10 +51,10 @@ namespace ncore
 
     mutex_t* threading_t::create_mutex()
     {
-        mutex_data_t* data = (mutex_data_t*)m_data->m_mutexes_data_pool.allocate();
+        mutex_data_t* data = m_data->m_mutexes_data_pool.allocate();
         if (data)
         {
-            mutex_t* m = (mutex_t*)m_data->m_mutexes_pool.allocate();
+            mutex_t* m = m_data->m_mutexes_pool.allocate();
             if (m)
             {
                 m->init(data);
@@ -66,10 +66,10 @@ namespace ncore
 
     event_t* threading_t::create_event(const char* name, bool autoReset)
     {
-        event_data_t* data = (event_data_t*)m_data->m_events_data_pool.allocate();
+        event_data_t* data = m_data->m_events_data_pool.allocate();
         if (data)
         {
-            event_t* e = (event_t*)m_data->m_events_pool.allocate();
+            event_t* e = m_data->m_events_pool.allocate();
             if (e)
             {
                 e->init(data, autoReset);
@@ -82,10 +82,10 @@ namespace ncore
 
     sema_t* threading_t::create_sema(s32 initial_count, s32 max_count)
     {
-        sema_data_t* data = (sema_data_t*)m_data->m_semaphores_data_pool.allocate();
+        sema_data_t* data = m_data->m_semaphores_data_pool.allocate();
         if (data)
         {
-            sema_t* s = (sema_t*)m_data->m_semaphores_pool.allocate();
+            sema_t* s = m_data->m_semaphores_pool.allocate();
             if (s)
             {
                 s->init(data, initial_count, max_count);
