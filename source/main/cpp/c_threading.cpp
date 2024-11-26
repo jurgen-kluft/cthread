@@ -25,12 +25,14 @@ namespace ncore
 {
     threading_t* threading_t::create(alloc_t* allocator, u32 max_threads, u32 max_mutex, u32 max_event, u32 max_semaphore)
     {
-        threading_t* threading = (threading_t*)allocator->allocate(sizeof(threading_t));
+        void*        mem       = g_allocate<threading_t>(allocator);
+        threading_t* threading = new (mem) threading_t();
         threading->m_data      = nullptr;
 
         if (instance() == threading)
             set_instance(nullptr);
 
+        set_instance(threading);
         threading->m_data = threading_data_t::create(allocator, max_threads, max_mutex, max_event, max_semaphore);
 
         // Initialize data instance
@@ -41,10 +43,11 @@ namespace ncore
 
     void threading_t::destroy(threading_t*& threading)
     {
-        threading->~threading_t();
-        threading->m_data->m_allocator->deallocate(threading);
-        threading->m_data = nullptr;
+        alloc_t* allocator = threading->m_data->m_allocator;
         threading_data_t::destroy(threading->m_data);
+        threading->m_data = nullptr;
+        threading->~threading_t();
+        allocator->deallocate(threading);
     }
 
     static threading_t* s_instance = nullptr;

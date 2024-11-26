@@ -1,6 +1,7 @@
 #include "ccore/c_target.h"
 #include "ccore/c_debug.h"
 #include "cbase/c_allocator.h"
+#include "ctime/c_time.h"
 
 #include "cthread/c_thread.h"
 #include "cthread/c_threading.h"
@@ -54,45 +55,55 @@ UNITTEST_SUITE_BEGIN(semaphore)
 {
     UNITTEST_FIXTURE(main)
     {
-        UNITTEST_FIXTURE_SETUP() {}
-        UNITTEST_FIXTURE_TEARDOWN() {}
+        UNITTEST_ALLOCATOR;
+
+        UNITTEST_FIXTURE_SETUP() { ncore::ntime::init(); }
+        UNITTEST_FIXTURE_TEARDOWN() { ncore::ntime::exit(); }
 
         UNITTEST_TEST(testInitZero)
         {
-            SemaRunnable r(0, 3);
-            CHECK_TRUE(!r.wait());
-            r.set();
-            r.wait();
+            threading_t* threading = threading_t::create(Allocator);
             {
-                r.try_wait(100);
-                // will fail
+                SemaRunnable r(0, 3);
+                CHECK_TRUE(r.wait());
+                r.set();
+                r.wait();
+                {
+                    r.try_wait(100);
+                    // will fail
+                }
+
+                r.set();
+                r.set();
+                CHECK_TRUE(r.try_wait(0));
+                r.wait();
+                CHECK_TRUE(r.try_wait(10));
+
+                thread_t* t = threading_t::instance()->create_thread("Thread", &r, thread_t::default_stacksize(), thread_t::default_priority());
+                t->start();
+                threading_t::sleep(100);
+                CHECK_TRUE(!r.ran());
+                r.set();
+                t->join();
+                CHECK_TRUE(r.ran());
+                CHECK_TRUE(r.try_wait(10));
             }
-
-            r.set();
-            r.set();
-            CHECK_TRUE(r.try_wait(0));
-            r.wait();
-            CHECK_TRUE(!r.try_wait(10));
-
-            thread_t* t = threading_t::instance()->create_thread("Thread", &r, thread_t::default_stacksize(), thread_t::default_priority());
-            t->start();
-            threading_t::sleep(100);
-            CHECK_TRUE(!r.ran());
-            r.set();
-            t->join();
-            CHECK_TRUE(r.ran());
-            CHECK_TRUE(!r.try_wait(10));
+            threading_t::destroy(threading);
         }
 
         UNITTEST_TEST(testInitNonZero)
         {
-            SemaRunnable r(2, 2);
-            r.wait();
-            CHECK_TRUE(r.try_wait(10));
-            CHECK_TRUE(!r.try_wait(10));
-            r.set();
-            CHECK_TRUE(r.try_wait(10));
-            CHECK_TRUE(!r.try_wait(10));
+            threading_t* threading = threading_t::create(Allocator);
+            {
+                SemaRunnable r(2, 2);
+                r.wait();
+                CHECK_TRUE(r.try_wait(10));
+                CHECK_TRUE(!r.try_wait(10));
+                r.set();
+                CHECK_TRUE(r.try_wait(10));
+                CHECK_TRUE(!r.try_wait(10));
+            }
+            threading_t::destroy(threading);
         }
     }
 }

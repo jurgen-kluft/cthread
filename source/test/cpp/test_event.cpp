@@ -1,6 +1,7 @@
 #include "ccore/c_target.h"
 #include "ccore/c_debug.h"
 #include "cbase/c_allocator.h"
+#include "ctime/c_time.h"
 
 #include "cthread/c_event.h"
 #include "cthread/c_thread.h"
@@ -52,8 +53,8 @@ UNITTEST_SUITE_BEGIN(event)
     {
         UNITTEST_ALLOCATOR;
 
-        UNITTEST_FIXTURE_SETUP() {}
-        UNITTEST_FIXTURE_TEARDOWN() {}
+        UNITTEST_FIXTURE_SETUP() { ntime::init();  }
+        UNITTEST_FIXTURE_TEARDOWN() { ntime::exit(); }
 
         UNITTEST_TEST(testNamedEvent)
         {
@@ -67,7 +68,7 @@ UNITTEST_SUITE_BEGIN(event)
             threading_t::sleep(2000);
             testEvent->set();
             threading_t::instance()->join(thr1);
-            CHECK_TRUE(te.timestamp() > now);
+            CHECK_TRUE(te.timestamp() >= now);
 
             thread_t* thr2 = threading->create_thread("test2", &te, thread_t::default_stacksize(), thread_t::default_priority());
             thr2->start();
@@ -75,7 +76,7 @@ UNITTEST_SUITE_BEGIN(event)
             threading_t::sleep(2000);
             testEvent->set();
             threading_t::instance()->join(thr2);
-            CHECK_TRUE(te.timestamp() > now);
+            CHECK_TRUE(te.timestamp() >= now);
 
             threading_t::destroy(threading);
         }

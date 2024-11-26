@@ -5,6 +5,7 @@
 #    pragma once
 #endif
 
+#include "ccore/c_allocator.h"
 #include "cthread/c_types.h"
 
 namespace ncore
@@ -59,6 +60,8 @@ namespace ncore
         static void yield();
         static void exit();
 
+        DCORE_CLASS_PLACEMENT_NEW_DELETE
+
     protected:
         friend class thread_t;
 
@@ -67,8 +70,7 @@ namespace ncore
 
         threading_data_t* m_data;
 
-    private:
-        threading_t();
+        threading_t() : m_data(nullptr) {}
         threading_t(const threading_t&) = delete;
         ~threading_t() {}
         threading_t& operator=(const threading_t&) { return *this; }

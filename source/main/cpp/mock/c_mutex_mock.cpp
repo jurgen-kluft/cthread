@@ -5,7 +5,7 @@
 #if defined(TARGET_TEST)
 #    include "cthread/c_threading.h"
 #    include "cthread/c_mutex.h"
-#    include "cthread/private/c_thread_win.h"
+#    include "cthread/private/c_thread_mock.h"
 
 namespace ncore
 {
@@ -13,22 +13,18 @@ namespace ncore
     {
         m_data = data;
 
-        // the func has a boolean return value under WInnNt/2000/XP but not on Win98
-        // the return only checks if the input address of &_cs was valid, so it is
-        // safe to omit it.
-        InitializeCriticalSectionAndSpinCount((CRITICAL_SECTION*)&m_data->_cs, 4000);
         return true;
     }
 
     void mutex_t::release()
     {
-        DeleteCriticalSection((CRITICAL_SECTION*)&m_data->_cs);
+
         threading_t::instance()->destroy(this);
     }
     
-    void mutex_t::lock() { EnterCriticalSection((CRITICAL_SECTION*)&m_data->_cs); }
-    bool mutex_t::tryLock() { return TryEnterCriticalSection((CRITICAL_SECTION*)&m_data->_cs) != 0; }
-    void mutex_t::unlock() { LeaveCriticalSection((CRITICAL_SECTION*)&m_data->_cs); }
+    void mutex_t::lock() {  }
+    bool mutex_t::tryLock() { return true; }
+    void mutex_t::unlock() { }
 
 } // namespace ncore
 

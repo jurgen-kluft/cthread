@@ -38,8 +38,7 @@ namespace ncore
 
     threading_data_t* threading_data_t::create(alloc_t* allocator, u32 max_threads, u32 max_mutexes, u32 max_events, u32 max_semaphores)
     {
-        threading_data_t* data = (threading_data_t*)allocator->allocate(sizeof(threading_data_t));
-        *data        = threading_data_t();
+        threading_data_t* data = g_construct<threading_data_t>(allocator);
 
         data->m_allocator = allocator;
         data->m_threads_pool.setup(allocator, max_threads);

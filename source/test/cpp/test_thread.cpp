@@ -1,6 +1,7 @@
 #include "ccore/c_target.h"
 #include "ccore/c_debug.h"
 #include "cbase/c_allocator.h"
+#include "ctime/c_time.h"
 
 #include "cthread/c_thread.h"
 #include "cthread/c_threading.h"
@@ -68,11 +69,13 @@ UNITTEST_SUITE_BEGIN(thread)
     {
         UNITTEST_ALLOCATOR;
 
-        UNITTEST_FIXTURE_SETUP() {}
-        UNITTEST_FIXTURE_TEARDOWN() {}
+        UNITTEST_FIXTURE_SETUP() { ncore::ntime::init(); }
+        UNITTEST_FIXTURE_TEARDOWN() { ncore::ntime::exit(); }
 
         UNITTEST_TEST(testThread)
         {
+            threading_t* threading = threading_t::create(Allocator);
+
             event_t* e = threading_t::instance()->create_event("event", false);
             MyRunnable r(e);
             thread_t*   thread = threading_t::instance()->create_thread("Thread", &r, thread_t::default_stacksize(), thread_t::default_priority());
@@ -90,11 +93,15 @@ UNITTEST_SUITE_BEGIN(thread)
 
             threading_t::instance()->destroy(e);
             threading_t::instance()->destroy(thread);
+
+            threading_t::destroy(threading);
         }
 
         UNITTEST_TEST(testNamedThread)
         {
-            event_t* e = threading_t::instance()->create_event("event", false);
+            threading_t* threading = threading_t::create(Allocator);
+
+            event_t*     e         = threading_t::instance()->create_event("event", false);
             MyRunnable r(e);
             thread_t* thread = threading_t::instance()->create_thread("MyThread", &r, thread_t::default_stacksize(), thread_t::default_priority());
 
@@ -106,12 +113,16 @@ UNITTEST_SUITE_BEGIN(thread)
 
             threading_t::instance()->destroy(e);
             threading_t::instance()->destroy(thread);
+
+            threading_t::destroy(threading);
         }
 
         UNITTEST_TEST(testCurrent) { CHECK_NULL(threading_t::current()); }
 
         UNITTEST_TEST(testThreads)
         {
+            threading_t* threading = threading_t::create(Allocator);
+
             event_t* e1 = threading_t::instance()->create_event("event1", false);
             event_t* e2 = threading_t::instance()->create_event("event2", false);
             event_t* e3 = threading_t::instance()->create_event("event3", false);
@@ -182,11 +193,15 @@ UNITTEST_SUITE_BEGIN(thread)
             threading_t::instance()->destroy(thread2);
             threading_t::instance()->destroy(thread3);
             threading_t::instance()->destroy(thread4);
+
+            threading_t::destroy(threading);
         }
 
         UNITTEST_TEST(testJoin)
         {
-            event_t* e = threading_t::instance()->create_event("event", false);
+            threading_t* threading = threading_t::create(Allocator);
+
+            event_t*     e         = threading_t::instance()->create_event("event", false);
             MyRunnable r(e);
             thread_t*  thread = threading_t::instance()->create_thread("Thread", &r, thread_t::default_stacksize(), thread_t::default_priority());
 
@@ -201,11 +216,15 @@ UNITTEST_SUITE_BEGIN(thread)
 
             threading_t::instance()->destroy(e);
             threading_t::instance()->destroy(thread);
+
+            threading_t::destroy(threading);
         }
 
         UNITTEST_TEST(testThreadFunction)
         {
-            event_t* e = threading_t::instance()->create_event("event", false);
+            threading_t* threading = threading_t::create(Allocator);
+
+            event_t*     e         = threading_t::instance()->create_event("event", false);
             MyRunnable f(e);
             thread_t* thread = threading_t::instance()->create_thread("Thread", &f, thread_t::default_stacksize(), thread_t::default_priority());
 
@@ -225,15 +244,21 @@ UNITTEST_SUITE_BEGIN(thread)
 
             threading_t::instance()->destroy(e);
             threading_t::instance()->destroy(thread);
+
+            threading_t::destroy(threading);
         }
 
         UNITTEST_TEST(testSleep)
         {
-            datetime_t start = datetime_t::sNow();
+            threading_t* threading = threading_t::create(Allocator);
+
+            datetime_t   start     = datetime_t::sNow();
             threading_t::sleep(200);
             datetime_t end     = datetime_t::sNow();
             timespan_t elapsed = end - start;
             CHECK_TRUE(elapsed.totalMilliseconds() >= 190 && elapsed.totalMilliseconds() < 250);
+
+            threading_t::destroy(threading);
         }
     }
 }

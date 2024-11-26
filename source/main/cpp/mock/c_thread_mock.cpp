@@ -70,6 +70,18 @@ namespace ncore
         {
             create();
         }
+
+        thread_data_t* d = get_data();
+
+        // Set the thread ID now that we are in the thread
+        d->m_tid = 8;
+
+        thread_fn_t* f = d->m_functor;
+        {
+            f->start(this, d);
+            f->run();
+            f->exit();
+        }
     }
 
     s32 thread_t::join()
