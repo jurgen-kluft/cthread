@@ -24,14 +24,14 @@ func GetPackage() *denv.Package {
 	mainpkg.AddPackage(ctimepkg)
 
 	// 'cthread' library
-	mainlib := denv.SetupDefaultCppLibProject("cthread", "github.com\\jurgen-kluft\\cthread")
-	mainlib.Dependencies = append(mainlib.Dependencies, ccorepkg.GetMainLib())
-	mainlib.Dependencies = append(mainlib.Dependencies, cbasepkg.GetMainLib())
-	mainlib.Dependencies = append(mainlib.Dependencies, ctimepkg.GetMainLib())
+	mainlib := denv.SetupCppLibProject("cthread", "github.com\\jurgen-kluft\\cthread")
+	mainlib.AddDependencies(ccorepkg.GetMainLib()...)
+	mainlib.AddDependencies(cbasepkg.GetMainLib()...)
+	mainlib.AddDependencies(ctimepkg.GetMainLib()...)
 
 	// 'cthread' unittest project
 	maintest := denv.SetupDefaultCppTestProject("cthread"+"_test", "github.com\\jurgen-kluft\\cthread")
-	maintest.Dependencies = append(maintest.Dependencies, cunittestpkg.GetMainLib())
+	maintest.AddDependencies(cunittestpkg.GetMainLib()...)
 	maintest.Dependencies = append(maintest.Dependencies, mainlib)
 
 	mainpkg.AddMainLib(mainlib)
