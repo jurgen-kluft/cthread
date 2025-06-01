@@ -3,38 +3,46 @@ package cthread
 import (
 	cbase "github.com/jurgen-kluft/cbase/package"
 	"github.com/jurgen-kluft/ccode/denv"
-	ccore "github.com/jurgen-kluft/ccore/package"
 	ctime "github.com/jurgen-kluft/ctime/package"
 	cunittest "github.com/jurgen-kluft/cunittest/package"
 )
 
-// GetPackage returns the package object of 'cthread'
+const (
+	repo_path = "github.com\\jurgen-kluft"
+	repo_name = "cthread"
+)
+
 func GetPackage() *denv.Package {
-	// Dependencies
+	name := repo_name
+
+	// dependencies
 	cunittestpkg := cunittest.GetPackage()
 	cbasepkg := cbase.GetPackage()
-	ccorepkg := ccore.GetPackage()
 	ctimepkg := ctime.GetPackage()
 
-	// The main (cthread) package
-	mainpkg := denv.NewPackage("cthread")
+	// main package
+	mainpkg := denv.NewPackage(repo_path, repo_name)
 	mainpkg.AddPackage(cunittestpkg)
-	mainpkg.AddPackage(ccorepkg)
 	mainpkg.AddPackage(cbasepkg)
 	mainpkg.AddPackage(ctimepkg)
 
-	// 'cthread' library
-	mainlib := denv.SetupCppLibProject("cthread", "github.com\\jurgen-kluft\\cthread")
-	mainlib.AddDependencies(ccorepkg.GetMainLib()...)
+	// main library
+	mainlib := denv.SetupCppLibProject(mainpkg, name)
 	mainlib.AddDependencies(cbasepkg.GetMainLib()...)
-	mainlib.AddDependencies(ctimepkg.GetMainLib()...)
 
-	// 'cthread' unittest project
-	maintest := denv.SetupDefaultCppTestProject("cthread"+"_test", "github.com\\jurgen-kluft\\cthread")
+	// test library
+	testlib := denv.SetupCppTestLibProject(mainpkg, name)
+	testlib.AddDependencies(cbasepkg.GetTestLib()...)
+	testlib.AddDependencies(ctimepkg.GetTestLib()...)
+	testlib.AddDependencies(cunittestpkg.GetTestLib()...)
+
+	// unittest project
+	maintest := denv.SetupCppTestProject(mainpkg, name)
 	maintest.AddDependencies(cunittestpkg.GetMainLib()...)
-	maintest.Dependencies = append(maintest.Dependencies, mainlib)
+	maintest.AddDependency(testlib)
 
 	mainpkg.AddMainLib(mainlib)
+	mainpkg.AddTestLib(testlib)
 	mainpkg.AddUnittest(maintest)
 	return mainpkg
 }
