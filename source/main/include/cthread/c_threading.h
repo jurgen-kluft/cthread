@@ -42,7 +42,7 @@ namespace ncore
         static void         set_instance(threading_t* instance);
         static threading_t* instance();
 
-        thread_t* create_thread(const char* name, thread_fn_t* f, u32 stack_size, thread_priority_t priority);
+        thread_t* create_thread(const char* name, thread_fn_t* f, thread_priority_t priority = thread_priority_t::NORMAL, u32 stack_size = 0);
         mutex_t*  create_mutex();
         event_t*  create_event(const char* name, bool autoReset);
         sema_t*   create_sema(s32 initial_count, s32 max_count);

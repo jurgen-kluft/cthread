@@ -8,6 +8,8 @@
   - semaphore
 
 ```c++
+#include "cthread/c_threading.h"
+
 class highest_priority_thread_fn : public thread_functor
 {
 public:
@@ -35,10 +37,12 @@ protected:
     thread_t*      m_thread;
     thread_data_t* m_data;
 };
+static highest_priority_thread_fn s_thread_fn;
 
 threading_t* threading = threading_t::create(alloc_t::get_system());
 
-thread_t* thread = threading->create_thread("main thread", highest_priority_thread_fn, threading_t::HIGHEST_PRIORITY);
+highest_priority_thread_fn* thread_fn = &s_thread_fn;
+thread_t* thread = threading->create_thread("main thread", thread_fn, threading_t::HIGHEST_PRIORITY);
 mutex_t* mutex = threading->create_mutex("shared resource lock");
 event_t* event = threading->create_event("resource locked");
 
