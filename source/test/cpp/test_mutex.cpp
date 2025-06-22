@@ -35,6 +35,11 @@ namespace
 
 		}
 
+		void quit()
+		{
+            // This method is called when the thread is requested to quit.
+		}
+
 		const datetime_t& timestamp() const
 		{
 			return _timestamp;
@@ -53,7 +58,7 @@ namespace
 		TestTryLock(mutex_t* m) :testMutex(m), _locked(false)
 		{
 		}
-		
+
 		void start(thread_t* t, thread_data_t* d) {}
 
 		void run()
@@ -66,6 +71,7 @@ namespace
 		}
 
 		void exit() {}
+		void quit() {}
 
 		bool locked() const
 		{
@@ -86,13 +92,13 @@ UNITTEST_SUITE_BEGIN(mutex)
     {
 		UNITTEST_ALLOCATOR;
 
-        UNITTEST_FIXTURE_SETUP() 
-		{ 
-			ntime::init(); 
+        UNITTEST_FIXTURE_SETUP()
+		{
+			ntime::init();
 		}
-        UNITTEST_FIXTURE_TEARDOWN() 
-		{ 
-			ntime::exit(); 
+        UNITTEST_FIXTURE_TEARDOWN()
+		{
+			ntime::exit();
         }
 
 		UNITTEST_TEST(testLock)
@@ -102,15 +108,15 @@ UNITTEST_SUITE_BEGIN(mutex)
             mutex_t*     testMutex = threading_t::instance()->create_mutex();
 			testMutex->lock();
 			TestLock* tl = Allocator->construct<TestLock>(testMutex);
-			thread_t* thr1 = threading_t::instance()->create_thread("test", tl, thread_t::default_stacksize(), thread_t::default_priority());
+			thread_t* thr1 = threading_t::instance()->create_thread("test", tl, thread_t::default_priority(), thread_t::default_stacksize());
 			thr1->start();
 			datetime_t now = datetime_t::sNow();
 			threading_t::sleep(2000);
 			testMutex->unlock();
 			threading_t::instance()->join(thr1);
 			CHECK_TRUE (tl->timestamp() >= now);
-			threading_t::instance()->destroy(thr1);	
-			threading_t::instance()->destroy(testMutex);	
+			threading_t::instance()->destroy(thr1);
+			threading_t::instance()->destroy(testMutex);
 			Allocator->destruct(tl);
 
             threading_t::destroy(threading);
@@ -126,7 +132,7 @@ UNITTEST_SUITE_BEGIN(mutex)
 			// thr1.start(&ttl1);
 			// threading_t::instance()->join(&thr1);
 			// CHECK_TRUE (ttl1.locked());
-	
+
 			// testMutex->lock();
 			// thread_t thr2;
 			// TestTryLock ttl2;
@@ -139,15 +145,15 @@ UNITTEST_SUITE_BEGIN(mutex)
             mutex_t*     testMutex = threading_t::instance()->create_mutex();
 
 			TestTryLock* tl1 = Allocator->construct<TestTryLock>(testMutex);
-			thread_t* thr1 = threading_t::instance()->create_thread("test1", tl1, thread_t::default_stacksize(), thread_t::default_priority());
+			thread_t* thr1 = threading_t::instance()->create_thread("test1", tl1, thread_t::default_priority(), thread_t::default_stacksize());
 			thr1->start();
 			threading_t::instance()->join(thr1);
 			CHECK_TRUE (tl1->locked());
-			
+
 			testMutex->lock();
 
 			TestTryLock* tl2 = Allocator->construct<TestTryLock>(testMutex);
-			thread_t* thr2 = threading_t::instance()->create_thread("test2", tl2, thread_t::default_stacksize(), thread_t::default_priority());
+			thread_t* thr2 = threading_t::instance()->create_thread("test2", tl2, thread_t::default_priority(), thread_t::default_stacksize());
 			thr2->start();
 
 			threading_t::instance()->join(thr2);
@@ -158,9 +164,9 @@ UNITTEST_SUITE_BEGIN(mutex)
 			Allocator->destruct(tl2);
 			Allocator->destruct(tl1);
 
-			threading_t::instance()->destroy(testMutex);	
+			threading_t::instance()->destroy(testMutex);
 
-			threading_t::instance()->destroy(thr1);	
+			threading_t::instance()->destroy(thr1);
 			threading_t::instance()->destroy(thr2);
 
             threading_t::destroy(threading);

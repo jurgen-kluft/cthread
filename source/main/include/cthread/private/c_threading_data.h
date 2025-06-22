@@ -19,7 +19,11 @@ namespace ncore
     public:
         array_pool_t<T> m_pool;
 
-        inline T*   allocate() { return m_pool.allocate<T>(); }
+        inline T*   allocate()
+        {
+            fsa_t* alloc = &m_pool;
+            return alloc->allocate<T>();
+        }
         inline void deallocate(T* object) { m_pool.deallocate(object); }
         inline u32  ptr2idx(T const* object) const { return m_pool.obj2idx(object); }
         inline T*   idx2ptr(u32 idx) const { return m_pool.idx2obj(idx); }

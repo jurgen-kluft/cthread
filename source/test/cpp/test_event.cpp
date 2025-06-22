@@ -39,6 +39,11 @@ namespace
 
         }
 
+        void quit()
+        {
+            // mark a variable to indicate that the run function should exit
+        }
+
         const datetime_t& timestamp() const { return _timestamp; }
 
     private:
@@ -62,7 +67,7 @@ UNITTEST_SUITE_BEGIN(event)
 			event_t* testEvent = threading->create_event("test", false);
 
             TestEvent te(testEvent);
-            thread_t* thr1 = threading->create_thread("test1", &te, thread_t::default_stacksize(), thread_t::default_priority());
+            thread_t* thr1 = threading->create_thread("test1", &te, thread_t::default_priority(), thread_t::default_stacksize());
             thr1->start();
             datetime_t now = datetime_t::sNow();
             threading_t::sleep(2000);
@@ -70,7 +75,7 @@ UNITTEST_SUITE_BEGIN(event)
             threading_t::instance()->join(thr1);
             CHECK_TRUE(te.timestamp() >= now);
 
-            thread_t* thr2 = threading->create_thread("test2", &te, thread_t::default_stacksize(), thread_t::default_priority());
+            thread_t* thr2 = threading->create_thread("test2", &te, thread_t::default_priority(), thread_t::default_stacksize());
             thr2->start();
             now = datetime_t::sNow();
             threading_t::sleep(2000);

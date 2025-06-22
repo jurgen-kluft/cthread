@@ -1,10 +1,9 @@
 #include "ccore/c_target.h"
 #include "cbase/c_allocator.h"
-#include "ctime/c_datetime.h"
+#include "cthread/c_mutex.h"
 
 #if defined(TARGET_TEST)
 #    include "cthread/c_threading.h"
-#    include "cthread/c_mutex.h"
 #    include "cthread/private/c_thread_mock.h"
 
 namespace ncore
@@ -16,15 +15,11 @@ namespace ncore
         return true;
     }
 
-    void mutex_t::release()
-    {
+    void mutex_t::release() { threading_t::instance()->destroy(this); }
 
-        threading_t::instance()->destroy(this);
-    }
-    
-    void mutex_t::lock() {  }
+    void mutex_t::lock() {}
     bool mutex_t::tryLock() { return true; }
-    void mutex_t::unlock() { }
+    void mutex_t::unlock() {}
 
 } // namespace ncore
 

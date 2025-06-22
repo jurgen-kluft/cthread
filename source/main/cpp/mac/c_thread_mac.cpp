@@ -1,17 +1,22 @@
 #include "ccore/c_target.h"
 
-#if defined( TARGET_MAC) && !defined(TARGET_TEST)
+#if defined(TARGET_MAC) && !defined(TARGET_TEST)
 
-#include "cthread/c_thread.h"
-#include "cthread/private/c_thread_mac.h"
-#include "cthread/private/c_threading_data.h"
+#    include "cthread/c_thread.h"
+#    include "cthread/private/c_thread_mac.h"
+#    include "cthread/private/c_threading_data.h"
 
-#include <pthread.h>
-#include <semaphore.h>
-#include <sys/time.h>
+#    include <pthread.h>
+#    include <semaphore.h>
+#    include <sys/time.h>
 
 namespace ncore
 {
+    thread_local thread_data_t* t_current_thread_data = nullptr;
+
+    thread_data_t* thread_data_t::current() { return t_current_thread_data; }
+    thread_t* threading_t::current() { return t_current_thread_data->m_thread; }
+
     void* __thread_main(void* arg)
     {
         thread_t*      t = reinterpret_cast<thread_t*>(arg);
@@ -22,17 +27,35 @@ namespace ncore
 
         thread_fn_t* f = d->m_functor;
         {
-            f->start(t, d);
-            f->run();
-            f->exit();
+            t_current_thread_data = d; // Set the current thread data as thread local
+            {
+                f->start(t, d);
+                d->m_state = thread_state_t::RUNNING;
+                f->run();
+                d->m_state = thread_state_t::STOPPED;
+                f->exit();
+            }
+            t_current_thread_data = nullptr; // Clear the thread local data
         }
+
+        // Destroy the thread
+        pthread_detach(d->m_pthread);
+        d->m_pthread = 0;
+
+        // Remove 'thread_t' and 'thread_data_t' from the threading system
+        threading_t* threading = threading_t::instance();
+        if (threading)
+        {
+            threading->destroy(t);
+        }
+
         return 0;
     }
 
     s32 thread_t::create()
     {
         s32 error = 0;
-        if (m_data->m_thread == 0)
+        if (m_data->m_pthread == 0)
         {
             pthread_attr_t attr;
             if (pthread_attr_init(&attr))
@@ -48,25 +71,15 @@ namespace ncore
                 return error;
             }
 
-            if (pthread_create(&m_data->m_thread, &attr, __thread_main, reinterpret_cast<void*>(this)))
+            if (pthread_create(&m_data->m_pthread, &attr, __thread_main, reinterpret_cast<void*>(this)))
             {
                 //  pthread_create failed
                 error = -3;
                 return error;
             }
-            m_data->m_state = thread_state_t::RUNNING;
         }
 
         return error;
-    }
-
-    void thread_t::destroy()
-    {
-        if (m_data->m_thread != 0)
-        {
-            pthread_detach(m_data->m_thread);
-            m_data->m_thread = 0;
-        }
     }
 
     void thread_t::set_priority(thread_priority_t priority)
@@ -81,7 +94,7 @@ namespace ncore
 
                 sched_param sp;
                 int         sched_policy = 0;
-                if (pthread_getschedparam(m_data->m_thread, &sched_policy, &sp) == 0)
+                if (pthread_getschedparam(m_data->m_pthread, &sched_policy, &sp) == 0)
                 {
                     s32 minPriority     = sched_get_priority_min(sched_policy);
                     s32 maxPriority     = sched_get_priority_max(sched_policy);
@@ -106,7 +119,7 @@ namespace ncore
                         sp.sched_priority = maxPriority;
                     }
 
-                    pthread_setschedparam(m_data->m_thread, sched_policy, &sp);
+                    pthread_setschedparam(m_data->m_pthread, sched_policy, &sp);
                 }
             }
         }
@@ -125,14 +138,14 @@ namespace ncore
         if (!m_data->m_thread || m_data->m_state == thread_state_t::STOPPED)
             return 0;
 
-        if (pthread_self() == m_data->m_thread)
+        if (pthread_self() == m_data->m_pthread)
         {
             // Thread waiting on itself to finish?
             return -1;
         }
 
         void* returnValue = 0L;
-        int   r           = pthread_join(m_data->m_thread, &returnValue);
+        int   r           = pthread_join(m_data->m_pthread, &returnValue);
         if (r != 0)
         {
             // pthread_join failed!

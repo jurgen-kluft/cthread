@@ -16,7 +16,8 @@ namespace ncore
 {
     struct thread_data_t
     {
-        pthread_t         m_thread;
+        pthread_t         m_pthread;
+        thread_t*         m_thread;
         thread_idx_t      m_idx;
         thread_id_t       m_tid;
         thread_state_t    m_state;
@@ -25,6 +26,8 @@ namespace ncore
         thread_fn_t*      m_functor;
         void*             m_arg;
         char              m_name[64];
+
+        static thread_data_t* current();
     };
 
     struct event_data_t

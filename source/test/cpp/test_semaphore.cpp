@@ -34,6 +34,7 @@ public:
     }
 
     void exit() {}
+    void quit() {}
 
     bool ran() const { return _ran; }
     void set() { _sema->signal(); }
@@ -79,7 +80,7 @@ UNITTEST_SUITE_BEGIN(semaphore)
                 r.wait();
                 CHECK_TRUE(r.try_wait(10));
 
-                thread_t* t = threading_t::instance()->create_thread("Thread", &r, thread_t::default_stacksize(), thread_t::default_priority());
+                thread_t* t = threading_t::instance()->create_thread("Thread", &r, thread_t::default_priority(), thread_t::default_stacksize());
                 t->start();
                 threading_t::sleep(100);
                 CHECK_TRUE(!r.ran());

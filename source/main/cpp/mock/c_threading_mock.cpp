@@ -11,7 +11,7 @@
 
 namespace ncore
 {
-    thread_t* threading_t::create_thread(const char* name, thread_fn_t* f, u32 stack_size, thread_priority_t priority)
+    thread_t* threading_t::create_thread(const char* name, thread_fn_t* f, thread_priority_t priority, u32 stack_size)
     {
         thread_data_t* data = (thread_data_t*)m_data->m_threads_data_pool.allocate();
         if (data)
@@ -69,7 +69,7 @@ namespace ncore
         //@TODO: Implement this
     }
 
-    void threading_t::exit()
+    void threading_t::quit()
     {
         //@TODO: Implement this
     }

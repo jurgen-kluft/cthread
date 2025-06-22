@@ -16,11 +16,6 @@
 
 namespace ncore
 {
-    void thread_t::destroy()
-    {
-
-    }
-
     void thread_t::set_priority(thread_priority_t priority)
     {
         if (priority != m_data->m_priority)

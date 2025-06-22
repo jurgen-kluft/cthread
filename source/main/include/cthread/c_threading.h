@@ -30,6 +30,8 @@ namespace ncore
         virtual void start(thread_t* t, thread_data_t* d) = 0;
         virtual void run()                                = 0;
         virtual void exit()                               = 0;
+
+        virtual void quit() = 0;
     };
 
     struct threading_data_t;
@@ -51,14 +53,13 @@ namespace ncore
         void destroy(mutex_t*);
         void destroy(event_t*);
         void destroy(sema_t*);
-
         void join(thread_t*);
 
-        static thread_t* current();
+        static thread_t* current(); // Returns the current thread
 
-        static void sleep(u32 milliseconds);
-        static void yield();
-        static void exit();
+        static void sleep(u32 milliseconds); // Sleeps the current thread for the specified number of milliseconds
+        static void yield();                 // Yields the current thread, allowing other threads to run
+        static void quit();                  // Marks the current thread for quitting
 
         DCORE_CLASS_PLACEMENT_NEW_DELETE
 
@@ -70,7 +71,10 @@ namespace ncore
 
         threading_data_t* m_data;
 
-        threading_t() : m_data(nullptr) {}
+        threading_t()
+            : m_data(nullptr)
+        {
+        }
         threading_t(const threading_t&) = delete;
         ~threading_t() {}
         threading_t& operator=(const threading_t&) { return *this; }

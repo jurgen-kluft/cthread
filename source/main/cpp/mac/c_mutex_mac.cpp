@@ -1,8 +1,7 @@
-#include "ctime/c_datetime.h"
+#    include "cthread/c_mutex.h"
 
 #if defined( TARGET_MAC) && !defined(TARGET_TEST)
 #    include "cthread/c_threading.h"
-#    include "cthread/c_mutex.h"
 #    include "cthread/private/c_thread_mac.h"
 
 namespace ncore

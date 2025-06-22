@@ -20,6 +20,8 @@ namespace ncore
             if (t)
             {
                 t->m_data               = data;
+                t->m_data->m_thread     = t;
+                t->m_data->m_pthread    = 0;
                 t->m_data->m_functor    = f;
                 t->m_data->m_stack_size = stack_size;
                 t->m_data->m_priority   = priority;
@@ -51,11 +53,35 @@ namespace ncore
         t->join();
     }
 
-    thread_t* threading_t::current() { return nullptr; }
+    void threading_t::sleep(u32 ms)
+    {
+        if (ms > 0)
+        {
+            struct timespec ts;
+            ts.tv_sec  = ms / 1000;
+            ts.tv_nsec = (ms % 1000) * 1000000; // Convert milliseconds to nanoseconds
+            nanosleep(&ts, nullptr);
+        }
+    }
 
-    void threading_t::sleep(u32 ms) {}
-    void threading_t::yield() {}
-    void threading_t::exit() {}
+    void threading_t::yield()
+    {
+        // Yield the processor to allow other threads to run
+        sched_yield();
+    }
+
+    void threading_t::quit()
+    {
+        thread_data_t* d = thread_data_t::current();
+        if (d)
+        {
+            thread_fn_t* f = d->m_functor;
+            if (f)
+            {
+                f->quit();
+            }
+        }
+    }
 
     void threading_t::init_thread_priority(u32* map)
     {

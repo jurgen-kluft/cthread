@@ -35,7 +35,6 @@ namespace ncore
         friend class threading_t;
 
         s32  create(); // return any negative value if failed
-        void destroy();
 
         thread_t()
             : m_data(nullptr)
