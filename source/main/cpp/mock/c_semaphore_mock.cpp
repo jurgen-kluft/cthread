@@ -9,37 +9,26 @@
 
 namespace ncore
 {
-    bool sema_t::init(sema_data_t* data, s32 n, s32 max)
+    namespace nthread
     {
-        m_data = data;
-        ASSERT(n >= 0 && max > 0 && n <= max);
-        m_data->_sema = 1;
-        if (!m_data->_sema)
+        bool sema_t::init(sema_data_t* data, s32 n, s32 max)
         {
-            // cannot create semaphore
-            return false;
+            m_data = data;
+            ASSERT(n >= 0 && max > 0 && n <= max);
+            m_data->_sema = 1;
+            if (!m_data->_sema)
+            {
+                // cannot create semaphore
+                return false;
+            }
+            return true;
         }
-        return true;
-    }
 
-    void sema_t::release()
-    {
-        threading_t::instance()->destroy(this);
-    }
-
-    void sema_t::signal()
-    {
-    }
-
-    void sema_t::wait()
-    {
-    }
-
-    bool sema_t::try_wait(u32 milliseconds)
-    {
-        return true;
-    }
-
+        void sema_t::release() { threading_t::instance()->destroy(this); }
+        void sema_t::signal() {}
+        void sema_t::wait() {}
+        bool sema_t::try_wait(u32 milliseconds) { return true; }
+    } // namespace nthread
 } // namespace ncore
 
 #endif

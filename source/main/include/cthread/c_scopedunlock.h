@@ -7,30 +7,32 @@
 
 namespace ncore
 {
-    // A class that simplifies thread synchronization with a mutex.
-    // The constructor accepts a mutex and unlocks it.
-    // The destructor locks the mutex.
-    template <class M> class unlock_t
+    namespace nthread
     {
-    public:
-        inline unlock_t(M* mutex, bool unlockNow = true)
-            : _mutex(mutex)
+        // A class that simplifies thread synchronization with a mutex.
+        // The constructor accepts a mutex and unlocks it.
+        // The destructor locks the mutex.
+        template <class M> class unlock_t
         {
-            if (unlockNow)
-                _mutex->unlock();
-        }
+        public:
+            inline unlock_t(M* mutex, bool unlockNow = true)
+                : _mutex(mutex)
+            {
+                if (unlockNow)
+                    _mutex->unlock();
+            }
 
-        inline ~unlock_t() { _mutex->lock(); }
+            inline ~unlock_t() { _mutex->lock(); }
 
-    private:
-        M* _mutex;
+        private:
+            M* _mutex;
 
-        unlock_t();
-        unlock_t(const unlock_t&);
+            unlock_t();
+            unlock_t(const unlock_t&);
 
-        unlock_t& operator=(const unlock_t&);
-    };
-
+            unlock_t& operator=(const unlock_t&);
+        };
+    } // namespace nthread
 } // namespace ncore
 
 #endif // __CMTHREAD_SCOPEDUNLOCK_H__

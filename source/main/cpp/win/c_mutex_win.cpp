@@ -9,27 +9,29 @@
 
 namespace ncore
 {
-    bool mutex_t::init(mutex_data_t* data)
+    namespace nthread
     {
-        m_data = data;
+        bool mutex_t::init(mutex_data_t* data)
+        {
+            m_data = data;
 
-        // the func has a boolean return value under WInnNt/2000/XP but not on Win98
-        // the return only checks if the input address of &_cs was valid, so it is
-        // safe to omit it.
-        InitializeCriticalSectionAndSpinCount((CRITICAL_SECTION*)&m_data->_cs, 4000);
-        return true;
-    }
+            // the func has a boolean return value under WInnNt/2000/XP but not on Win98
+            // the return only checks if the input address of &_cs was valid, so it is
+            // safe to omit it.
+            InitializeCriticalSectionAndSpinCount((CRITICAL_SECTION*)&m_data->_cs, 4000);
+            return true;
+        }
 
-    void mutex_t::release()
-    {
-        DeleteCriticalSection((CRITICAL_SECTION*)&m_data->_cs);
-        threading_t::instance()->destroy(this);
-    }
-    
-    void mutex_t::lock() { EnterCriticalSection((CRITICAL_SECTION*)&m_data->_cs); }
-    bool mutex_t::tryLock() { return TryEnterCriticalSection((CRITICAL_SECTION*)&m_data->_cs) != 0; }
-    void mutex_t::unlock() { LeaveCriticalSection((CRITICAL_SECTION*)&m_data->_cs); }
+        void mutex_t::release()
+        {
+            DeleteCriticalSection((CRITICAL_SECTION*)&m_data->_cs);
+            threading_t::instance()->destroy(this);
+        }
 
+        void mutex_t::lock() { EnterCriticalSection((CRITICAL_SECTION*)&m_data->_cs); }
+        bool mutex_t::tryLock() { return TryEnterCriticalSection((CRITICAL_SECTION*)&m_data->_cs) != 0; }
+        void mutex_t::unlock() { LeaveCriticalSection((CRITICAL_SECTION*)&m_data->_cs); }
+    } // namespace nthread
 } // namespace ncore
 
 #endif
