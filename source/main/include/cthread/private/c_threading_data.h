@@ -20,7 +20,7 @@ namespace ncore
         template <typename T> class objects_array_t
         {
         public:
-            array_pool_t<T> m_pool;
+            fixed_pool_t<T> m_pool;
             inline T*       allocate() { return m_pool.allocate(); }
             inline void     deallocate(T* object) { m_pool.deallocate(object); }
             inline u32      ptr2idx(T const* object) const { return m_pool.obj2idx(object); }
