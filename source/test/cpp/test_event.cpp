@@ -11,19 +11,20 @@
 #include "cunittest/cunittest.h"
 
 using namespace ncore;
+using namespace ncore::nthread;
 using ncore::datetime_t;
 
 namespace
 {
-    class TestEvent : public ncore::thread_fn_t
+    class TestEvent : public ncore::nthread::thread_fn_t
     {
     public:
-		TestEvent(ncore::event_t* data)
+		TestEvent(ncore::nthread::event_t* data)
 		{
 			testEvent = data;
 		}
 
-        void start(thread_t* t, thread_data_t* d)
+        void start(nthread::thread_t* t, nthread::thread_data_t* d)
         {
 
         }
@@ -47,7 +48,7 @@ namespace
         const datetime_t& timestamp() const { return _timestamp; }
 
     private:
-        ncore::event_t*   testEvent;
+        ncore::nthread::event_t*   testEvent;
         ncore::datetime_t _timestamp;
     };
 } // namespace

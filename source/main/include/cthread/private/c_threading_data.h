@@ -6,6 +6,7 @@
 #endif
 
 #include "cbase/c_allocator.h"
+#include "cbase/c_allocator_pool.h"
 
 #include "cthread/c_thread.h"
 #include "cthread/c_mutex.h"
@@ -20,27 +21,12 @@ namespace ncore
         {
         public:
             array_pool_t<T> m_pool;
-
-            inline T* allocate()
-            {
-                fsa_t* alloc = &m_pool;
-                return alloc->allocate<T>();
-            }
-            inline void deallocate(T* object) { m_pool.deallocate(object); }
-            inline u32  ptr2idx(T const* object) const { return m_pool.obj2idx(object); }
-            inline T*   idx2ptr(u32 idx) const { return m_pool.idx2obj(idx); }
-
-            inline void setup(alloc_t* allocator, u32 capacity)
-            {
-                T* data = g_allocate_array_and_clear<T>(allocator, capacity);
-                m_pool.setup(data, capacity);
-            }
-
-            inline void teardown(alloc_t* allocator)
-            {
-                allocator->deallocate(m_pool.m_data);
-                m_pool.m_data = nullptr;
-            }
+            inline T*       allocate() { return m_pool.allocate(); }
+            inline void     deallocate(T* object) { m_pool.deallocate(object); }
+            inline u32      ptr2idx(T const* object) const { return m_pool.obj2idx(object); }
+            inline T*       idx2ptr(u32 idx) const { return m_pool.idx2obj(idx); }
+            inline void     setup(alloc_t* allocator, u32 capacity) { m_pool.setup(allocator, capacity); }
+            inline void     teardown(alloc_t* allocator) { m_pool.teardown(allocator); }
         };
 
         struct threading_data_t

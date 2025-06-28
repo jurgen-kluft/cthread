@@ -10,10 +10,11 @@
 namespace ncore
 {
     class thread_functor;
-    struct thread_data_t;
 
     namespace nthread
     {
+        struct thread_data_t;
+
         class thread_t
         {
         public:

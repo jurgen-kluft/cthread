@@ -14,15 +14,15 @@
 #include "cunittest/cunittest.h"
 
 using ncore::alloc_t;
-using ncore::thread_t;
-using ncore::thread_data_t;
-using ncore::threading_t;
-using ncore::event_t;
+using ncore::nthread::thread_t;
+using ncore::nthread::thread_data_t;
+using ncore::nthread::threading_t;
+using ncore::nthread::event_t;
 using ncore::datetime_t;
 using ncore::timespan_t;
 using ncore::s32;
 
-class MyRunnable : public ncore::thread_fn_t
+class MyRunnable : public ncore::nthread::thread_fn_t
 {
 public:
     MyRunnable(event_t* e)

@@ -9,12 +9,12 @@
 
 #include "cunittest/cunittest.h"
 
-using ncore::thread_t;
-using ncore::thread_data_t;
-using ncore::threading_t;
-using ncore::sema_t;
+using ncore::nthread::thread_t;
+using ncore::nthread::thread_data_t;
+using ncore::nthread::threading_t;
+using ncore::nthread::sema_t;
 
-class SemaRunnable : public ncore::thread_fn_t
+class SemaRunnable : public ncore::nthread::thread_fn_t
 {
 public:
     SemaRunnable(int n, int max)

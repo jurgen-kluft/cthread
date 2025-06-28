@@ -11,6 +11,7 @@
 #include "cunittest/cunittest.h"
 
 using namespace ncore;
+using namespace ncore::nthread;
 
 namespace
 {
@@ -107,7 +108,7 @@ UNITTEST_SUITE_BEGIN(mutex)
 
             mutex_t*     testMutex = threading_t::instance()->create_mutex();
 			testMutex->lock();
-			TestLock* tl = Allocator->construct<TestLock>(testMutex);
+			TestLock* tl = new (Allocator) TestLock(testMutex);
 			thread_t* thr1 = threading_t::instance()->create_thread("test", tl, thread_t::default_priority(), thread_t::default_stacksize());
 			thr1->start();
 			datetime_t now = datetime_t::sNow();
@@ -117,7 +118,7 @@ UNITTEST_SUITE_BEGIN(mutex)
 			CHECK_TRUE (tl->timestamp() >= now);
 			threading_t::instance()->destroy(thr1);
 			threading_t::instance()->destroy(testMutex);
-			Allocator->destruct(tl);
+			g_destruct(Allocator, tl);
 
             threading_t::destroy(threading);
         }
@@ -144,7 +145,7 @@ UNITTEST_SUITE_BEGIN(mutex)
             threading_t* threading = threading_t::create(Allocator);
             mutex_t*     testMutex = threading_t::instance()->create_mutex();
 
-			TestTryLock* tl1 = Allocator->construct<TestTryLock>(testMutex);
+			TestTryLock* tl1 = new (Allocator) TestTryLock(testMutex);
 			thread_t* thr1 = threading_t::instance()->create_thread("test1", tl1, thread_t::default_priority(), thread_t::default_stacksize());
 			thr1->start();
 			threading_t::instance()->join(thr1);
@@ -152,7 +153,7 @@ UNITTEST_SUITE_BEGIN(mutex)
 
 			testMutex->lock();
 
-			TestTryLock* tl2 = Allocator->construct<TestTryLock>(testMutex);
+			TestTryLock* tl2 = new (Allocator) TestTryLock(testMutex);
 			thread_t* thr2 = threading_t::instance()->create_thread("test2", tl2, thread_t::default_priority(), thread_t::default_stacksize());
 			thr2->start();
 
@@ -161,8 +162,8 @@ UNITTEST_SUITE_BEGIN(mutex)
 			testMutex->unlock();
 			CHECK_TRUE (!tl2->locked());
 
-			Allocator->destruct(tl2);
-			Allocator->destruct(tl1);
+			g_destruct(Allocator, tl2);
+			g_destruct(Allocator, tl1);
 
 			threading_t::instance()->destroy(testMutex);
 

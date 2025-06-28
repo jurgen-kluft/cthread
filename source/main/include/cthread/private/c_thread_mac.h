@@ -1,5 +1,5 @@
-#ifndef __CMTHREAD_THREAD_OSX_H__
-#define __CMTHREAD_THREAD_OSX_H__
+#ifndef __CMTHREAD_THREAD_MACOSX_H__
+#define __CMTHREAD_THREAD_MACOSX_H__
 #include "ccore/c_target.h"
 #include "cbase/c_context.h"
 
@@ -21,7 +21,7 @@ namespace ncore
         {
             pthread_t         m_pthread;
             thread_t*         m_thread;
-            thread_context_t* m_context;
+            context_t         m_context;
             thread_idx_t      m_idx;
             thread_id_t       m_tid;
             thread_state_t    m_state;
@@ -54,4 +54,4 @@ namespace ncore
     } // namespace nthread
 } // namespace ncore
 
-#endif // __CMTHREAD_THREAD_OSX_H__
+#endif // __CMTHREAD_THREAD_MACOSX_H__
