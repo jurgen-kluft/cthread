@@ -15,15 +15,18 @@ namespace ncore
 
         struct thread_data_t
         {
-            hnd_t             m_handle;
-            thread_idx_t      m_idx;
-            thread_id_t       m_tid;
-            thread_state_t    m_state;
-            thread_priority_t m_priority;
-            u32               m_stack_size;
-            thread_fn_t*      m_functor;
-            void*             m_arg;
-            char              m_name[64];
+            hnd_t      m_handle;
+            index_t    m_idx;
+            id_t       m_tid;
+            state_t    m_state;
+            priority_t m_priority;
+            u32        m_stack_size;
+            start_fn   m_start_fn;
+            run_fn     m_run_fn;
+            exit_fn    m_exit_fn;
+            quit_fn    m_quit_fn;
+            void*      m_arg;
+            char       m_name[64];
         };
 
         struct event_data_t

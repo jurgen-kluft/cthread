@@ -24,19 +24,19 @@ namespace ncore
         enum e_config
         {
             DEFAULT_STACKSIZE = 256 * 1024,
-            DEFAULT_PRIORITY  = thread_priority_t::NORMAL
+            DEFAULT_PRIORITY  = npriority::NORMAL
         };
 
-        thread_id_t       thread_t::get_tid() const { return m_data->m_tid; }
-        thread_idx_t      thread_t::get_idx() const { return m_data->m_idx; }
-        const char*       thread_t::get_name() const { return m_data->m_name; }
-        thread_priority_t thread_t::get_priority() const { return m_data->m_priority; }
-        thread_state_t    thread_t::get_state() const { return m_data->m_state; }
-        thread_data_t*    thread_t::get_data() const { return m_data; }
-        bool              thread_t::is_running() const { return m_data->m_state == thread_state_t::RUNNING; }
-        u32               thread_t::get_stacksize() const { return m_data->m_stack_size; }
+        id_t        thread_get_tid(thread_t* t) { return t->m_data->m_tid; }
+        index_t     thread_get_idx(thread_t* t) { return t->m_data->m_idx; }
+        const char* thread_get_name(thread_t* t) { return t->m_data->m_name; }
+        priority_t  thread_get_priority(thread_t* t) { return t->m_data->m_priority; }
+        state_t     thread_get_state(thread_t* t) { return t->m_data->m_state; }
+        system_t*   thread_get_system(thread_t* t) { return s_system; }
+        bool        thread_is_running(thread_t* t) { return t->m_data->m_state == nstate::RUNNING; }
+        u32         thread_get_stacksize(thread_t* t) { return t->m_data->m_stack_size; }
 
-        u32               thread_t::default_stacksize() { return e_config::DEFAULT_STACKSIZE; }
-        thread_priority_t thread_t::default_priority() { return e_config::DEFAULT_PRIORITY; }
+        u32        thread_default_stacksize() { return e_config::DEFAULT_STACKSIZE; }
+        priority_t thread_default_priority() { return e_config::DEFAULT_PRIORITY; }
     } // namespace nthread
 } // namespace ncore

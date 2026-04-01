@@ -15,17 +15,16 @@ namespace ncore
     {
         // Semaphore (Apple iOS and OSX)
 
-        bool sema_t::init(sema_data_t* data, s32 n, s32 max)
+        bool sema_data_init(sema_data_t* data, s32 n, s32 max)
         {
             ASSERT(n >= 0 && max > 0 && n <= max);
-            semaphore_create(mach_task_self(), &m_data->_sema, SYNC_POLICY_FIFO, n);
+            semaphore_create(mach_task_self(), &data->_sema, SYNC_POLICY_FIFO, n);
             return true;
         }
 
-        void sema_t::release()
+        void sema_data_release(sema_data_t* data)
         {
-            semaphore_destroy(mach_task_self(), m_data->_sema);
-            threading_t::instance()->destroy(this);
+            semaphore_destroy(mach_task_self(), data->_sema);
         }
 
         void sema_t::signal() { semaphore_signal(m_data->_sema); }

@@ -27,14 +27,11 @@ namespace ncore
             void reset();   // Resets the event to unsignalled state.
             void release(); // Releases the event object back to threading
 
-        protected:
-            friend class threading_t;
             event_t()
                 : m_data(nullptr)
             {
             }
 
-            bool          init(event_data_t* data, bool autoReset = true);
             event_data_t* m_data;
 
         private:

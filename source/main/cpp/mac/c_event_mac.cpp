@@ -82,18 +82,16 @@ namespace ncore
 
         // -------------------------------------------------------------------------------
         // Event implementation using lightweight semaphore
-        bool event_t::init(event_data_t* data, bool autoReset)
+        bool event_data_init(event_data_t* data, bool autoReset)
         {
-            m_data = data;
-            s_lightweight_sema_init(m_data);
-            m_data->m_status = 0;
+            s_lightweight_sema_init(data);
+            data->m_status = 0;
             return true;
         }
 
-        void event_t::release()
+        void event_data_release(event_data_t* data)
         {
-            s_lightweight_sema_destroy(m_data);
-            threading_t::instance()->destroy(this);
+            s_lightweight_sema_destroy(data);
         }
 
         void event_t::set()

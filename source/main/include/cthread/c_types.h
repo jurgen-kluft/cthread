@@ -9,50 +9,40 @@ namespace ncore
 {
     namespace nthread
     {
-        typedef s32 thread_idx_t;
-        typedef u64 thread_id_t;
+        typedef s32 index_t;
+        typedef u64 id_t;
 
-        class thread_state_t
+        struct system_t;
+
+        typedef void (*start_fn)(thread_t* t);
+        typedef void (*run_fn)(thread_t* t);
+        typedef void (*exit_fn)(thread_t* t);
+        typedef void (*quit_fn)(thread_t* t);
+
+        struct thread_data_t;
+        struct thread_t
         {
-        public:
+            start_fn       m_start_fn;
+            run_fn         m_run_fn;
+            exit_fn        m_exit_fn;
+            quit_fn        m_quit_fn;
+            thread_data_t* m_data;
+        };
+
+        typedef s8 state_t;
+        namespace nstate
+        {
             enum
             {
                 CREATED = 0,
                 RUNNING = 1,
                 STOPPED = 3
             };
+        }; // namespace nstate
 
-            inline thread_state_t()
-                : state(CREATED)
-            {
-            }
-
-            inline thread_state_t(s32 s)
-                : state(s)
-            {
-            }
-
-            bool operator==(const thread_state_t& s) const { return state == s.state; }
-            bool operator!=(const thread_state_t& s) const { return state != s.state; }
-            bool operator<(const thread_state_t& s) const { return state < s.state; }
-            bool operator<=(const thread_state_t& s) const { return state <= s.state; }
-            bool operator>(const thread_state_t& s) const { return state > s.state; }
-            bool operator>=(const thread_state_t& s) const { return state >= s.state; }
-
-            s32 state;
-        };
-
-        class thread_priority_t
+        typedef s8 priority_t;
+        namespace npriority
         {
-        public:
-            inline thread_priority_t()
-                : prio(NORMAL)
-            {
-            }
-            inline thread_priority_t(s32 p)
-                : prio(p)
-            {
-            }
             enum
             {
                 IDLE         = 0,
@@ -64,16 +54,8 @@ namespace ncore
                 CRITICAL     = 6,
                 COUNT        = 7
             };
+        }; // namespace npriority
 
-            bool operator==(const thread_priority_t& p) const { return prio == p.prio; }
-            bool operator!=(const thread_priority_t& p) const { return prio != p.prio; }
-            bool operator<(const thread_priority_t& p) const { return prio < p.prio; }
-            bool operator<=(const thread_priority_t& p) const { return prio <= p.prio; }
-            bool operator>(const thread_priority_t& p) const { return prio > p.prio; }
-            bool operator>=(const thread_priority_t& p) const { return prio >= p.prio; }
-
-            s32 prio;
-        };
     } // namespace nthread
 } // namespace ncore
 

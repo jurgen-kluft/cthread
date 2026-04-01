@@ -48,20 +48,10 @@ namespace ncore
             void release();
             // Releases the semaphore object back to threading
 
-        protected:
-            friend class threading_t;
             sema_t()
                 : m_data(nullptr)
             {
             }
-
-            // Initializes the semaphore. The current value of the semaphore is given in n.
-            // The maximum value of the semaphore is given in max.
-            // If only n is given, it must be greater than zero.
-            // If both n and max are given, max must be greater than zero, n must be greater
-            // than or equal to zero and less than or equal to max.
-            bool init(sema_data_t* data, s32 n);
-            bool init(sema_data_t* data, s32 n, s32 max);
 
             sema_data_t* m_data;
 
@@ -69,6 +59,14 @@ namespace ncore
             sema_t(const sema_t&);
             sema_t& operator=(const sema_t&) { return *this; }
         };
+
+        // Initializes the semaphore. The current value of the semaphore is given in n.
+        // The maximum value of the semaphore is given in max.
+        // If only n is given, it must be greater than zero.
+        // If both n and max are given, max must be greater than zero, n must be greater
+        // than or equal to zero and less than or equal to max.
+        bool sema_data_init(sema_data_t* data, s32 n);
+        bool sema_data_init(sema_data_t* data, s32 n, s32 max);
     } // namespace nthread
 } // namespace ncore
 

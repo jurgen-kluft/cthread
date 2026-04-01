@@ -19,17 +19,20 @@ namespace ncore
     {
         struct thread_data_t
         {
-            pthread_t         m_pthread;
-            thread_t*         m_thread;
-            context_t         m_context;
-            thread_idx_t      m_idx;
-            thread_id_t       m_tid;
-            thread_state_t    m_state;
-            thread_priority_t m_priority;
-            u32               m_stack_size; // TODO Is this necessary?
-            thread_fn_t*      m_functor;
-            void*             m_arg;
-            char              m_name[64];
+            pthread_t  m_pthread;
+            thread_t*  m_thread;
+            context_t  m_context;
+            index_t    m_idx;
+            id_t       m_tid;
+            state_t    m_state;
+            priority_t m_priority;
+            u32        m_stack_size; // TODO Is this necessary?
+            start_fn   m_start_fn;
+            run_fn     m_run_fn;
+            exit_fn    m_exit_fn;
+            quit_fn    m_quit_fn;
+            void*      m_arg;
+            char       m_name[64];
 
             static thread_data_t* current();
         };

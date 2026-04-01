@@ -38,13 +38,6 @@ namespace ncore
             void release();
             // Releases the mutex object back to threading
 
-        protected:
-            friend class threading_t;
-            mutex_t()
-                : m_data(nullptr)
-            {
-            }
-            bool          init(mutex_data_t* data);
             mutex_data_t* m_data;
 
         private:

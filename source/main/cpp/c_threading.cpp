@@ -25,102 +25,104 @@ namespace ncore
 {
     namespace nthread
     {
-        threading_t* threading_t::create(alloc_t* allocator, u32 max_threads, u32 max_mutex, u32 max_event, u32 max_semaphore)
+        system_t* create_system(alloc_t* allocator, u32 max_threads, u32 max_mutex, u32 max_event, u32 max_semaphore)
         {
-            void*        mem       = g_allocate<threading_t>(allocator);
-            threading_t* threading = new (mem) threading_t();
-            threading->m_data      = nullptr;
+            void*     mem = g_allocate<system_t>(allocator);
+            system_t* sys = new (mem) system_t();
 
-            if (instance() == threading)
-                set_instance(nullptr);
+            if (s_system == nullptr)
+                s_system = sys;
 
-            set_instance(threading);
-            threading->m_data = threading_data_t::create(allocator, max_threads, max_mutex, max_event, max_semaphore);
+            system_t::setup(sys, allocator, max_threads, max_mutex, max_event, max_semaphore);
 
             // Initialize data instance
-            init_thread_priority(threading->m_data->m_thread_priority_map);
+            init_thread_priority(sys->m_thread_priority_map);
 
-            return threading;
+            return sys;
         }
 
-        void threading_t::destroy(threading_t*& threading)
+        void destroy_system(system_t*& sys)
         {
-            alloc_t* allocator = threading->m_data->m_allocator;
-            threading_data_t::destroy(threading->m_data);
-            threading->m_data = nullptr;
-            threading->~threading_t();
-            allocator->deallocate(threading);
+            alloc_t* allocator = sys->m_allocator;
+            system_t::teardown(sys);
+            allocator->deallocate(sys);
+            sys = nullptr;
         }
 
-        static threading_t* s_instance = nullptr;
-        void                threading_t::set_instance(threading_t* instance) { s_instance = instance; }
-        threading_t*        threading_t::instance() { return s_instance; }
+        system_t* s_system = nullptr;
 
-        mutex_t* threading_t::create_mutex()
+        mutex_t* create_mutex()
         {
-            mutex_data_t* data = m_data->m_mutexes_data_pool.allocate();
+            mutex_data_t* data = s_system->m_mutexes_data_pool.allocate();
             if (data)
             {
-                mutex_t* m = m_data->m_mutexes_pool.allocate();
+                mutex_t* m = s_system->m_mutexes_pool.allocate();
                 if (m)
                 {
-                    m->init(data);
+                    mutex_data_init(data);
                     return m;
                 }
             }
             return nullptr;
         }
 
-        event_t* threading_t::create_event(const char* name, bool autoReset)
+        event_t* create_event(const char* name, bool autoReset)
         {
-            event_data_t* data = m_data->m_events_data_pool.allocate();
+            system_t*     sys  = s_system;
+            event_data_t* data = sys->m_events_data_pool.allocate();
             if (data)
             {
-                event_t* e = m_data->m_events_pool.allocate();
+                event_t* e = sys->m_events_pool.allocate();
                 if (e)
                 {
-                    e->init(data, autoReset);
+                    event_data_init(data, autoReset);
                     return e;
                 }
-                m_data->m_events_data_pool.deallocate(data);
+                sys->m_events_data_pool.deallocate(data);
             }
             return nullptr;
         }
 
-        sema_t* threading_t::create_sema(s32 initial_count, s32 max_count)
+        sema_t* create_sema(s32 initial_count, s32 max_count)
         {
-            sema_data_t* data = m_data->m_semaphores_data_pool.allocate();
+            system_t*    sys  = s_system;
+            sema_data_t* data = sys->m_semaphores_data_pool.allocate();
             if (data)
             {
-                sema_t* s = m_data->m_semaphores_pool.allocate();
+                sema_t* s = sys->m_semaphores_pool.allocate();
                 if (s)
                 {
-                    s->init(data, initial_count, max_count);
+                    sema_data_init(data, initial_count, max_count);
                     return s;
                 }
+                sys->m_semaphores_data_pool.deallocate(data);
             }
             return nullptr;
         }
 
-        void threading_t::destroy(thread_t* t)
+        void destroy(thread_t* t)
         {
-            m_data->m_threads_data_pool.deallocate(t->m_data);
-            m_data->m_threads_pool.deallocate(t);
+            system_t* sys = s_system;
+            sys->m_threads_data_pool.deallocate(t->m_data);
+            sys->m_threads_pool.deallocate(t);
         }
-        void threading_t::destroy(mutex_t* m)
+        void destroy(mutex_t* m)
         {
-            m_data->m_mutexes_data_pool.deallocate(m->m_data);
-            m_data->m_mutexes_pool.deallocate(m);
+            system_t* sys = s_system;
+            sys->m_mutexes_data_pool.deallocate(m->m_data);
+            sys->m_mutexes_pool.deallocate(m);
         }
-        void threading_t::destroy(event_t* e)
+        void destroy(event_t* e)
         {
-            m_data->m_events_data_pool.deallocate(e->m_data);
-            m_data->m_events_pool.deallocate(e);
+            system_t* sys = s_system;
+            sys->m_events_data_pool.deallocate(e->m_data);
+            sys->m_events_pool.deallocate(e);
         }
-        void threading_t::destroy(sema_t* s)
+        void destroy(sema_t* s)
         {
-            m_data->m_semaphores_data_pool.deallocate(s->m_data);
-            m_data->m_semaphores_pool.deallocate(s);
+            system_t* sys = s_system;
+            sys->m_semaphores_data_pool.deallocate(s->m_data);
+            sys->m_semaphores_pool.deallocate(s);
         }
     } // namespace nthread
 } // namespace ncore

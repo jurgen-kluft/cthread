@@ -1,5 +1,5 @@
-#ifndef __CTHREAD_THREADING_DATA_H__
-#define __CTHREAD_THREADING_DATA_H__
+#ifndef __CTHREAD_THREADING_SYSTEM_H__
+#define __CTHREAD_THREADING_SYSTEM_H__
 #include "ccore/c_target.h"
 #ifdef USE_PRAGMA_ONCE
 #    pragma once
@@ -17,37 +17,30 @@ namespace ncore
 {
     namespace nthread
     {
-        template <typename T> class objects_array_t
+        bool mutex_data_init(mutex_data_t* data);
+        void mutex_data_release(mutex_data_t* data);
+
+        bool event_data_init(event_data_t* data, bool autoReset);
+        void event_data_release(event_data_t* data);
+
+        bool sema_data_init(sema_data_t* data, s32 n, s32 max);
+        void sema_data_release(sema_data_t* data);
+
+        struct system_t
         {
-        public:
-            fixed_pool_t<T> m_pool;
-            inline T*       allocate() { return m_pool.allocate(); }
-            inline void     deallocate(T* object) { m_pool.deallocate(object); }
-            inline u32      ptr2idx(T const* object) const { return m_pool.obj2idx(object); }
-            inline T*       idx2ptr(u32 idx) const { return m_pool.idx2obj(idx); }
-            inline void     setup(alloc_t* allocator, u32 capacity) { m_pool.setup(allocator, capacity); }
-            inline void     teardown(alloc_t* allocator) { m_pool.teardown(allocator); }
-        };
+            static void setup(system_t* system, alloc_t* allocator, u32 max_threads, u32 max_mutexes, u32 max_events, u32 max_semaphores);
+            static void teardown(system_t* system);
 
-        struct threading_data_t
-        {
-            threading_data_t();
-
-            static threading_data_t* create(alloc_t* allocator, u32 max_threads, u32 max_mutexes, u32 max_events, u32 max_semaphores);
-            static void              destroy(threading_data_t*& data);
-
-            alloc_t*                       m_allocator;
-            u32                            m_thread_priority_map[thread_priority_t::COUNT];
-            objects_array_t<thread_t>      m_threads_pool;
-            objects_array_t<thread_data_t> m_threads_data_pool;
-            objects_array_t<event_t>       m_events_pool;
-            objects_array_t<event_data_t>  m_events_data_pool;
-            objects_array_t<mutex_t>       m_mutexes_pool;
-            objects_array_t<mutex_data_t>  m_mutexes_data_pool;
-            objects_array_t<sema_t>        m_semaphores_pool;
-            objects_array_t<sema_data_t>   m_semaphores_data_pool;
-
-            DCORE_CLASS_PLACEMENT_NEW_DELETE
+            alloc_t*                    m_allocator;
+            u32                         m_thread_priority_map[npriority::COUNT];
+            fixed_pool_t<thread_t>      m_threads_pool;
+            fixed_pool_t<thread_data_t> m_threads_data_pool;
+            fixed_pool_t<event_t>       m_events_pool;
+            fixed_pool_t<event_data_t>  m_events_data_pool;
+            fixed_pool_t<mutex_t>       m_mutexes_pool;
+            fixed_pool_t<mutex_data_t>  m_mutexes_data_pool;
+            fixed_pool_t<sema_t>        m_semaphores_pool;
+            fixed_pool_t<sema_data_t>   m_semaphores_data_pool;
         };
     } // namespace nthread
 } // namespace ncore
