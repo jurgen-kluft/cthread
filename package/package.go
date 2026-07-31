@@ -2,9 +2,9 @@ package cthread
 
 import (
 	cbase "github.com/jurgen-kluft/cbase/package"
-	"github.com/jurgen-kluft/ccode/denv"
 	ctime "github.com/jurgen-kluft/ctime/package"
 	cunittest "github.com/jurgen-kluft/cunittest/package"
+	"github.com/jurgen-kluft/gide/denv"
 )
 
 const (
